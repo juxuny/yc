@@ -1,0 +1,77 @@
+package errors
+
+import (
+	"encoding/json"
+	"github.com/pkg/errors"
+	"reflect"
+	"strconv"
+)
+
+type Error struct {
+	Code int                    `json:"code"`
+	Msg  string                 `json:"msg"`
+	Data map[string]interface{} `json:"data,omitempty"`
+}
+
+func (t Error) WithField(fieldName string, value interface{}) Error {
+	ret := Error{
+		Code: t.Code,
+		Msg:  t.Msg,
+		Data: map[string]interface{}{},
+	}
+	if t.Data != nil {
+		for k, v := range t.Data {
+			ret.Data[k] = v
+		}
+	}
+	ret.Data[fieldName] = value
+	return ret
+}
+
+func (t Error) Error() string {
+	jsonData, _ := json.Marshal(t)
+	return string(jsonData)
+}
+
+func New(code int, msg string) error {
+	return Error{
+		Code: code,
+		Msg:  msg,
+	}
+}
+
+func InitErrorStruct(in interface{}) error {
+	vv := reflect.ValueOf(in)
+	if vv.Kind() != reflect.Ptr {
+		return errors.Errorf("input must be a point of struct")
+	}
+	elem := vv.Elem()
+	tt := elem.Type()
+	for i := 0; i < tt.NumField(); i++ {
+		if tt.Field(i).Type.String() != "errors.Error" {
+			continue
+		}
+		var code int64
+		var msg string
+		var err error
+		tag := tt.Field(i).Tag
+		if v, ok := tag.Lookup("code"); !ok {
+			return errors.Errorf("not found code in tag")
+		} else {
+			code, err = strconv.ParseInt(v, 10, 64)
+			if err != nil {
+				return err
+			}
+		}
+		if v, ok := tag.Lookup("msg"); !ok {
+			return errors.Errorf("not foun msg in tag")
+		} else {
+			msg = v
+		}
+		elem.Field(i).Set(reflect.ValueOf(Error{
+			Code: int(code),
+			Msg:  msg,
+		}))
+	}
+	return nil
+}
