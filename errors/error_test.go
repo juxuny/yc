@@ -5,6 +5,7 @@ import "testing"
 type TestErrorConst struct {
 	Success Error `code:"0" msg:""`
 	System  Error `code:"-1" msg:"system error"`
+	Proto   Error `code:"-1" msg:"proto error"`
 }
 
 func TestInitErrorStruct(t *testing.T) {

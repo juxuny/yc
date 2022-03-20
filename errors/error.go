@@ -41,6 +41,7 @@ func New(code int, msg string) error {
 }
 
 func InitErrorStruct(in interface{}) error {
+	codeSet := make(map[int64]string)
 	vv := reflect.ValueOf(in)
 	if vv.Kind() != reflect.Ptr {
 		return errors.Errorf("input must be a point of struct")
@@ -72,6 +73,11 @@ func InitErrorStruct(in interface{}) error {
 			Code: int(code),
 			Msg:  msg,
 		}))
+		if field, ok := codeSet[code]; ok {
+			return errors.Errorf("fields '%s' and '%s' have duplicated code: %v", field, tt.Field(i).Name, code)
+		} else {
+			codeSet[code] = tt.Field(i).Name
+		}
 	}
 	return nil
 }
