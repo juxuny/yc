@@ -3,8 +3,8 @@ package log
 import (
 	"context"
 	"fmt"
-	"gitlab-dev.52-520.com/library/env"
-	"gitlab-dev.52-520.com/library/trace"
+	"github.com/juxuny/yc/env"
+	"github.com/juxuny/yc/trace"
 	"os"
 	"runtime"
 	"strings"
