@@ -5,7 +5,7 @@ import "testing"
 type TestErrorConst struct {
 	Success Error `code:"0" msg:""`
 	System  Error `code:"-1" msg:"system error"`
-	Proto   Error `code:"-1" msg:"proto error"`
+	Proto   Error `code:"-2" msg:"proto error"`
 }
 
 func TestInitErrorStruct(t *testing.T) {
@@ -23,4 +23,6 @@ func TestInitErrorStruct(t *testing.T) {
 	t.Log(obj.System)
 	t.Log(obj.System.WithField("reqId", "123"))
 	t.Log(obj.System)
+	t.Log(FromError(obj.System.Err()))
+	t.Log(FromError(obj.Success.Err()))
 }

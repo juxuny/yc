@@ -3,6 +3,7 @@ package errors
 import (
 	"encoding/json"
 	"github.com/pkg/errors"
+	"google.golang.org/grpc/status"
 	"reflect"
 	"strconv"
 )
@@ -28,6 +29,13 @@ func (t Error) WithField(fieldName string, value interface{}) Error {
 	return ret
 }
 
+func (t Error) Err() error {
+	if t.Code == 0 {
+		return nil
+	}
+	return t
+}
+
 func (t Error) Error() string {
 	jsonData, _ := json.Marshal(t)
 	return string(jsonData)
@@ -38,6 +46,23 @@ func New(code int, msg string) error {
 		Code: code,
 		Msg:  msg,
 	}
+}
+
+func FromError(err error) (ret Error, ok bool) {
+	if err == nil {
+		return ret, true
+	}
+	s, ok := status.FromError(err)
+	var jsonData string
+	if ok {
+		jsonData = s.Message()
+	} else {
+		jsonData = err.Error()
+	}
+	if err := json.Unmarshal([]byte(jsonData), &ret); err != nil {
+		return ret, false
+	}
+	return ret, true
 }
 
 func InitErrorStruct(in interface{}) error {
