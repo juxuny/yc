@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package user;
+
+option go_package = "./;user";
+
+service User {
+  rpc Call(CallRequest) returns (CallResponse) {}
+  rpc Health(HealthRequest) returns (HealthResponse) {}
+}
+
+message CallRequest {
+  string name = 1;
+}
+
+message CallResponse {
+  string msg = 1;
+  string current_time = 2;
+  reserved 3,4;
+}
+
+
+message HealthRequest {
+
+}
+
+message HealthResponse {
+  string currentTime = 1;
+}
