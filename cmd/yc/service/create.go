@@ -1,22 +1,60 @@
 package service
 
 import (
-	"fmt"
+	"github.com/juxuny/yc/cmd"
+	"github.com/juxuny/yc/utils"
+	"github.com/juxuny/yc/utils/template"
 	"github.com/spf13/cobra"
 	"log"
+	"os"
+	"path"
 )
 
-var createCommand = &cobra.Command{
-	Use: "create",
-	Run: create,
+type CreateCommand struct {
+	Name    string
+	WorkDir string
 }
 
-func create(cmd *cobra.Command, args []string) {
-	fis, err := templateFs.ReadDir("template")
-	if err != nil {
+func (t *CreateCommand) Prepare(cmd *cobra.Command) {
+}
+
+func (t *CreateCommand) InitFlag(cmd *cobra.Command) {
+	cmd.PersistentFlags().StringVarP(&t.Name, "name", "n", "", "service name")
+	cmd.PersistentFlags().StringVarP(&t.WorkDir, "work-dir", "w", "", "working dir")
+}
+
+func (t *CreateCommand) Run() {
+	if t.Name == "" {
+		log.Fatal("missing --name")
+	}
+	if t.WorkDir == "" {
+		if w, err := os.Getwd(); err != nil {
+			log.Fatal(err)
+		} else {
+			t.WorkDir = w
+		}
+	}
+	service := NewServiceEntity(t.Name)
+	serviceDir := path.Join(t.WorkDir, service.ServiceDir)
+	if utils.IsFileOrDirExists(serviceDir) {
+		log.Fatalf("service '%s' is exists", service.ServiceDir)
+	}
+	if err := utils.TouchDir(service.ServiceDir, 0755); err != nil {
 		log.Fatal(err)
 	}
-	for _, item := range fis {
-		fmt.Println(item.Name())
+
+	// generate .proto
+	protoOutputFile := path.Join(t.WorkDir, service.ServiceDir, service.PackageName+".proto")
+	log.Printf("creating proto file: %s", protoOutputFile)
+	if err := template.Run(templateFs, protoFileName, protoOutputFile, service); err != nil {
+		log.Fatal(err)
 	}
+
+	log.Printf("create service finished: %s", service.ServiceDir)
+}
+
+func init() {
+	createCommand := &CreateCommand{}
+	builder := cmd.NewCommandBuilder("create", createCommand)
+	Service.AddCommand(builder.Build())
 }

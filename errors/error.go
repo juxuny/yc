@@ -29,6 +29,13 @@ func (t Error) WithField(fieldName string, value interface{}) Error {
 	return ret
 }
 
+func (t Error) Wrap(err error) Error {
+	if err != nil {
+		return t.WithField("prev", err.Error())
+	}
+	return t
+}
+
 func (t Error) Err() error {
 	if t.Code == 0 {
 		return nil
