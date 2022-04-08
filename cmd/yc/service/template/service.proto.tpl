@@ -8,9 +8,7 @@ service {{ .ServiceStruct }} {
   rpc Health(HealthRequest) returns (HealthResponse) {}
 }
 
-message HealthRequest {
-
-}
+message HealthRequest {}
 
 message HealthResponse {
   string currentTime = 1;

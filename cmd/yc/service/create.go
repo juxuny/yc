@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/juxuny/yc/cmd"
+	"github.com/juxuny/yc/services"
 	"github.com/juxuny/yc/utils"
 	"github.com/juxuny/yc/utils/template"
 	"github.com/spf13/cobra"
@@ -34,7 +35,7 @@ func (t *CreateCommand) Run() {
 			t.WorkDir = w
 		}
 	}
-	service := NewServiceEntity(t.Name)
+	service := services.NewServiceEntity(t.Name)
 	serviceDir := path.Join(t.WorkDir, service.ServiceDir)
 	if utils.IsFileOrDirExists(serviceDir) {
 		log.Fatalf("service '%s' is exists", service.ServiceDir)
@@ -56,5 +57,5 @@ func (t *CreateCommand) Run() {
 func init() {
 	createCommand := &CreateCommand{}
 	builder := cmd.NewCommandBuilder("create", createCommand)
-	Service.AddCommand(builder.Build())
+	Command.AddCommand(builder.Build())
 }

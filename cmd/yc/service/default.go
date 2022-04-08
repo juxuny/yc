@@ -8,6 +8,6 @@ import (
 //go:embed template
 var templateFs embed.FS
 
-var Service = &cobra.Command{
+var Command = &cobra.Command{
 	Use: "service",
 }
