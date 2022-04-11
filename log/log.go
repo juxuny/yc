@@ -1,7 +1,6 @@
 package log
 
 import (
-	"context"
 	"fmt"
 	"github.com/juxuny/yc/env"
 	"github.com/juxuny/yc/trace"
@@ -117,12 +116,6 @@ func (l *RpcLogger) Debug(v ...interface{}) {
 	}
 	message := l.output("DEBUG", v...)
 	fmt.Println(message)
-	if rpcLogger == nil {
-		return
-	}
-	ctx, cancel := context.WithTimeout(context.Background(), rpcLogTimeout)
-	defer cancel()
-	_ = rpcLogger.Add(ctx, l.logPrefix, message)
 }
 
 func (l *RpcLogger) SQL(v ...interface{}) {
@@ -131,12 +124,6 @@ func (l *RpcLogger) SQL(v ...interface{}) {
 	}
 	message := l.output("INFO", v...)
 	fmt.Println(message)
-	if rpcLogger == nil {
-		return
-	}
-	ctx, cancel := context.WithTimeout(context.Background(), rpcLogTimeout)
-	defer cancel()
-	_ = rpcLogger.Add(ctx, l.logPrefix, message)
 }
 
 func (l *RpcLogger) Consuming(v ...interface{}) {
@@ -145,23 +132,11 @@ func (l *RpcLogger) Consuming(v ...interface{}) {
 	}
 	message := l.output("INFO", v...)
 	fmt.Println(message)
-	if rpcLogger == nil {
-		return
-	}
-	ctx, cancel := context.WithTimeout(context.Background(), rpcLogTimeout)
-	defer cancel()
-	_ = rpcLogger.Add(ctx, l.logPrefix, message)
 }
 
 func (l *RpcLogger) Output(v ...interface{}) {
 	message := l.output("INFO", v...)
 	fmt.Println(message)
-	if rpcLogger == nil {
-		return
-	}
-	ctx, cancel := context.WithTimeout(context.Background(), rpcLogTimeout)
-	defer cancel()
-	_ = rpcLogger.Add(ctx, l.logPrefix, message)
 }
 
 func (l *RpcLogger) Debugf(format string, v ...interface{}) {
@@ -170,12 +145,6 @@ func (l *RpcLogger) Debugf(format string, v ...interface{}) {
 	}
 	message := l.output("DEBUG", fmt.Sprintf(format, v...))
 	fmt.Println(message)
-	if rpcLogger == nil {
-		return
-	}
-	ctx, cancel := context.WithTimeout(context.Background(), rpcLogTimeout)
-	defer cancel()
-	_ = rpcLogger.Add(ctx, l.logPrefix, message)
 }
 
 func (l *RpcLogger) Info(v ...interface{}) {
@@ -184,12 +153,6 @@ func (l *RpcLogger) Info(v ...interface{}) {
 	}
 	message := l.output("INFO", v...)
 	fmt.Println(message)
-	if rpcLogger == nil {
-		return
-	}
-	ctx, cancel := context.WithTimeout(context.Background(), rpcLogTimeout)
-	defer cancel()
-	_ = rpcLogger.Add(ctx, l.logPrefix, message)
 }
 
 func (l *RpcLogger) Infof(format string, v ...interface{}) {
@@ -198,12 +161,6 @@ func (l *RpcLogger) Infof(format string, v ...interface{}) {
 	}
 	message := l.output("INFO", fmt.Sprintf(format, v...))
 	fmt.Println(message)
-	if rpcLogger == nil {
-		return
-	}
-	ctx, cancel := context.WithTimeout(context.Background(), rpcLogTimeout)
-	defer cancel()
-	_ = rpcLogger.Add(ctx, l.logPrefix, message)
 }
 
 func (l *RpcLogger) Print(v ...interface{}) {
@@ -212,12 +169,6 @@ func (l *RpcLogger) Print(v ...interface{}) {
 	}
 	message := l.output("INFO", v...)
 	fmt.Println(message)
-	if rpcLogger == nil {
-		return
-	}
-	ctx, cancel := context.WithTimeout(context.Background(), rpcLogTimeout)
-	defer cancel()
-	_ = rpcLogger.Add(ctx, l.logPrefix, message)
 }
 
 func (l *RpcLogger) Println(v ...interface{}) {
@@ -226,12 +177,6 @@ func (l *RpcLogger) Println(v ...interface{}) {
 	}
 	message := l.output("INFO", v...)
 	fmt.Println(message)
-	if rpcLogger == nil {
-		return
-	}
-	ctx, cancel := context.WithTimeout(context.Background(), rpcLogTimeout)
-	defer cancel()
-	_ = rpcLogger.Add(ctx, l.logPrefix, message)
 }
 
 func (l *RpcLogger) Printf(format string, v ...interface{}) {
@@ -240,12 +185,6 @@ func (l *RpcLogger) Printf(format string, v ...interface{}) {
 	}
 	message := l.output("INFO", fmt.Sprintf(format, v...))
 	fmt.Println(message)
-	if rpcLogger == nil {
-		return
-	}
-	ctx, cancel := context.WithTimeout(context.Background(), rpcLogTimeout)
-	defer cancel()
-	_ = rpcLogger.Add(ctx, l.logPrefix, message)
 }
 
 func (l *RpcLogger) Warning(v ...interface{}) {
@@ -254,12 +193,6 @@ func (l *RpcLogger) Warning(v ...interface{}) {
 	}
 	message := l.output("WARN", v...)
 	fmt.Println(message)
-	if rpcLogger == nil {
-		return
-	}
-	ctx, cancel := context.WithTimeout(context.Background(), rpcLogTimeout)
-	defer cancel()
-	_ = rpcLogger.Add(ctx, l.logPrefix, message)
 }
 
 func (l *RpcLogger) Warn(v ...interface{}) {
@@ -268,12 +201,6 @@ func (l *RpcLogger) Warn(v ...interface{}) {
 	}
 	message := l.output("WARN", v...)
 	fmt.Println(message)
-	if rpcLogger == nil {
-		return
-	}
-	ctx, cancel := context.WithTimeout(context.Background(), rpcLogTimeout)
-	defer cancel()
-	_ = rpcLogger.Add(ctx, l.logPrefix, message)
 }
 
 func (l *RpcLogger) Warnf(format string, v ...interface{}) {
@@ -282,12 +209,6 @@ func (l *RpcLogger) Warnf(format string, v ...interface{}) {
 	}
 	message := l.output("WARN", fmt.Sprintf(format, v...))
 	fmt.Println(message)
-	if rpcLogger == nil {
-		return
-	}
-	ctx, cancel := context.WithTimeout(context.Background(), rpcLogTimeout)
-	defer cancel()
-	_ = rpcLogger.Add(ctx, l.logPrefix, message)
 }
 
 func (l *RpcLogger) Error(v ...interface{}) {
@@ -296,12 +217,6 @@ func (l *RpcLogger) Error(v ...interface{}) {
 	}
 	message := l.output("ERROR", v...)
 	fmt.Println(message)
-	if rpcLogger == nil {
-		return
-	}
-	ctx, cancel := context.WithTimeout(context.Background(), rpcLogTimeout)
-	defer cancel()
-	_ = rpcLogger.Add(ctx, l.logPrefix, message)
 }
 
 func (l *RpcLogger) Errorf(format string, v ...interface{}) {
@@ -310,12 +225,6 @@ func (l *RpcLogger) Errorf(format string, v ...interface{}) {
 	}
 	message := l.output("ERROR", fmt.Sprintf(format, v...))
 	fmt.Println(message)
-	if rpcLogger == nil {
-		return
-	}
-	ctx, cancel := context.WithTimeout(context.Background(), rpcLogTimeout)
-	defer cancel()
-	_ = rpcLogger.Add(ctx, l.logPrefix, message)
 }
 
 func (l *RpcLogger) Fatal(v ...interface{}) {
@@ -324,12 +233,6 @@ func (l *RpcLogger) Fatal(v ...interface{}) {
 	}
 	message := l.output("ERROR", v...)
 	fmt.Println(message)
-	if rpcLogger == nil {
-		return
-	}
-	ctx, cancel := context.WithTimeout(context.Background(), rpcLogTimeout)
-	defer cancel()
-	_ = rpcLogger.Add(ctx, l.logPrefix, message)
 }
 
 func (l *RpcLogger) Fatalf(format string, v ...interface{}) {
@@ -338,12 +241,6 @@ func (l *RpcLogger) Fatalf(format string, v ...interface{}) {
 	}
 	message := l.output("ERROR", fmt.Sprintf(format, v...))
 	fmt.Println(message)
-	if rpcLogger == nil {
-		return
-	}
-	ctx, cancel := context.WithTimeout(context.Background(), rpcLogTimeout)
-	defer cancel()
-	_ = rpcLogger.Add(ctx, l.logPrefix, message)
 }
 
 func (l *RpcLogger) Flush() {
