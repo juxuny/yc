@@ -14,7 +14,10 @@ import (
 var fileLogger impl.Logger
 
 func Flush() error {
-	return fileLogger.Flush()
+	if fileLogger != nil {
+		return fileLogger.Flush()
+	}
+	return nil
 }
 
 func (t *Handler) Print(ctx context.Context, req *logServer.PrintRequest) (resp *logServer.PrintResponse, err error) {
