@@ -148,97 +148,61 @@ func (l *RpcLogger) Debugf(format string, v ...interface{}) {
 }
 
 func (l *RpcLogger) Info(v ...interface{}) {
-	if l.level > LevelInfo {
-		return
-	}
 	message := l.output("INFO", v...)
 	fmt.Println(message)
 }
 
 func (l *RpcLogger) Infof(format string, v ...interface{}) {
-	if l.level > LevelInfo {
-		return
-	}
 	message := l.output("INFO", fmt.Sprintf(format, v...))
 	fmt.Println(message)
 }
 
 func (l *RpcLogger) Print(v ...interface{}) {
-	if l.level > LevelInfo {
-		return
-	}
 	message := l.output("INFO", v...)
 	fmt.Println(message)
 }
 
 func (l *RpcLogger) Println(v ...interface{}) {
-	if l.level > LevelInfo {
-		return
-	}
 	message := l.output("INFO", v...)
 	fmt.Println(message)
 }
 
 func (l *RpcLogger) Printf(format string, v ...interface{}) {
-	if l.level > LevelInfo {
-		return
-	}
 	message := l.output("INFO", fmt.Sprintf(format, v...))
 	fmt.Println(message)
 }
 
 func (l *RpcLogger) Warning(v ...interface{}) {
-	if l.level > LevelWarn {
-		return
-	}
 	message := l.output("WARN", v...)
 	fmt.Println(message)
 }
 
 func (l *RpcLogger) Warn(v ...interface{}) {
-	if l.level > LevelWarn {
-		return
-	}
 	message := l.output("WARN", v...)
 	fmt.Println(message)
 }
 
 func (l *RpcLogger) Warnf(format string, v ...interface{}) {
-	if l.level > LevelWarn {
-		return
-	}
 	message := l.output("WARN", fmt.Sprintf(format, v...))
 	fmt.Println(message)
 }
 
 func (l *RpcLogger) Error(v ...interface{}) {
-	if l.level > LevelError {
-		return
-	}
 	message := l.output("ERROR", v...)
 	fmt.Println(message)
 }
 
 func (l *RpcLogger) Errorf(format string, v ...interface{}) {
-	if l.level > LevelError {
-		return
-	}
 	message := l.output("ERROR", fmt.Sprintf(format, v...))
 	fmt.Println(message)
 }
 
 func (l *RpcLogger) Fatal(v ...interface{}) {
-	if l.level > LevelFatal {
-		return
-	}
 	message := l.output("ERROR", v...)
 	fmt.Println(message)
 }
 
 func (l *RpcLogger) Fatalf(format string, v ...interface{}) {
-	if l.level > LevelFatal {
-		return
-	}
 	message := l.output("ERROR", fmt.Sprintf(format, v...))
 	fmt.Println(message)
 }

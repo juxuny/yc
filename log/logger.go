@@ -2,18 +2,17 @@ package log
 
 import (
 	"fmt"
+	logServer "github.com/juxuny/yc/services/log-server"
 	"log"
 )
 
-type Level int
+type Level = logServer.LogLevel
 
 const (
-	LevelDebug = 1
-	LevelInfo  = 2
-	LevelWarn  = 3
-	LevelError = 4
-	LevelFatal = 5
-	LevelNone  = 10000 // 不输出
+	LevelDebug = logServer.LogLevel_Debug
+	LevelInfo  = logServer.LogLevel_Info
+	LevelWarn  = logServer.LogLevel_Warn
+	LevelError = logServer.LogLevel_Error
 )
 
 var (
