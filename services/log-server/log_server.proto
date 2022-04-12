@@ -4,8 +4,13 @@ package log_server;
 
 option go_package = "./;log_server";
 
+// @level: 1
 service LogServer {
+  // @group: devops
   rpc Health(HealthRequest) returns (HealthResponse) {}
+
+  // @group: log
+  rpc Print(PrintRequest) returns (PrintResponse) {}
 }
 
 message HealthRequest {}
@@ -28,7 +33,12 @@ message KeyPairs {
 }
 
 message PrintRequest {
+  // @v: min=1;max=4
+  // @msg: 取值范围不正确
   LogLevel level = 1;
+
+  // @v: length.min=1
+  // @msg: content不能为空
   string content = 2;
   repeated KeyPairs extra = 3;
   string fileLine = 4;

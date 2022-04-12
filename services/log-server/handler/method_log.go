@@ -20,7 +20,7 @@ func Flush() error {
 	return nil
 }
 
-func (t *Handler) Print(ctx context.Context, req *logServer.PrintRequest) (resp *logServer.PrintResponse, err error) {
+func (t *handler) Print(ctx context.Context, req *logServer.PrintRequest) (resp *logServer.PrintResponse, err error) {
 	if config.Env.LogDir == "" {
 		return nil, errors.SystemError.LogDirEmpty
 	}
@@ -38,7 +38,7 @@ func (t *Handler) Print(ctx context.Context, req *logServer.PrintRequest) (resp 
 		data += "] "
 	}
 	data += " message: " + req.GetContent()
-	log.Debug(data)
+	log.Debug(req.GetContent())
 	err = fileLogger.Info(config.Env.FilePrefix, data)
 	return
 }
