@@ -36,6 +36,13 @@ func (t Error) Wrap(err error) Error {
 	return t
 }
 
+func (t Error) SetMsg(msg string) Error {
+	return Error{
+		Code: t.Code,
+		Msg:  msg,
+	}
+}
+
 func (t Error) Err() error {
 	if t.Code == 0 {
 		return nil

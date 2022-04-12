@@ -47,7 +47,7 @@ func (t *CreateCommand) Run() {
 	// generate .proto
 	protoOutputFile := path.Join(t.WorkDir, service.ServiceDir, service.PackageName+".proto")
 	log.Printf("creating proto file: %s", protoOutputFile)
-	if err := template.Run(templateFs, protoFileName, protoOutputFile, service); err != nil {
+	if err := template.RunEmbedFile(templateFs, protoFileName, protoOutputFile, service); err != nil {
 		log.Fatal(err)
 	}
 

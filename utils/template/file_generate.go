@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-func Run(fs embed.FS, templateFileName string, outputFileName string, data interface{}) error {
+func RunEmbedFile(fs embed.FS, templateFileName string, outputFileName string, data interface{}) error {
 	buf, err := fs.ReadFile(templateFileName)
 	if err != nil {
 		return errors.SystemError.FsReadTemplateDataFailed.Wrap(err)
