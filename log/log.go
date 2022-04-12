@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/juxuny/yc/env"
 	"github.com/juxuny/yc/trace"
-	"os"
 	"runtime"
 	"strings"
 	"time"
@@ -30,10 +29,6 @@ func NewRpcLogger() *RpcLogger {
 		appName:      env.GetString("LOG_SERVER_APP_NAME"),
 		logPrefix:    env.GetString("LOG_SERVER_PREFIX"),
 		ReportCaller: true,
-	}
-	if l.appName == "" {
-		fmt.Println("missing environment: LOG_SERVER_APP_NAME")
-		os.Exit(-1)
 	}
 	return l
 }
