@@ -12,15 +12,15 @@ func TestValidator(t *testing.T) {
 		List    []int
 	}
 	v := &TestStruct{
-		Level:   3,
+		Level:   5,
 		Content: "100",
 		List:    []int{1},
 	}
 	action := Action{
 		ValidatorFormulas: []string{
-			"min",
+			"min", "max",
 		},
-		ErrorTemplate: "minimum of level is 5, current value is: {{.Level}}",
+		ErrorTemplate: "{{if lt .Level 5r }}minimum of level is 5, current value is: {{.Level}}{{else}}maximum of level is 10{{end}}",
 	}
 	if err := RegisterTemplate(action.ErrorTemplate); err != nil {
 		t.Fatal(err)
