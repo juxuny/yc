@@ -24,7 +24,7 @@ func Start(ctx context.Context) {
 	log.Info("start rpc ")
 	opts := make([]grpc.ServerOption, 0)
 	rpcServer = grpc.NewServer(opts...)
-	logServer.RegisterLogServerServer(rpcServer, &handler.Handler{})
+	logServer.RegisterLogServerServer(rpcServer, handler.NewWrapper())
 	finished := make(chan bool, 1)
 	go func() {
 		if err := rpcServer.Serve(ln); err != nil {

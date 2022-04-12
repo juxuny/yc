@@ -13,7 +13,7 @@ import (
 
 func Start(ctx context.Context) {
 	r := router.NewRouter("/api")
-	if err := r.Register(logServer.Name, &handler.Handler{}); err != nil {
+	if err := r.Register(logServer.Name, handler.NewWrapper()); err != nil {
 		panic(err)
 	}
 	finished := make(chan bool, 1)
