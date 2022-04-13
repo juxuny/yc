@@ -47,3 +47,25 @@ func ToHump(variableName string) string {
 	}
 	return strings.Join(s, "")
 }
+
+type stringHelper struct{}
+
+var StringHelper = stringHelper{}
+
+func (stringHelper) Filter(data []string, f func(index int, item string) bool) []string {
+	ret := make([]string, 0)
+	for index, item := range data {
+		if f(index, item) {
+			ret = append(ret, item)
+		}
+	}
+	return ret
+}
+
+func (stringHelper) Transform(data []string, f func(in string) string) []string {
+	ret := make([]string, 0)
+	for _, item := range data {
+		ret = append(ret, f(item))
+	}
+	return ret
+}

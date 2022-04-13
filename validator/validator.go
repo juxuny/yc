@@ -13,30 +13,30 @@ type IValidator interface {
 var validatorSet = map[string]IValidator{
 	"min": &minValidator{},
 	"max": &maxValidator{},
+	"in":  &inValidator{},
 }
 
 type Action struct {
-	ValidatorFormulas []string
+	ValidatorFormulas string
+	RefValue          string
 	ErrorTemplate     string
 }
 
-func Run(v interface{}, refValue string, action Action, inputEntity interface{}) error {
-	for _, a := range action.ValidatorFormulas {
-		validator, b := validatorSet[a]
-		if !b {
-			return errors.SystemError.InvalidValidatorFormula.Wrap(fmt.Errorf("%s", a))
-		}
-		if ok, err := validator.Run(v, refValue); err != nil {
+func Run(v interface{}, action Action, inputEntity interface{}) error {
+	validator, b := validatorSet[action.ValidatorFormulas]
+	if !b {
+		return errors.SystemError.InvalidValidatorFormula.Wrap(fmt.Errorf("%s", action.ValidatorFormulas))
+	}
+	if ok, err := validator.Run(v, action.RefValue); err != nil {
+		return err
+	} else if !ok && action.ErrorTemplate != "" {
+		if msg, err := defaultTemplateExecutor.Exec(action.ErrorTemplate, inputEntity); err != nil {
 			return err
-		} else if !ok && action.ErrorTemplate != "" {
-			if msg, err := defaultTemplateExecutor.Exec(action.ErrorTemplate, inputEntity); err != nil {
-				return err
-			} else {
-				return errors.SystemError.InvalidParams.SetMsg(msg)
-			}
-		} else if !ok {
-			return errors.SystemError.InvalidParams
+		} else {
+			return errors.SystemError.InvalidParams.SetMsg(msg)
 		}
+	} else if !ok {
+		return errors.SystemError.InvalidParams
 	}
 	return nil
 }
