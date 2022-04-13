@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package dt;
+
+option go_package = "./;dt";
+
+message ID {
+  bool valid = 1;
+  int64 int64 = 2;
+}
+
+message NullString {
+  bool valid = 1;
+  string string = 2;
+}
+
+message NullInt64 {
+  bool valid = 1;
+  int64 int64 = 2;
+}
+
+message NullInt32 {
+  bool valid = 1;
+  int32 int32 = 2;
+}
+
+message NullBool {
+  bool valid = 1;
+  bool bool = 2;
+}
+
+message NullFloat64 {
+  bool valid = 1;
+  double float64 = 2;
+}
+
+message NullFloat32 {
+  bool valid = 1;
+  float float32 = 2;
+}

@@ -6,7 +6,9 @@ import (
 	"github.com/gorilla/schema"
 	"github.com/juxuny/yc/errors"
 	"github.com/juxuny/yc/log"
+	"github.com/juxuny/yc/trace"
 	"github.com/juxuny/yc/utils"
+	"google.golang.org/grpc/metadata"
 	"io/ioutil"
 	"net/http"
 	"reflect"
@@ -28,7 +30,6 @@ func NewRouter(prefix string) *Router {
 		Prefix: prefix,
 		m:      make(map[string]reflect.Value),
 		RecoverHandler: func(w http.ResponseWriter, r *http.Request) {
-
 		},
 	}
 }
@@ -57,90 +58,103 @@ func (t *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Path
 	start := time.Now()
 	statusCode := http.StatusOK
+	ctx := context.Background()
+	prevMetadata := CreateMetadataFromHeader(r.Header)
+	ctx = metadata.NewIncomingContext(ctx, prevMetadata)
+	trace.InitContext(prevMetadata)
+	defer trace.Clean()
 	defer func(s time.Time, httpStatus *int) {
 		log.Infof("%d %v %v [%v]", *httpStatus, r.Method, path, time.Now().Sub(s))
 	}(start, &statusCode)
-	defer func() {
-		if err := recover(); err != nil {
-			log.Error(err)
-			debug.PrintStack()
-			t.RecoverHandler(w, r)
+	callFinished := make(chan bool, 1)
+	trace.GoRun(func() {
+		defer func() {
+			close(callFinished)
+		}()
+		defer func() {
+			if err := recover(); err != nil {
+				log.Error(err)
+				debug.PrintStack()
+				t.RecoverHandler(w, r)
+				return
+			}
+		}()
+		caller, b := t.m[path]
+		if !b {
+			statusCode = http.StatusNotFound
+			WriteJson(w, errors.SystemError.NotFound, http.StatusNotFound)
 			return
 		}
-	}()
-	caller, b := t.m[path]
-	if !b {
-		statusCode = http.StatusNotFound
-		WriteJson(w, errors.SystemError.NotFound, http.StatusNotFound)
-		return
-	}
-	ctx := context.Background()
-	if r.Method != http.MethodPost && r.Method != http.MethodGet {
-		statusCode = http.StatusBadRequest
-		WriteJson(w, errors.SystemError.NotSupportedMethod, http.StatusBadRequest)
-		return
-	}
-	in := []reflect.Value{reflect.ValueOf(ctx)}
-	tt := caller.Type()
-	ct := r.Header.Get("Content-Type")
-	var requestParam reflect.Value
-	if tt.In(1).Kind() == reflect.Ptr {
-		requestParam = reflect.New(tt.In(1).Elem())
-	} else {
-		requestParam = reflect.New(tt.In(1))
-	}
-	requestParamInstance := requestParam.Interface()
-	if r.Method == http.MethodPost && strings.Contains(ct, "json") {
-		data, err := ioutil.ReadAll(r.Body)
-		if err != nil {
+		if r.Method != http.MethodPost && r.Method != http.MethodGet {
 			statusCode = http.StatusBadRequest
 			WriteJson(w, errors.SystemError.NotSupportedMethod, http.StatusBadRequest)
 			return
 		}
-		_ = r.Body.Close()
-		log.Info("request:", string(data))
-		if err := json.Unmarshal(data, requestParamInstance); err != nil {
-			statusCode = http.StatusBadRequest
-			WriteJson(w, errors.SystemError.InvalidJsonData.Wrap(err), http.StatusBadRequest)
-			return
+		md := trace.GetMetadata()
+		ctx = metadata.NewIncomingContext(ctx, md)
+		in := []reflect.Value{reflect.ValueOf(ctx)}
+		tt := caller.Type()
+		ct := r.Header.Get("Content-Type")
+		var requestParam reflect.Value
+		if tt.In(1).Kind() == reflect.Ptr {
+			requestParam = reflect.New(tt.In(1).Elem())
+		} else {
+			requestParam = reflect.New(tt.In(1))
 		}
-	} else {
-		if r.Method == http.MethodGet {
-			log.Info("request:", r.URL.Query().Encode())
-			if err := decoder.Decode(requestParamInstance, r.URL.Query()); err != nil {
+		requestParamInstance := requestParam.Interface()
+		if r.Method == http.MethodPost && strings.Contains(ct, "json") {
+			data, err := ioutil.ReadAll(r.Body)
+			if err != nil {
 				statusCode = http.StatusBadRequest
-				WriteJson(w, errors.SystemError.InvalidInputDataObject.Wrap(err), http.StatusBadRequest)
+				WriteJson(w, errors.SystemError.NotSupportedMethod, http.StatusBadRequest)
+				return
+			}
+			_ = r.Body.Close()
+			log.Info("request:", string(data))
+			if err := json.Unmarshal(data, requestParamInstance); err != nil {
+				statusCode = http.StatusBadRequest
+				WriteJson(w, errors.SystemError.InvalidJsonData.Wrap(err), http.StatusBadRequest)
 				return
 			}
 		} else {
-			if err := r.ParseForm(); err != nil {
-				statusCode = http.StatusBadRequest
-				WriteJson(w, errors.SystemError.InvalidFormData.Wrap(err), http.StatusBadRequest)
-				return
-			}
-			log.Info("request:", r.PostForm.Encode())
-			if err := decoder.Decode(requestParamInstance, r.PostForm); err != nil {
-				statusCode = http.StatusBadRequest
-				WriteJson(w, errors.SystemError.InvalidInputDataObject.Wrap(err), http.StatusBadRequest)
-				return
-			}
-		}
-	}
-	in = append(in, reflect.ValueOf(requestParamInstance))
-	responses := caller.Call(in)
-	if len(responses) == 0 {
-		log.Error("no response")
-	} else if len(responses) == 1 {
-		WriteSuccessData(w, responses[0].Interface())
-	} else if len(responses) == 2 {
-		secondResponse := responses[1].Interface()
-		if secondResponse != nil {
-			if err, ok := secondResponse.(error); ok {
-				statusCode = http.StatusBadRequest
-				WriteJson(w, err, http.StatusBadRequest)
-				return
+			if r.Method == http.MethodGet {
+				log.Info("request:", r.URL.Query().Encode())
+				if err := decoder.Decode(requestParamInstance, r.URL.Query()); err != nil {
+					statusCode = http.StatusBadRequest
+					WriteJson(w, errors.SystemError.InvalidInputDataObject.Wrap(err), http.StatusBadRequest)
+					return
+				}
+			} else {
+				if err := r.ParseForm(); err != nil {
+					statusCode = http.StatusBadRequest
+					WriteJson(w, errors.SystemError.InvalidFormData.Wrap(err), http.StatusBadRequest)
+					return
+				}
+				log.Info("request:", r.PostForm.Encode())
+				if err := decoder.Decode(requestParamInstance, r.PostForm); err != nil {
+					statusCode = http.StatusBadRequest
+					WriteJson(w, errors.SystemError.InvalidInputDataObject.Wrap(err), http.StatusBadRequest)
+					return
+				}
 			}
 		}
-		WriteSuccessData(w, responses[0].Interface())
-	}
+		in = append(in, reflect.ValueOf(requestParamInstance))
+		responses := caller.Call(in)
+		if len(responses) == 0 {
+			log.Error("no response")
+		} else if len(responses) == 1 {
+			WriteSuccessData(w, responses[0].Interface())
+		} else if len(responses) == 2 {
+			secondResponse := responses[1].Interface()
+			if secondResponse != nil {
+				if err, ok := secondResponse.(error); ok {
+					statusCode = http.StatusBadRequest
+					WriteJson(w, err, http.StatusBadRequest)
+					return
+				}
+			}
+			WriteSuccessData(w, responses[0].Interface())
+		}
+	})
+	<-callFinished
 }

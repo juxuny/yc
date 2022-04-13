@@ -59,11 +59,8 @@ func (l *RpcLogger) SetReportCaller(reportCaller bool) *RpcLogger {
 func (l *RpcLogger) output(level string, v ...interface{}) string {
 	var reqId = trace.GetReqId()
 	var fieldList []string
-	var hasUid bool
-	if !hasUid {
-		if uid, found := trace.GetUid(); found {
-			fieldList = append(fieldList, fmt.Sprintf("uid=%d", uid))
-		}
+	if uid := trace.GetUid(); uid.Valid {
+		fieldList = append(fieldList, fmt.Sprintf("uid=%d", uid.Int64))
 	}
 	if l.appName != "" {
 		fieldList = append(fieldList, fmt.Sprintf("app=%s", l.appName))

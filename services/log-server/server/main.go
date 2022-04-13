@@ -15,8 +15,8 @@ import (
 
 func main() {
 	ctx, serverCanceler := context.WithCancel(context.Background())
-	go rpc.Start(ctx)
-	go http.Start(ctx)
+	trace.GoRunWithContext(ctx, rpc.Start)
+	trace.GoRunWithContext(ctx, http.Start)
 	// Wait for interrupt signal to gracefully shutdown the server with
 	// a timeout of 5 seconds.
 	quit := make(chan os.Signal)

@@ -7,7 +7,7 @@ import (
 )
 
 func TestGoRun(t *testing.T) {
-	InitReqId()
+	InitContext()
 	t.Log(goid.Get())
 	wg := sync.WaitGroup{}
 	wg.Add(1)
