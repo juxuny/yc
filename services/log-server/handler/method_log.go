@@ -28,7 +28,7 @@ func (t *handler) Print(ctx context.Context, req *logServer.PrintRequest) (resp 
 		fileLogger = impl.NewDefaultFileLogger(config.Env.LogDir, config.Env.CacheSize, config.Env.FlushSeconds)
 	}
 	resp = &logServer.PrintResponse{}
-	data := "[" + req.GetDateTime() + "] " + fmt.Sprintf("<req_id=%s>", req.GetReqId()) + "[" + req.GetLevel().Name() + "] " + "(" + req.GetFileLine() + ") "
+	data := "[" + req.GetDateTime() + "] " + fmt.Sprintf("<req_id=%s>", req.GetReqId()) + " " + "[" + req.GetLevel().Name() + "] " + "(" + req.GetFileLine() + ") "
 	if len(req.Extra) > 0 {
 		data += "["
 		for _, item := range req.GetExtra() {
@@ -37,7 +37,7 @@ func (t *handler) Print(ctx context.Context, req *logServer.PrintRequest) (resp 
 		data = strings.TrimSpace(data)
 		data += "] "
 	}
-	data += " message: " + req.GetContent()
+	data += "message: " + req.GetContent()
 	log.Debug(req.GetContent())
 	err = fileLogger.Info(config.Env.FilePrefix, data)
 	return

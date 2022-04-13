@@ -57,9 +57,9 @@ func (t *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Path
 	start := time.Now()
 	statusCode := http.StatusOK
-	defer func(s time.Time) {
-		log.Infof("%d %v %v [%v]", statusCode, r.Method, path, time.Now().Sub(s))
-	}(start)
+	defer func(s time.Time, httpStatus *int) {
+		log.Infof("%d %v %v [%v]", *httpStatus, r.Method, path, time.Now().Sub(s))
+	}(start, &statusCode)
 	defer func() {
 		if err := recover(); err != nil {
 			log.Error(err)
@@ -70,11 +70,13 @@ func (t *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}()
 	caller, b := t.m[path]
 	if !b {
+		statusCode = http.StatusNotFound
 		WriteJson(w, errors.SystemError.NotFound, http.StatusNotFound)
 		return
 	}
 	ctx := context.Background()
 	if r.Method != http.MethodPost && r.Method != http.MethodGet {
+		statusCode = http.StatusBadRequest
 		WriteJson(w, errors.SystemError.NotSupportedMethod, http.StatusBadRequest)
 		return
 	}
@@ -91,26 +93,34 @@ func (t *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost && strings.Contains(ct, "json") {
 		data, err := ioutil.ReadAll(r.Body)
 		if err != nil {
+			statusCode = http.StatusBadRequest
 			WriteJson(w, errors.SystemError.NotSupportedMethod, http.StatusBadRequest)
 			return
 		}
 		_ = r.Body.Close()
+		log.Info("request:", string(data))
 		if err := json.Unmarshal(data, requestParamInstance); err != nil {
+			statusCode = http.StatusBadRequest
 			WriteJson(w, errors.SystemError.InvalidJsonData.Wrap(err), http.StatusBadRequest)
 			return
 		}
 	} else {
 		if r.Method == http.MethodGet {
+			log.Info("request:", r.URL.Query().Encode())
 			if err := decoder.Decode(requestParamInstance, r.URL.Query()); err != nil {
+				statusCode = http.StatusBadRequest
 				WriteJson(w, errors.SystemError.InvalidInputDataObject.Wrap(err), http.StatusBadRequest)
 				return
 			}
 		} else {
 			if err := r.ParseForm(); err != nil {
+				statusCode = http.StatusBadRequest
 				WriteJson(w, errors.SystemError.InvalidFormData.Wrap(err), http.StatusBadRequest)
 				return
 			}
+			log.Info("request:", r.PostForm.Encode())
 			if err := decoder.Decode(requestParamInstance, r.PostForm); err != nil {
+				statusCode = http.StatusBadRequest
 				WriteJson(w, errors.SystemError.InvalidInputDataObject.Wrap(err), http.StatusBadRequest)
 				return
 			}
@@ -126,6 +136,7 @@ func (t *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		secondResponse := responses[1].Interface()
 		if secondResponse != nil {
 			if err, ok := secondResponse.(error); ok {
+				statusCode = http.StatusBadRequest
 				WriteJson(w, err, http.StatusBadRequest)
 				return
 			}

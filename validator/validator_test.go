@@ -24,7 +24,7 @@ func TestValidator(t *testing.T) {
 	if err := RegisterTemplate(action.ErrorTemplate); err != nil {
 		t.Fatal(err)
 	}
-	if err := Run(v.Level, action, v); err != nil {
+	if err := Run(v.Level, action, v, "level"); err != nil {
 		t.Fatal(err)
 	}
 	v = &TestStruct{
@@ -40,28 +40,28 @@ func TestValidator(t *testing.T) {
 	if err := RegisterTemplate(action.ErrorTemplate); err != nil {
 		t.Fatal(err)
 	}
-	if err := Run(v.Level, action, v); err != nil {
+	if err := Run(v.Level, action, v, "level"); err != nil {
 		t.Fatal(err)
 	}
 	action = Action{
 		ValidatorFormulas: FormulaLengthMax,
 		RefValue:          "1",
 	}
-	if err := Run(v.List, action, v); err != nil {
+	if err := Run(v.List, action, v, "list"); err != nil {
 		t.Fatal(err)
 	}
 	action = Action{
 		ValidatorFormulas: FormulaLengthMin,
 		RefValue:          "1",
 	}
-	if err := Run(v.List, action, v); err != nil {
+	if err := Run(v.List, action, v, "list"); err != nil {
 		t.Fatal(err)
 	}
 	action = Action{
 		ValidatorFormulas: FormulaLengthMin,
 		RefValue:          "6",
 	}
-	if err := Run(v.Content, action, v); err != nil {
+	if err := Run(v.Content, action, v, "content"); err != nil {
 		t.Fatal(err)
 	}
 }

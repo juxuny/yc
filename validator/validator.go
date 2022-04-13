@@ -13,19 +13,29 @@ type IValidator interface {
 type Formula string
 
 const (
-	FormulaMin       Formula = "min"
-	FormulaMax       Formula = "max"
-	FormulaIn        Formula = "in"
-	FormulaLengthMax Formula = "length.max"
-	FormulaLengthMin Formula = "length.min"
+	FormulaMin          Formula = "min"
+	FormulaMax          Formula = "max"
+	FormulaIn           Formula = "in"
+	FormulaLengthMax    Formula = "length.max"
+	FormulaLengthMin    Formula = "length.min"
+	FormulaPattern      Formula = "pattern"
+	FormulaDateTime     Formula = "datetime"
+	FormulaDate         Formula = "date"
+	FormulaTime         Formula = "time"
+	FormulaTimestampLog Formula = "timestamp.log"
 )
 
 var validatorSet = map[Formula]IValidator{
-	FormulaMin:       &minValidator{},
-	FormulaMax:       &maxValidator{},
-	FormulaIn:        &inValidator{},
-	FormulaLengthMax: &lengthMaxValidator{},
-	FormulaLengthMin: &lengthMinValidator{},
+	FormulaMin:          &minValidator{},
+	FormulaMax:          &maxValidator{},
+	FormulaIn:           &inValidator{},
+	FormulaLengthMax:    &lengthMaxValidator{},
+	FormulaLengthMin:    &lengthMinValidator{},
+	FormulaPattern:      &patternValidator{},
+	FormulaDateTime:     &timeValidator{layout: "2006-01-02 15:04:05"},
+	FormulaDate:         &timeValidator{layout: "2006-01-02"},
+	FormulaTime:         &timeValidator{layout: "15:04:05"},
+	FormulaTimestampLog: &timeValidator{layout: "2006-01-02 15:04:05.000"},
 }
 
 type Action struct {
@@ -34,7 +44,15 @@ type Action struct {
 	ErrorTemplate     string
 }
 
-func Run(v interface{}, action Action, inputEntity interface{}) error {
+func CreateAction(formula Formula, refValue string, errorTemplate string) Action {
+	return Action{
+		ValidatorFormulas: formula,
+		RefValue:          refValue,
+		ErrorTemplate:     errorTemplate,
+	}
+}
+
+func Run(v interface{}, action Action, inputEntity interface{}, paramName string) error {
 	validator, b := validatorSet[action.ValidatorFormulas]
 	if !b {
 		return errors.SystemError.InvalidValidatorFormula.Wrap(fmt.Errorf("%s", action.ValidatorFormulas))
@@ -48,7 +66,7 @@ func Run(v interface{}, action Action, inputEntity interface{}) error {
 			return errors.SystemError.InvalidParams.SetMsg(msg)
 		}
 	} else if !ok {
-		return errors.SystemError.InvalidParams.WithField("param", v)
+		return errors.SystemError.InvalidParams.WithField("value", v).WithField("param", paramName)
 	}
 	return nil
 }
