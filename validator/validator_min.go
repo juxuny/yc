@@ -17,7 +17,7 @@ func (t *minValidator) Run(v interface{}, refValueString string) (bool, error) {
 	}
 	refValue, err := strconv.ParseFloat(refValueString, 64)
 	if err != nil {
-		return false, errors.SystemError.InvalidValidatorErrorTemplate.Wrap(err)
+		return false, errors.SystemError.InvalidRefValueDefinition.Wrap(err)
 	}
 	return inputValue >= refValue, nil
 }

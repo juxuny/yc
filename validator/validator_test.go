@@ -28,9 +28,9 @@ func TestValidator(t *testing.T) {
 		t.Fatal(err)
 	}
 	v = &TestStruct{
-		Level:   0,
-		Content: "",
-		List:    nil,
+		Level:   1,
+		Content: "123456",
+		List:    []int{1},
 	}
 	action = Action{
 		ValidatorFormulas: "in",
@@ -41,6 +41,27 @@ func TestValidator(t *testing.T) {
 		t.Fatal(err)
 	}
 	if err := Run(v.Level, action, v); err != nil {
+		t.Fatal(err)
+	}
+	action = Action{
+		ValidatorFormulas: FormulaLengthMax,
+		RefValue:          "1",
+	}
+	if err := Run(v.List, action, v); err != nil {
+		t.Fatal(err)
+	}
+	action = Action{
+		ValidatorFormulas: FormulaLengthMin,
+		RefValue:          "1",
+	}
+	if err := Run(v.List, action, v); err != nil {
+		t.Fatal(err)
+	}
+	action = Action{
+		ValidatorFormulas: FormulaLengthMin,
+		RefValue:          "6",
+	}
+	if err := Run(v.Content, action, v); err != nil {
 		t.Fatal(err)
 	}
 }

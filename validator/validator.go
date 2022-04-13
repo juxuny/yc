@@ -10,14 +10,26 @@ type IValidator interface {
 	Run(value interface{}, refValue string) (bool, error)
 }
 
-var validatorSet = map[string]IValidator{
-	"min": &minValidator{},
-	"max": &maxValidator{},
-	"in":  &inValidator{},
+type Formula string
+
+const (
+	FormulaMin       Formula = "min"
+	FormulaMax       Formula = "max"
+	FormulaIn        Formula = "in"
+	FormulaLengthMax Formula = "length.max"
+	FormulaLengthMin Formula = "length.min"
+)
+
+var validatorSet = map[Formula]IValidator{
+	FormulaMin:       &minValidator{},
+	FormulaMax:       &maxValidator{},
+	FormulaIn:        &inValidator{},
+	FormulaLengthMax: &lengthMaxValidator{},
+	FormulaLengthMin: &lengthMinValidator{},
 }
 
 type Action struct {
-	ValidatorFormulas string
+	ValidatorFormulas Formula
 	RefValue          string
 	ErrorTemplate     string
 }
@@ -36,7 +48,7 @@ func Run(v interface{}, action Action, inputEntity interface{}) error {
 			return errors.SystemError.InvalidParams.SetMsg(msg)
 		}
 	} else if !ok {
-		return errors.SystemError.InvalidParams
+		return errors.SystemError.InvalidParams.WithField("param", v)
 	}
 	return nil
 }
