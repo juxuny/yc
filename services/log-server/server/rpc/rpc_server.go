@@ -7,6 +7,7 @@ import (
 	"github.com/juxuny/yc/log"
 	logServer "github.com/juxuny/yc/services/log-server"
 	"github.com/juxuny/yc/services/log-server/handler"
+	"github.com/juxuny/yc/trace"
 	"google.golang.org/grpc"
 	"net"
 	"os"
@@ -15,6 +16,7 @@ import (
 var rpcServer *grpc.Server
 
 func Start(ctx context.Context) {
+	trace.InitReqId("rpc")
 	listenAddress := fmt.Sprintf(":%d", yc.DefaultRpcPort)
 	ln, err := net.Listen("tcp", listenAddress)
 	if err != nil {

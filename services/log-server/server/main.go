@@ -15,8 +15,8 @@ import (
 
 func main() {
 	ctx, serverCanceler := context.WithCancel(context.Background())
-	trace.GoRunWithContext(ctx, rpc.Start)
-	trace.GoRunWithContext(ctx, http.Start)
+	go rpc.Start(ctx)
+	go http.Start(ctx)
 	// Wait for interrupt signal to gracefully shutdown the server with
 	// a timeout of 5 seconds.
 	quit := make(chan os.Signal)
@@ -31,6 +31,7 @@ func main() {
 	defer cancel()
 	finished := make(chan bool)
 	go func() {
+		trace.InitContext()
 		if err := handler.Flush(); err != nil {
 			log.Error(err)
 		}

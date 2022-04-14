@@ -42,6 +42,17 @@ func GetMetadata(goId ...int64) metadata.MD {
 	return metadata.New(map[string]string{})
 }
 
+func InitReqId(reqId ...string) {
+	if len(reqId) > 0 && reqId[0] != "" {
+		md := metadata.New(map[string]string{
+			HeaderTraceReqId: reqId[0],
+		})
+		InitContext(md)
+	} else {
+		InitContext()
+	}
+}
+
 func InitContext(initMetadata ...metadata.MD) {
 	id := goid.Get()
 	md := make(metadata.MD)

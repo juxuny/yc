@@ -8,10 +8,12 @@ import (
 	logServer "github.com/juxuny/yc/services/log-server"
 	"github.com/juxuny/yc/services/log-server/config"
 	"github.com/juxuny/yc/services/log-server/handler"
+	"github.com/juxuny/yc/trace"
 	"net/http"
 )
 
 func Start(ctx context.Context) {
+	trace.InitReqId("http")
 	r := router.NewRouter("/api")
 	if err := r.Register(logServer.Name, handler.NewWrapper()); err != nil {
 		panic(err)
