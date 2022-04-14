@@ -42,7 +42,7 @@ func main() {
 	select {
 	case <-finished:
 		serverCanceler()
-		log.Info("server shutdown properly")
+		log.Info("server shutdown gracefully")
 	case <-ctx.Done():
 		log.Info("timeout of 15 seconds.")
 	}
