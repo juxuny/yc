@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/juxuny/yc/dt"
+	"github.com/juxuny/yc/env"
 	"github.com/petermattis/goid"
 	"google.golang.org/grpc/metadata"
 	"runtime/debug"
@@ -63,7 +64,7 @@ func InitContext(initMetadata ...metadata.MD) {
 	}
 	reqId := md[HeaderTraceReqId]
 	if len(reqId) == 0 {
-		reqId := genReqId(20)
+		reqId := env.DefaultEnv.Mode + "." + genReqId(20)
 		md[HeaderTraceReqId] = []string{reqId}
 	}
 	metadataMap.Store(id, md)
