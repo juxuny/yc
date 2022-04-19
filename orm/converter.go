@@ -134,11 +134,27 @@ func (t *dataTypeConverter) convertStruct(in reflect.Value, dstType reflect.Type
 			panic("unknown struct: " + inTypeName)
 		}
 	} else if inTypeName == "sql.NullBool" {
-
-	} else if inTypeName == "sql.NullString" {
-
-	} else if inTypeName == "sql.NullInt32" {
-
+		nullBool := in.Interface().(sql.NullBool)
+		if holderTypeName == "sql.NullBool" {
+			holder.Set(in)
+		} else if holderTypeName == "dt.NullBool" {
+			holder.Set(reflect.ValueOf(dt.NullBool{
+				Valid: nullBool.Valid,
+				Bool:  nullBool.Bool,
+			}))
+		} else if holderTypeName == "bool" {
+			holder.SetBool(nullBool.Bool)
+		} else if holderTypeName == "*bool" {
+			holder.Set(reflect.ValueOf(&nullBool.Bool))
+		} else if holderTypeName == "int" || holderTypeName == "int8" || holderTypeName == "int16" || holderTypeName == "int32" || holderTypeName == "int64" || holderTypeName == "uint" || holderTypeName == "uint8" || holderTypeName == "uint16" || holderTypeName == "uint32" || holderTypeName == "uint64" {
+			var v int
+			if nullBool.Bool {
+				v = 1
+			}
+			holder.Set(reflect.ValueOf(v).Convert(holder.Type()))
+		} else {
+			panic("unknown dest type:" + holderTypeName)
+		}
 	} else {
 		panic("unknown struct: " + inTypeName)
 	}
