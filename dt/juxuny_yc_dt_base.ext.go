@@ -12,12 +12,12 @@ func (m *ID) UnmarshalJSON(data []byte) error {
 		m.Valid = false
 		return nil
 	}
-	id, err := strconv.ParseInt(input, 10, 64)
+	id, err := strconv.ParseUint(input, 10, 64)
 	if err != nil {
 		return err
 	}
 	m.Valid = true
-	m.Int64 = id
+	m.Uint64 = id
 	return err
 }
 
@@ -25,11 +25,11 @@ func (m ID) MarshalJSON() (data []byte, err error) {
 	if !m.Valid {
 		return []byte("null"), nil
 	}
-	return []byte(fmt.Sprintf("\"%v\"", m.Int64)), nil
+	return []byte(fmt.Sprintf("\"%v\"", m.Uint64)), nil
 }
 
 func (m ID) Equal(id ID) bool {
-	return m.Valid == id.Valid && m.Int64 == id.Int64
+	return m.Valid == id.Valid && m.Uint64 == id.Uint64
 }
 
 func (m *NullInt64) UnmarshalJSON(data []byte) error {
@@ -54,7 +54,7 @@ func (m NullInt64) MarshalJSON() (data []byte, err error) {
 	return []byte(fmt.Sprintf("\"%v\"", m.Int64)), nil
 }
 
-func (m NullInt64) Equal(id ID) bool {
+func (m NullInt64) Equal(id NullInt64) bool {
 	return m.Valid == id.Valid && m.Int64 == id.Int64
 }
 

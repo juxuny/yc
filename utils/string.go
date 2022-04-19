@@ -69,3 +69,23 @@ func (stringHelper) Transform(data []string, f func(in string) string) []string 
 	}
 	return ret
 }
+
+func (stringHelper) RandString(n int) string {
+	tb := "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+	ret := make([]byte, 0)
+	r := getRandInstance()
+	for i := 0; i < n; i++ {
+		ret = append(ret, tb[r.Intn(len(tb))])
+	}
+	return string(ret)
+}
+
+func (stringHelper) RandNumString(n int) string {
+	tb := "0123456789"
+	ret := make([]byte, 0)
+	r := getRandInstance()
+	for i := 0; i < n; i++ {
+		ret = append(ret, tb[r.Intn(len(tb))])
+	}
+	return string(ret)
+}

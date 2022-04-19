@@ -18,6 +18,19 @@ var SystemError = struct {
 	InvalidParams                 Error `code:"-10014" msg:"invalid params"`
 	InvalidDataType               Error `code:"-10015" msg:"invalid data type"`
 	InvalidRefValueDefinition     Error `code:"-10016" msg:"invalid ref value definition"`
+	DuplicatedConfigName          Error `code:"-10017" msg:"duplicated config name"`
+	DatabaseConnectError          Error `code:"-10018" msg:"database connect error"`
+	DatabaseConfigNotFound        Error `code:"-10019" msg:"database config not found"`
+	DatabaseConnectionIndexError  Error `code:"-10020" msg:"database connection index error"`
+	DatabaseQueryError            Error `code:"-10021" msg:"database query error"`
+	DatabaseExecError             Error `code:"-10022" msg:"database exec error"`
+	DatabaseColumnError           Error `code:"-10023" msg:"database column error"`
+	DatabaseColumnTypeError       Error `code:"-10024" msg:"database column type error"`
+	DatabaseScanError             Error `code:"-10025" msg:"scan error"`
+	ReflectNoFieldError           Error `code:"-10026" msg:"field not exists"`
+	DatabaseNoData                Error `code:"-10027" msg:"no data"`
+	NotSupportedDataType          Error `code:"-10028" msg:"not supported data type"`
+	NotPointer                    Error `code:"-10029" msg:"not pointer"`
 }{}
 
 func init() {

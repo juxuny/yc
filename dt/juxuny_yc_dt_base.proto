@@ -6,7 +6,7 @@ option go_package = "./;dt";
 
 message ID {
   bool valid = 1;
-  int64 int64 = 2;
+  uint64 uint64 = 2;
 }
 
 message NullString {

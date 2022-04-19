@@ -1,6 +1,7 @@
 package env
 
 import (
+	"fmt"
 	"github.com/fatih/camelcase"
 	"reflect"
 	"strconv"
@@ -40,25 +41,25 @@ func Init(ks interface{}, upper bool, prefix ...string) {
 		case reflect.Int64, reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32:
 			intValue, err := strconv.ParseInt(finalValue, 10, 64)
 			if err != nil {
-				panic(err)
+				panic(fmt.Errorf("%s is not a int: \"%v\"", value, finalValue))
 			}
 			v.Elem().Field(i).SetInt(intValue)
 		case reflect.Uint64, reflect.Uint, reflect.Uint32, reflect.Uint16, reflect.Uint8:
 			intValue, err := strconv.ParseUint(finalValue, 10, 64)
 			if err != nil {
-				panic(err)
+				panic(fmt.Errorf("%s is not a uint: \"%v\"", value, finalValue))
 			}
 			v.Elem().Field(i).SetUint(intValue)
 		case reflect.Float32, reflect.Float64:
 			floatValue, err := strconv.ParseFloat(finalValue, 64)
 			if err != nil {
-				panic(err)
+				panic(fmt.Errorf("%s is not a float64: \"%v\"", value, finalValue))
 			}
 			v.Elem().Field(i).SetFloat(floatValue)
 		case reflect.Bool:
 			boolValue, err := strconv.ParseBool(finalValue)
 			if err != nil {
-				panic(err)
+				panic(fmt.Errorf("%s is not a bool: \"%v\"", value, finalValue))
 			}
 			v.Elem().Field(i).SetBool(boolValue)
 		default:
