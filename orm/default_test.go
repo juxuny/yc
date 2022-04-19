@@ -27,6 +27,7 @@ type testUserInfo struct {
 	Deleted     *int `orm:"is_deleted"`
 	DeletedAt   *time.Time
 	Description string
+	Started     int
 }
 
 func TestQueryScan(t *testing.T) {
@@ -38,6 +39,18 @@ func TestQueryScan(t *testing.T) {
 	for _, item := range items {
 		t.Log(utils.ToJson(item))
 	}
+	var first testUserInfo
+	err = QueryScan(context.Background(), DefaultName, &first, "SELECT * FROM test_user_info")
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(utils.ToJson(first))
+	var count int
+	err = QueryScan(context.Background(), DefaultName, &count, "SELECT COUNT(*) FROM test_user_info")
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log("count: ", count)
 }
 
 // goos: darwin

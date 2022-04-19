@@ -17,6 +17,9 @@ func (t Row) Reform(out reflect.Value) error {
 	if out.Kind() != reflect.Ptr {
 		return errors.SystemError.NotPointer
 	}
+	if len(t) == 0 {
+		return errors.SystemError.DatabaseNoData
+	}
 	outElem := out.Elem()
 	if outElem.Kind() == reflect.Struct {
 		nm := getOrmColumnNameMap(outElem.Type())
@@ -32,6 +35,8 @@ func (t Row) Reform(out reflect.Value) error {
 			//fmt.Println("set field:", fieldName, " field type:", ft.Type().String(), " kind:", ft.Kind())
 			ft.Set(defaultConverter.Convert(col.Value, ft.Type()))
 		}
+	} else {
+		outElem.Set(defaultConverter.Convert(t[0].Value, outElem.Type()))
 	}
 	return nil
 }
@@ -77,14 +82,14 @@ func (t *DataSet) Reform(out interface{}) error {
 		if len(*t) == 0 {
 			return errors.SystemError.DatabaseNoData
 		}
-		var item reflect.Value
-		elemType := list.Type().Elem()
-		if elemType.Kind() == reflect.Ptr {
-			item = reflect.Zero(elemType)
-		} else {
-			item = reflect.New(elemType)
+		if err := (*t)[0].Reform(outValue); err != nil {
+			return err
 		}
-		if err := (*t)[0].Reform(item); err != nil {
+	} else {
+		if len(*t) == 0 {
+			return errors.SystemError.DatabaseNoData
+		}
+		if err := (*t)[0].Reform(outValue); err != nil {
 			return err
 		}
 	}
