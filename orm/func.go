@@ -26,3 +26,15 @@ func getOrmColumnNameMap(model reflect.Type) map[string]string {
 	}
 	return ret
 }
+
+func wrap(s string, c string) string {
+	return c + s + c
+}
+
+func JoinFieldNames(fields []FieldName, sep string) string {
+	list := make([]string, len(fields))
+	for i, item := range fields {
+		list[i] = item.String()
+	}
+	return strings.Join(list, sep)
+}

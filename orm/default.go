@@ -20,3 +20,11 @@ func QueryScan(ctx context.Context, configName string, out interface{}, statemen
 	}
 	return ds.Reform(out)
 }
+
+func QueryWithWrapper(ctx context.Context, configName string, w QueryWrapper, out interface{}) error {
+	statement, values, err := w.Build()
+	if err != nil {
+		return err
+	}
+	return QueryScan(ctx, configName, out, statement, values...)
+}

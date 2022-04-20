@@ -36,7 +36,7 @@ func ToUnderLine(variableName string) string {
 	for i := range s {
 		s[i] = strings.ToLower(s[i])
 	}
-	return strings.Join(s, "_")
+	return strings.Trim(strings.Join(s, "_"), "_")
 }
 
 func ToHump(variableName string) string {

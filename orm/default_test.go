@@ -22,7 +22,7 @@ type testUserInfo struct {
 	Price       float64
 	Count       int64
 	Remark      dt.NullString
-	F1          dt.NullFloat64
+	F1          dt.NullFloat64 `orm:"f1"`
 	Type        testUserType
 	Deleted     *int `orm:"is_deleted"`
 	DeletedAt   *time.Time
