@@ -48,6 +48,9 @@ func (t *connMgr) Add(c Config) error {
 }
 
 func (t *connMgr) Exec(ctx context.Context, configName string, statement string, values ...interface{}) (result sql.Result, err error) {
+	defer func() {
+		printSqlStatement(statement, values...)
+	}()
 	idx, b := t.ns[configName]
 	if !b {
 		return nil, errors.SystemError.DatabaseConfigNotFound.WithField("name", configName)
@@ -60,6 +63,9 @@ func (t *connMgr) Exec(ctx context.Context, configName string, statement string,
 }
 
 func (t *connMgr) Query(ctx context.Context, configName string, statement string, values ...interface{}) (result *sql.Rows, err error) {
+	defer func() {
+		printSqlStatement(statement, values...)
+	}()
 	idx, b := t.ns[configName]
 	if !b {
 		return nil, errors.SystemError.DatabaseConfigNotFound.WithField("name", configName)

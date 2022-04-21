@@ -6,3 +6,7 @@ func NewID(id uint64) ID {
 		Valid:  true,
 	}
 }
+
+func InvalidID() ID {
+	return ID{}
+}

@@ -79,7 +79,7 @@ func Clean() {
 func SetUid(uid dt.ID) {
 	id := goid.Get()
 	md := GetMetadata(id)
-	md.Set(HeaderTraceUid, fmt.Sprintf("%d", uid.Int64))
+	md.Set(HeaderTraceUid, fmt.Sprintf("%d", uid.Uint64))
 	metadataMap.Store(id, md)
 }
 
@@ -91,7 +91,7 @@ func GetUid() (ret dt.ID) {
 		if err != nil {
 			return
 		}
-		ret = dt.NewID(id)
+		ret = dt.NewID(uint64(id))
 	}
 	return
 }

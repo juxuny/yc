@@ -60,7 +60,7 @@ func (l *RpcLogger) output(level string, v ...interface{}) string {
 	var reqId = trace.GetReqId()
 	var fieldList []string
 	if uid := trace.GetUid(); uid.Valid {
-		fieldList = append(fieldList, fmt.Sprintf("uid=%d", uid.Int64))
+		fieldList = append(fieldList, fmt.Sprintf("uid=%d", uid.Uint64))
 	}
 	if l.appName != "" {
 		fieldList = append(fieldList, fmt.Sprintf("app=%s", l.appName))

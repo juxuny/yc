@@ -2,9 +2,6 @@ package orm
 
 import (
 	"fmt"
-	"github.com/juxuny/yc/utils"
-	"path"
-	"reflect"
 	"strings"
 )
 
@@ -113,40 +110,8 @@ func (t *queryWrapper) Order(asc bool, fields ...FieldName) QueryWrapper {
 	}
 }
 
-func (t *queryWrapper) Model(v interface{}) QueryWrapper {
-	modelValue := reflect.ValueOf(v)
-	if modelValue.Kind() == reflect.Ptr {
-		modelValue = modelValue.Elem()
-	}
-	m := modelValue.MethodByName("TableName")
-	if m.IsValid() {
-		out := m.Call(nil)
-		for _, v := range out {
-			if v.Kind() == reflect.String {
-				t.model.TableName = TableName(TablePrefix + "_" + v.String())
-			}
-		}
-	}
-	if t.model.TableName == "" {
-		n := modelValue.Type().Name()
-		if strings.Contains(n, ".") {
-			n = path.Ext(n)
-		}
-		tn := utils.ToUnderLine(n)
-		t.model.TableName = TableName(tn).Prefix(TablePrefix)
-	}
-	modelType := modelValue.Type()
-	for i := 0; i < modelType.NumField(); i++ {
-		f := modelType.Field(i)
-		tag := f.Tag
-		fieldName := ""
-		if fn, ok := tag.Lookup("orm"); ok {
-			fieldName = strings.TrimSpace(fn)
-		} else {
-			fieldName = utils.ToUnderLine(f.Name)
-		}
-		t.model.Fields = append(t.model.Fields, FieldName(fieldName).Wrap())
-	}
+func (t *queryWrapper) Model(model interface{}) QueryWrapper {
+	t.model = CreateModel(model)
 	return t
 }
 

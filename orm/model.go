@@ -1,12 +1,55 @@
 package orm
 
-import "strings"
+import (
+	"github.com/juxuny/yc/utils"
+	"path"
+	"reflect"
+	"strings"
+)
 
 var TablePrefix = ""
 
 type Model struct {
 	TableName TableName
 	Fields    []FieldName
+}
+
+func CreateModel(model interface{}) Model {
+	ret := Model{}
+	modelValue := reflect.ValueOf(model)
+	if modelValue.Kind() == reflect.Ptr {
+		modelValue = modelValue.Elem()
+	}
+	m := modelValue.MethodByName("TableName")
+	if m.IsValid() {
+		out := m.Call(nil)
+		for _, v := range out {
+			if v.Kind() == reflect.String {
+				ret.TableName = TableName(TablePrefix + "_" + v.String())
+			}
+		}
+	}
+	if ret.TableName == "" {
+		n := modelValue.Type().Name()
+		if strings.Contains(n, ".") {
+			n = path.Ext(n)
+		}
+		tn := utils.ToUnderLine(n)
+		ret.TableName = TableName(tn).Prefix(TablePrefix)
+	}
+	modelType := modelValue.Type()
+	for i := 0; i < modelType.NumField(); i++ {
+		f := modelType.Field(i)
+		tag := f.Tag
+		fieldName := ""
+		if fn, ok := tag.Lookup("orm"); ok {
+			fieldName = strings.TrimSpace(fn)
+		} else {
+			fieldName = utils.ToUnderLine(f.Name)
+		}
+		ret.Fields = append(ret.Fields, FieldName(fieldName).Wrap())
+	}
+	return ret
 }
 
 type TableName string
