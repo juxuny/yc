@@ -165,10 +165,10 @@ func printSqlStatement(statement string, values ...interface{}) {
 			l[i] = "NULL"
 		} else if tn == "time.Time" {
 			t := item.(time.Time)
-			l[i] = t.Format("2006-01-02 15:04:05.000")
+			l[i] = wrap(t.Format("2006-01-02 15:04:05.000"), "'")
 		} else if tn == "*time.Time" {
 			t := item.(*time.Time)
-			l[i] = t.Format("2006-01-02 15:04:05.000")
+			l[i] = wrap(t.Format("2006-01-02 15:04:05.000"), "'")
 		} else {
 			l[i] = fmt.Sprintf("'%v'", item)
 		}

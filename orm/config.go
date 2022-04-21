@@ -1,6 +1,7 @@
 package orm
 
 const DefaultName = "default"
+const DefaultRetry = 3
 
 type Config struct {
 	Name   string `json:"name"`
