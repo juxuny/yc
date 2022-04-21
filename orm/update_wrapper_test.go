@@ -20,3 +20,16 @@ func TestUpdateWrapper_Updates(t *testing.T) {
 	}
 	t.Log(result.RowsAffected())
 }
+
+func TestUpdateWrapper_UpdateWithMap(t *testing.T) {
+	w := NewUpdateWrapper().Updates(map[string]interface{}{
+		"name":  utils.RandHelper.RandString(10),
+		"count": 1,
+	}).Table("test_user_info").Inc("price", 1)
+	w.Eq("id", dt.NewID(36))
+	result, err := UpdateWithWrapper(context.Background(), DefaultName, w)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(result.RowsAffected())
+}
