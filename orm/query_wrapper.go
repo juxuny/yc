@@ -158,6 +158,7 @@ func (t *queryWrapper) Build() (statement string, values []interface{}, err erro
 		statement += " LIMIT ? OFFSET ?"
 		values = append(values, t.limit, t.offset)
 	}
+	values = placementValueFilter(values)
 	return
 }
 

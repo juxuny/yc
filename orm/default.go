@@ -88,3 +88,11 @@ func InsertWithWrapper(ctx context.Context, configName string, w InsertWrapper) 
 	}
 	return
 }
+
+func UpdateWithWrapper(ctx context.Context, configName string, w UpdateWrapper) (result sql.Result, err error) {
+	statement, values, err := w.Build()
+	if err != nil {
+		return result, err
+	}
+	return connectManagerInstance.Exec(ctx, configName, statement, values...)
+}

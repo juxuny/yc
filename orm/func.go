@@ -43,6 +43,14 @@ func JoinFieldNames(fields []FieldName, sep string) string {
 	return strings.Join(list, sep)
 }
 
+func placementValueFilter(values []interface{}) []interface{} {
+	ret := make([]interface{}, len(values))
+	for i, item := range values {
+		ret[i] = toPlacementValue(reflect.ValueOf(item))
+	}
+	return ret
+}
+
 func toPlacementValue(v reflect.Value) interface{} {
 	switch v.Kind() {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64,

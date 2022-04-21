@@ -101,7 +101,7 @@ func (t *insertWrapper) Build() (statement string, values []interface{}, next bo
 			}
 			if v, b := valueMap[f.String()]; b {
 				holderStatement += "?"
-				rowValues = append(rowValues, toPlacementValue(reflect.ValueOf(v)))
+				rowValues = append(rowValues, reflect.ValueOf(v))
 			} else {
 				holderStatement += "NULL"
 			}
@@ -128,6 +128,7 @@ func (t *insertWrapper) Build() (statement string, values []interface{}, next bo
 			values = append(values, updateValues...)
 		}
 	}
+	values = placementValueFilter(values)
 	return
 }
 
