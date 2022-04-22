@@ -96,3 +96,11 @@ func Update(ctx context.Context, configName string, w UpdateWrapper) (result sql
 	}
 	return connectManagerInstance.Exec(ctx, configName, statement, values...)
 }
+
+func Delete(ctx context.Context, configName string, w DeleteWrapper) (result sql.Result, err error) {
+	statement, values, err := w.Build()
+	if err != nil {
+		return result, err
+	}
+	return connectManagerInstance.Exec(ctx, configName, statement, values...)
+}
