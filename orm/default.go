@@ -34,7 +34,7 @@ func QueryScan(ctx context.Context, configName string, out interface{}, statemen
 	return ds.Reform(out)
 }
 
-func QueryWithWrapper(ctx context.Context, configName string, w QueryWrapper, out interface{}) error {
+func Select(ctx context.Context, configName string, w QueryWrapper, out interface{}) error {
 	statement, values, err := w.Build()
 	if err != nil {
 		return err
@@ -46,7 +46,7 @@ func QueryWithWrapper(ctx context.Context, configName string, w QueryWrapper, ou
 	return ds.Reform(out)
 }
 
-func InsertWithWrapper(ctx context.Context, configName string, w InsertWrapper) (result sql.Result, err error) {
+func Insert(ctx context.Context, configName string, w InsertWrapper) (result sql.Result, err error) {
 	statement, values, next, err := w.Build()
 	if err != nil {
 		return result, err
@@ -89,7 +89,7 @@ func InsertWithWrapper(ctx context.Context, configName string, w InsertWrapper) 
 	return
 }
 
-func UpdateWithWrapper(ctx context.Context, configName string, w UpdateWrapper) (result sql.Result, err error) {
+func Update(ctx context.Context, configName string, w UpdateWrapper) (result sql.Result, err error) {
 	statement, values, err := w.Build()
 	if err != nil {
 		return result, err

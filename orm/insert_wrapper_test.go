@@ -28,7 +28,7 @@ func TestInsertWrapper_Build(t *testing.T) {
 		OnDuplicatedUpdate("name", 100).
 		OnDuplicatedUpdate("count").
 		OnDuplicatedUpdate("deleted_at", time.Now())
-	result, err := InsertWithWrapper(context.Background(), DefaultName, w)
+	result, err := Insert(context.Background(), DefaultName, w)
 	if err != nil {
 		t.Fatal(err)
 	}

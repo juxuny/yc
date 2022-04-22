@@ -17,7 +17,7 @@ func TestQueryWrapper_Build(t *testing.T) {
 	t.Log(values...)
 
 	var items []testUserInfo
-	err = QueryWithWrapper(context.Background(), DefaultName, w, &items)
+	err = Select(context.Background(), DefaultName, w, &items)
 	if err != nil {
 		t.Fatal(err)
 	}
