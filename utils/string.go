@@ -89,3 +89,27 @@ func (stringHelper) RandNumString(n int) string {
 	}
 	return string(ret)
 }
+
+func (stringHelper) Reverse(input string) string {
+	ret := make([]byte, len(input))
+	for i, c := range []byte(input) {
+		ret[len(input)-1-i] = c
+	}
+	return string(ret)
+}
+
+func (stringHelper) TrimSubSequenceLeft(input, sub string) string {
+	for strings.Index(input, sub) == 0 {
+		input = strings.Replace(input, sub, "", 1)
+	}
+	return input
+}
+
+func (stringHelper) TrimSubSequenceRight(input, sub string) string {
+	reverseInput := StringHelper.Reverse(input)
+	reverseSub := StringHelper.Reverse(sub)
+	for strings.Index(reverseInput, reverseSub) == 0 {
+		reverseInput = strings.Replace(reverseInput, reverseSub, "", 1)
+	}
+	return StringHelper.Reverse(reverseInput)
+}
