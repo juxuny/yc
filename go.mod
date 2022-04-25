@@ -10,5 +10,6 @@ require (
 	github.com/petermattis/goid v0.0.0-20220302125637-5f11c28912df
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.4.0
+	github.com/yoheimuta/go-protoparser/v4 v4.5.4
 	google.golang.org/grpc v1.45.0
 )

@@ -5,6 +5,7 @@ package {{ .PackageName }};
 option go_package = "./;{{ .PackageName }}";
 
 service {{ .ServiceStruct }} {
+  // @group: devops
   rpc Health(HealthRequest) returns (HealthResponse) {}
 }
 
