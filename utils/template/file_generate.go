@@ -25,3 +25,23 @@ func RunEmbedFile(fs embed.FS, templateFileName string, outputFileName string, d
 	}()
 	return tpl.Execute(out, data)
 }
+
+func AppendFromEmbedFile(fs embed.FS, templateFileName string, outputFileName string, data interface{}) error {
+	buf, err := fs.ReadFile(templateFileName)
+	if err != nil {
+		return errors.SystemError.FsReadTemplateDataFailed.Wrap(err)
+	}
+	tpl, err := template.New(templateFileName).Parse(string(buf))
+	if err != nil {
+		return errors.SystemError.TemplateSyntaxError.Wrap(err)
+	}
+	out, err := os.OpenFile(outputFileName, os.O_APPEND|os.O_WRONLY, 0644)
+	if err != nil {
+		return errors.SystemError.FsCreateFailed.Wrap(err)
+	}
+	defer func() {
+		_ = out.Close()
+	}()
+	return tpl.Execute(out, data)
+
+}

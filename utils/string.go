@@ -113,3 +113,13 @@ func (stringHelper) TrimSubSequenceRight(input, sub string) string {
 	}
 	return StringHelper.Reverse(reverseInput)
 }
+
+func (stringHelper) ContainsAllKey(s string, keys []string) bool {
+	count := 0
+	for _, k := range keys {
+		if strings.Contains(s, k) {
+			count += 1
+		}
+	}
+	return count == len(keys)
+}

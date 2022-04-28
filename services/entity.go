@@ -48,7 +48,14 @@ type Message struct {
 	Fields []MessageField
 }
 
-type HandlerEntity struct {
+type HandlerInitEntity struct {
 	ServiceEntity
 	GoModuleName string
+}
+
+type MethodEntity struct {
+	HandlerInitEntity
+	MethodName string
+	Request    string
+	Response   string
 }
