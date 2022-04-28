@@ -15,6 +15,10 @@ type ModelCommand struct {
 	Service  string
 }
 
+func (t *ModelCommand) BeforeRun(cmd *cobra.Command) {
+	panic("implement me")
+}
+
 func (t *ModelCommand) Prepare(cmd *cobra.Command) {
 }
 

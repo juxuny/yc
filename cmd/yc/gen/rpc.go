@@ -8,6 +8,10 @@ import (
 type RpcCommand struct {
 }
 
+func (r RpcCommand) BeforeRun(cmd *cobra.Command) {
+	panic("implement me")
+}
+
 func (r RpcCommand) Prepare(cmd *cobra.Command) {
 }
 

@@ -19,6 +19,7 @@ func (t *commandBuilder) Build() *cobra.Command {
 	cmd := &cobra.Command{
 		Use: t.Name,
 		Run: func(cmd *cobra.Command, args []string) {
+			t.Runner.BeforeRun(cmd)
 			t.Runner.Run()
 		},
 	}
@@ -30,5 +31,6 @@ func (t *commandBuilder) Build() *cobra.Command {
 type Runner interface {
 	Prepare(cmd *cobra.Command)
 	InitFlag(cmd *cobra.Command)
+	BeforeRun(cmd *cobra.Command)
 	Run()
 }

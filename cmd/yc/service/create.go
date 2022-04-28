@@ -16,6 +16,9 @@ type CreateCommand struct {
 	WorkDir string
 }
 
+func (t *CreateCommand) BeforeRun(cmd *cobra.Command) {
+}
+
 func (t *CreateCommand) Prepare(cmd *cobra.Command) {
 }
 

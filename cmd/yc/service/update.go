@@ -20,8 +20,16 @@ type UpdateCommand struct {
 	WorkDir string
 }
 
-func (t *UpdateCommand) Prepare(cmd *cobra.Command) {
+func (t *UpdateCommand) BeforeRun(cmd *cobra.Command) {
+	if Env.Gopath == "" {
+		log.Fatal("missing environment GOPATH")
+	}
+	if Env.YcHome == "" {
+		log.Fatal("missing environment YC_HOME")
+	}
+}
 
+func (t *UpdateCommand) Prepare(cmd *cobra.Command) {
 }
 
 func (t *UpdateCommand) InitFlag(cmd *cobra.Command) {
@@ -84,7 +92,19 @@ func (t *UpdateCommand) initEnvConfig(service services.ServiceEntity) error {
 }
 
 func (t *UpdateCommand) genRpc(service services.ServiceEntity) {
-	if err := cmd.Exec("protoc", "--go_out=.", "--go_opt=paths=source_relative", "--go-grpc_out=.", "--go-grpc_opt=paths=source_relative", fmt.Sprintf("%s.proto", service.ProtoFileName)); err != nil {
+	args := []string{
+		"-I=" + Env.YcHome,
+		"-I=.",
+		"--go_out=.",
+		"--go_opt=paths=source_relative",
+		"--go-grpc_out=.",
+		"--go-grpc_opt=paths=source_relative",
+		fmt.Sprintf("%s.proto", service.ProtoFileName),
+	}
+	if err := cmd.Exec(
+		"protoc",
+		args...,
+	); err != nil {
 		log.Fatal(err)
 	}
 }
