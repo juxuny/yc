@@ -31,6 +31,8 @@ var SystemError = struct {
 	DatabaseNoData                Error `code:"-10027" msg:"no data"`
 	NotSupportedDataType          Error `code:"-10028" msg:"not supported data type"`
 	NotPointer                    Error `code:"-10029" msg:"not pointer"`
+	InvalidGoModule               Error `code:"-10030" msg:"invalid go module"`
+	NotFoundModuleFile            Error `code:"-10031" msg:"not found go.mod file"`
 }{}
 
 func init() {

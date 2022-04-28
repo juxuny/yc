@@ -11,6 +11,7 @@ type ServiceEntity struct {
 	ServiceStruct string
 	ServiceDir    string
 	ProtoFileName string
+	PackageAlias  string
 }
 
 func NewServiceEntity(serviceName string) ServiceEntity {
@@ -20,6 +21,7 @@ func NewServiceEntity(serviceName string) ServiceEntity {
 		PackageName:   utils.ToUnderLine(serviceName),
 		ProtoFileName: utils.ToUnderLine(serviceName),
 		ServiceStruct: utils.ToHump(serviceName),
+		PackageAlias:  utils.ToLowerFirst(utils.ToHump(serviceName)),
 	}
 	return ret
 }
@@ -44,4 +46,9 @@ type MessageField struct {
 type Message struct {
 	Name   string
 	Fields []MessageField
+}
+
+type HandlerEntity struct {
+	ServiceEntity
+	GoModuleName string
 }

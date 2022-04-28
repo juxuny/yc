@@ -1,10 +1,10 @@
 package handler
 
-import logServer "github.com/juxuny/yc/services/log-server"
+import {{.PackageAlias}} "{{.GoModuleName}}"
 
 type wrapper struct {
 	handler *handler
-	logServer.UnimplementedLogServerServer
+	{{.PackageAlias}}.Unimplemented{{.ServiceStruct}}Server
 }
 
 func NewWrapper() *wrapper {

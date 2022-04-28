@@ -61,7 +61,6 @@ func (t *UpdateCommand) Run() {
 	// auto generate client and request entities
 	t.genRpc(service)
 	t.genExtend(service)
-	t.genEntrypoint(service)
 }
 
 func (t *UpdateCommand) getServiceName() string {
@@ -137,6 +136,33 @@ func (t *UpdateCommand) genExtend(service services.ServiceEntity) {
 }
 
 func (t *UpdateCommand) genService(service services.ServiceEntity, svc []*parser.Service) {
+	t.genHandler(service, svc)
+	for _, s := range svc {
+		log.Println(s.ServiceName)
+	}
+}
+
+func (t *UpdateCommand) genHandler(service services.ServiceEntity, svc []*parser.Service) {
+	moduleName, err := utils.GetCurrentPackageName(t.WorkDir)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println("module name:", moduleName)
+	// create default
+	if err := utils.TouchDir(path.Join(t.WorkDir, "handler"), 0755); err != nil {
+		log.Fatal(err)
+	}
+	handlerEntity := services.HandlerEntity{
+		ServiceEntity: service,
+		GoModuleName:  moduleName,
+	}
+	if err := template.RunEmbedFile(templateFs, handlerDefaultFileName, path.Join(t.WorkDir, "handler", "default.go"), handlerEntity); err != nil {
+		log.Fatal(err)
+	}
+	if err := template.RunEmbedFile(templateFs, handlerWrapperFileName, path.Join(t.WorkDir, "handler", "wrapper.go"), handlerEntity); err != nil {
+		log.Fatal(err)
+	}
+	// create method groups
 }
 
 func (t *UpdateCommand) genValidator(service services.ServiceEntity, msgs []*parser.Message) {
@@ -199,10 +225,6 @@ func (t *UpdateCommand) genValidator(service services.ServiceEntity, msgs []*par
 	if err := template.RunEmbedFile(templateFs, validatorFileName, path.Join(t.WorkDir, service.ProtoFileName+".pb.validator.go"), validatorEntities); err != nil {
 		log.Fatal(err)
 	}
-}
-
-func (t *UpdateCommand) genEntrypoint(service services.ServiceEntity) {
-
 }
 
 func init() {
