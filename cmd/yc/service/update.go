@@ -156,11 +156,10 @@ func (t *UpdateCommand) genValidator(service services.ServiceEntity, msgs []*par
 				log.Println("is not a message field")
 				continue
 			}
-			pattern := ""
-			refValue := ""
 			errorMessageTemplate := ""
+			formulas := make([]services.ValidatorFormula, 0)
 			for _, comment := range f.Comments {
-				if pattern != "" && errorMessageTemplate != "" && refValue != "" {
+				if len(formulas) > 0 && errorMessageTemplate != "" {
 					break
 				}
 				for _, l := range comment.Lines() {
@@ -168,8 +167,10 @@ func (t *UpdateCommand) genValidator(service services.ServiceEntity, msgs []*par
 					if strings.Index(l, "@v:") == 0 {
 						kvs := strings.Split(strings.TrimSpace(utils.StringHelper.TrimSubSequenceLeft(l, "@v:")), "=")
 						if len(kvs) >= 2 {
-							pattern = strings.TrimSpace(kvs[0])
-							refValue = strings.TrimSpace(kvs[1])
+							formulas = append(formulas, services.ValidatorFormula{
+								Pattern:  strings.TrimSpace(kvs[0]),
+								RefValue: strings.TrimSpace(kvs[1]),
+							})
 						}
 						continue
 					}
@@ -179,11 +180,10 @@ func (t *UpdateCommand) genValidator(service services.ServiceEntity, msgs []*par
 					}
 				}
 			}
-			if pattern != "" && refValue != "" && errorMessageTemplate != "" {
+			if len(formulas) > 0 && errorMessageTemplate != "" {
 				fields = append(fields, services.MessageField{
 					Name:      utils.ToUpperFirst(utils.ToHump(f.FieldName)),
-					Pattern:   pattern,
-					RefValue:  refValue,
+					Formulas:  formulas,
 					ParamName: utils.ToLowerFirst(utils.ToHump(f.FieldName)),
 					Error:     errorMessageTemplate,
 				})

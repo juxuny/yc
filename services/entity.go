@@ -29,10 +29,14 @@ type ValidatorEntity struct {
 	Messages []Message
 }
 
+type ValidatorFormula struct {
+	Pattern  string
+	RefValue string
+}
+
 type MessageField struct {
 	Name      string
-	Pattern   string
-	RefValue  string
+	Formulas  []ValidatorFormula
 	ParamName string
 	Error     string
 }
