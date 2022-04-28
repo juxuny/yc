@@ -146,6 +146,9 @@ func (t *UpdateCommand) genValidator(service services.ServiceEntity, msgs []*par
 	for _, m := range msgs {
 		//log.Println(m.MessageName)
 		fields := make([]services.MessageField, 0)
+		if !strings.HasSuffix(m.MessageName, "Request") && !strings.HasSuffix(m.MessageName, "Req") {
+			continue
+		}
 		for _, body := range m.MessageBody {
 			//log.Println(reflect.ValueOf(body).Type().String())
 			f, ok := body.(*parser.Field)
