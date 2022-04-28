@@ -59,3 +59,8 @@ type MethodEntity struct {
 	Request    string
 	Response   string
 }
+
+type EntrypointEntity struct {
+	ServiceEntity
+	GoModuleName string
+}

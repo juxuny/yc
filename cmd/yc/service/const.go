@@ -10,4 +10,7 @@ const (
 	handlerMethodFuncFileName  = "template/handler/method_func.go.tpl"
 	handlerWrapperInitFileName = "template/handler/wrapper_init.go.tpl"
 	handlerWrapperFuncFileName = "template/handler/wrapper_func.go.tpl"
+	defaultConfigFileName      = "template/default.go.tpl"
+	httpServerFileName         = "template/server/http/http_server.go.tpl"
+	rpcServerFileName          = "template/service/rpc/rpc_service.go.tpl"
 )

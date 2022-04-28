@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"github.com/juxuny/yc"
 	"github.com/juxuny/yc/log"
-	logServer "github.com/juxuny/yc/services/log-server"
-	"github.com/juxuny/yc/services/log-server/handler"
+	{{.PackageAlias}} "{{.GoModuleName}}"
+	"{{.GoModuleName}}/handler"
 	"github.com/juxuny/yc/trace"
 	"google.golang.org/grpc"
 	"net"
@@ -27,7 +27,7 @@ func Start(ctx context.Context) {
 	log.Info("start rpc ")
 	opts := make([]grpc.ServerOption, 0)
 	rpcServer = grpc.NewServer(opts...)
-	logServer.RegisterLogServerServer(rpcServer, handler.NewWrapper())
+	{{.PackageAlias}}.Register{{.ServiceStruct}}Server(rpcServer, handler.NewWrapper())
 	finished := make(chan bool, 1)
 	go func() {
 		if err := rpcServer.Serve(ln); err != nil {

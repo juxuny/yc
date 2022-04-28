@@ -141,6 +141,13 @@ func (t *UpdateCommand) genService(service services.ServiceEntity, svc []*parser
 	for _, s := range svc {
 		log.Println(s.ServiceName)
 	}
+
+	// gen entrypoint
+	if _, err := os.Stat(path.Join(t.WorkDir, "default.go")); os.IsNotExist(err) {
+		if err := template.RunEmbedFile(templateFs, defaultConfigFileName, path.Join(t.WorkDir, "default.go"), service); err != nil {
+			log.Fatal("create default config failed:", err)
+		}
+	}
 }
 
 func (t *UpdateCommand) genHandler(service services.ServiceEntity, svc []*parser.Service) {
