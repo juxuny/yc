@@ -14,6 +14,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 )
 
 type UpdateCommand struct {
@@ -139,7 +140,62 @@ func (t *UpdateCommand) genService(service services.ServiceEntity, svc []*parser
 }
 
 func (t *UpdateCommand) genValidator(service services.ServiceEntity, msgs []*parser.Message) {
+	validatorEntities := services.ValidatorEntity{
+		ServiceEntity: service,
+	}
+	for _, m := range msgs {
+		//log.Println(m.MessageName)
+		fields := make([]services.MessageField, 0)
+		for _, body := range m.MessageBody {
+			//log.Println(reflect.ValueOf(body).Type().String())
+			f, ok := body.(*parser.Field)
+			if !ok {
+				log.Println("is not a message field")
+				continue
+			}
+			pattern := ""
+			refValue := ""
+			errorMessageTemplate := ""
+			for _, comment := range f.Comments {
+				if pattern != "" && errorMessageTemplate != "" && refValue != "" {
+					break
+				}
+				for _, l := range comment.Lines() {
+					l = strings.TrimSpace(l)
+					if strings.Index(l, "@v:") == 0 {
+						kvs := strings.Split(strings.TrimSpace(utils.StringHelper.TrimSubSequenceLeft(l, "@v:")), "=")
+						if len(kvs) >= 2 {
+							pattern = strings.TrimSpace(kvs[0])
+							refValue = strings.TrimSpace(kvs[1])
+						}
+						continue
+					}
+					if strings.Index(l, "@msg:") == 0 {
+						errorMessageTemplate = strings.TrimSpace(utils.StringHelper.TrimSubSequenceLeft(l, "@msg:"))
+						continue
+					}
+				}
+			}
+			if pattern != "" && refValue != "" && errorMessageTemplate != "" {
+				fields = append(fields, services.MessageField{
+					Name:      utils.ToUpperFirst(utils.ToHump(f.FieldName)),
+					Pattern:   pattern,
+					RefValue:  refValue,
+					ParamName: utils.ToLowerFirst(utils.ToHump(f.FieldName)),
+					Error:     errorMessageTemplate,
+				})
+			}
+		}
+		messageItem := services.Message{
+			Name:   m.MessageName,
+			Fields: fields,
+		}
+		validatorEntities.Messages = append(validatorEntities.Messages, messageItem)
+	}
 
+	if err := template.RunEmbedFile(templateFs, validatorFileName, path.Join(t.WorkDir, service.ProtoFileName+".pb.validator.go"), validatorEntities); err != nil {
+		log.Fatal(err)
+	}
 }
 
 func (t *UpdateCommand) genEntrypoint(service services.ServiceEntity) {

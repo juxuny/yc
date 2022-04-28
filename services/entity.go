@@ -23,3 +23,21 @@ func NewServiceEntity(serviceName string) ServiceEntity {
 	}
 	return ret
 }
+
+type ValidatorEntity struct {
+	ServiceEntity
+	Messages []Message
+}
+
+type MessageField struct {
+	Name      string
+	Pattern   string
+	RefValue  string
+	ParamName string
+	Error     string
+}
+
+type Message struct {
+	Name   string
+	Fields []MessageField
+}
