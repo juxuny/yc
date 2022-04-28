@@ -5,7 +5,7 @@ import (
 )
 
 const (
-{{range $item := .Messages}}{{range $f := .Fields}}	ValidatorTemplate{{$item.Name}}{{$f.Name}} = "invalid level"
+{{range $item := .Messages}}{{range $f := .Fields}}	ValidatorTemplate{{$item.Name}}{{$f.Name}} = "{{$f.Error}}"
 {{end}}{{end}})
 
 var templateList = []string{
