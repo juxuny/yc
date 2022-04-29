@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"github.com/juxuny/yc/errors"
 	"os"
 )
@@ -14,6 +15,15 @@ func TouchDir(dir string, perm os.FileMode) error {
 	}
 	if !stat.IsDir() {
 		return errors.SystemError.FsIsNotDir
+	}
+	return nil
+}
+
+func TouchDirs(dirs []string, perm os.FileMode) error {
+	for _, d := range dirs {
+		if err := TouchDir(d, perm); err != nil {
+			return fmt.Errorf("touch dir failed: %s: %v", d, err)
+		}
 	}
 	return nil
 }

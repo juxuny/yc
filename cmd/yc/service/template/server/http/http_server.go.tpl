@@ -24,13 +24,13 @@ func Start(ctx context.Context) {
 		if err := http.ListenAndServe(fmt.Sprintf(":%d", config.Env.HttpPort), r); err != nil {
 			panic(err)
 		}
-		finished <- true
+		finished {{.Lt}}- true
 	}()
 	select {
-	case <-ctx.Done():
+	case {{.Lt}}-ctx.Done():
 		log.Info("canceled")
 		return
-	case <-finished:
+	case {{.Lt}}-finished:
 		log.Info("http server finished")
 	}
 }

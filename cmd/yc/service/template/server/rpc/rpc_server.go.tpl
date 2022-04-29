@@ -33,14 +33,14 @@ func Start(ctx context.Context) {
 		if err := rpcServer.Serve(ln); err != nil {
 			log.Error("failed to serve:", err)
 			rpcServer = nil
-			finished <- true
+			finished {{.Lt}}- true
 		}
 	}()
 	select {
-	case <-ctx.Done():
+	case {{.Lt}}-ctx.Done():
 		Stop()
 		return
-	case <-finished:
+	case {{.Lt}}-finished:
 		return
 	}
 }

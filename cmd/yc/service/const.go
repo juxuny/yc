@@ -12,5 +12,5 @@ const (
 	handlerWrapperFuncFileName = "template/handler/wrapper_func.go.tpl"
 	defaultConfigFileName      = "template/default.go.tpl"
 	httpServerFileName         = "template/server/http/http_server.go.tpl"
-	rpcServerFileName          = "template/service/rpc/rpc_service.go.tpl"
+	rpcServerFileName          = "template/server/rpc/rpc_server.go.tpl"
 )

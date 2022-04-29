@@ -148,6 +148,29 @@ func (t *UpdateCommand) genService(service services.ServiceEntity, svc []*parser
 			log.Fatal("create default config failed:", err)
 		}
 	}
+	if err := utils.TouchDirs([]string{
+		path.Join(t.WorkDir, "server"),
+		path.Join(t.WorkDir, "server", "http"),
+		path.Join(t.WorkDir, "server", "rpc"),
+	}, 0755); err != nil {
+		log.Fatal(err)
+	}
+	moduleName, err := utils.GetCurrentPackageName(t.WorkDir)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := template.RunEmbedFile(templateFs, httpServerFileName, path.Join(t.WorkDir, "server", "http", "http_server.go"), services.EntrypointEntity{
+		ServiceEntity: service,
+		GoModuleName:  moduleName,
+	}); err != nil {
+		log.Fatal(err)
+	}
+	if err := template.RunEmbedFile(templateFs, rpcServerFileName, path.Join(t.WorkDir, "server", "rpc", "rpc_server.go"), services.EntrypointEntity{
+		ServiceEntity: service,
+		GoModuleName:  moduleName,
+	}); err != nil {
+		log.Fatal(err)
+	}
 }
 
 func (t *UpdateCommand) genHandler(service services.ServiceEntity, svc []*parser.Service) {
@@ -250,7 +273,7 @@ func (t *UpdateCommand) checkOrAppendMethod(group string, method services.Method
 }
 
 func (t *UpdateCommand) checkIfContainMethod(fileName string, group string, method services.MethodEntity) (found bool, err error) {
-	searchKey := fmt.Sprintf("func (t *handler) %s(ctx context.Context, req *cos.%s) (resp *cos.%s, err error)", method.MethodName, method.Request, method.Response)
+	searchKey := fmt.Sprintf("func %s(ctx context.Context, req *cos.%s) (resp *cos.%s, err error)", method.MethodName, method.Request, method.Response)
 	content, err := ioutil.ReadFile(fileName)
 	if err != nil {
 		return false, err

@@ -2,8 +2,19 @@ package services
 
 import (
 	"github.com/juxuny/yc/utils"
+	"html/template"
 	"strings"
 )
+
+type baseEntity struct{}
+
+func (baseEntity) Lt() template.HTML {
+	return "<"
+}
+
+func (baseEntity) Gt() template.HTML {
+	return ">"
+}
 
 type ServiceEntity struct {
 	ServiceName   string
@@ -61,6 +72,7 @@ type MethodEntity struct {
 }
 
 type EntrypointEntity struct {
+	baseEntity
 	ServiceEntity
 	GoModuleName string
 }
