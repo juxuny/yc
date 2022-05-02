@@ -33,6 +33,10 @@ var SystemError = struct {
 	NotPointer                    Error `code:"-10029" msg:"not pointer"`
 	InvalidGoModule               Error `code:"-10030" msg:"invalid go module"`
 	NotFoundModuleFile            Error `code:"-10031" msg:"not found go.mod file"`
+	InternalError                 Error `code:"-10032" msg:"server error"`
+	RpcCallLevelNotAllow          Error `code:"-10033" msg:"rpc level not allow"`
+	RpcCallMetaEmpty              Error `code:"-10034" msg:"rpc call metadata empty"`
+	InvalidRpcCallerLevel         Error `code:"-10035" msg:"invalid rpc caller level"`
 }{}
 
 func init() {

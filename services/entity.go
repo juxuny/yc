@@ -16,6 +16,14 @@ func (baseEntity) Gt() template.HTML {
 	return ">"
 }
 
+func (baseEntity) Le() template.HTML {
+	return "<="
+}
+
+func (baseEntity) Ge() template.HTML {
+	return ">="
+}
+
 type ServiceEntity struct {
 	ServiceName   string
 	PackageName   string
@@ -60,6 +68,7 @@ type Message struct {
 }
 
 type HandlerInitEntity struct {
+	baseEntity
 	ServiceEntity
 	GoModuleName string
 }

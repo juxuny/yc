@@ -2,4 +2,4 @@
 package {{.PackageName}}
 
 const Name = "{{.PackageName}}"
-const Level = 1
+const Level = int64(1)

@@ -187,11 +187,17 @@ func (t *UpdateCommand) genHandler(service services.ServiceEntity, svc []*parser
 		ServiceEntity: service,
 		GoModuleName:  moduleName,
 	}
-	if err := template.RunEmbedFile(templateFs, handlerDefaultFileName, path.Join(t.WorkDir, "handler", "default.go"), handlerEntity); err != nil {
-		log.Fatal(err)
+	handlerDefaultOutputFile := path.Join(t.WorkDir, "handler", "default.go")
+	if _, err := os.Stat(handlerDefaultOutputFile); os.IsNotExist(err) {
+		if err := template.RunEmbedFile(templateFs, handlerDefaultFileName, path.Join(t.WorkDir, "handler", "default.go"), handlerEntity); err != nil {
+			log.Fatal(err)
+		}
 	}
-	if err := template.RunEmbedFile(templateFs, handlerWrapperFileName, path.Join(t.WorkDir, "handler", "wrapper.go"), handlerEntity); err != nil {
-		log.Fatal(err)
+	handlerWrapperOutputFile := path.Join(t.WorkDir, "handler", "wrapper.go")
+	if _, err := os.Stat(handlerWrapperOutputFile); os.IsNotExist(err) {
+		if err := template.RunEmbedFile(templateFs, handlerWrapperFileName, path.Join(t.WorkDir, "handler", "wrapper.go"), handlerEntity); err != nil {
+			log.Fatal(err)
+		}
 	}
 	// create method groups
 	if len(svc) > 1 {

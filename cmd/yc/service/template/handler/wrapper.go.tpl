@@ -1,14 +1,40 @@
 package handler
 
-import {{.PackageAlias}} "{{.GoModuleName}}"
+import (
+	"context"
+	"github.com/juxuny/yc"
+	"github.com/juxuny/yc/errors"
+	"github.com/juxuny/yc/log"
+	"github.com/juxuny/yc/middle"
+
+	{{.PackageAlias}} "{{.GoModuleName}}"
+)
 
 type wrapper struct {
 	handler *handler
+	beforeHandler middle.Group
+	afterHandler middle.Group
 	{{.PackageAlias}}.Unimplemented{{.ServiceStruct}}Server
 }
 
 func NewWrapper() *wrapper {
 	return &wrapper{
+		beforeHandler: middle.NewGroup().Add(&levelValidator{}),
+		afterHandler: middle.NewGroup().Add(&middle.RecoverHandler{}),
 		handler: &handler{},
 	}
+}
+
+type levelValidator struct {}
+
+func (t *levelValidator) Run(ctx context.Context) (isEnd bool, err error) {
+	callerLevel, err := yc.GetCallerLevelFromContext(ctx)
+	if err != nil {
+		return true, err
+	}
+	if callerLevel {{.Le}} {{.PackageAlias}}.Level {
+		log.Error("caller service's level is smaller than current")
+		return true, errors.SystemError.RpcCallLevelNotAllow
+	}
+	return
 }
