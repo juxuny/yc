@@ -13,4 +13,5 @@ const (
 	defaultConfigFileName      = "template/default.go.tpl"
 	httpServerFileName         = "template/server/http/http_server.go.tpl"
 	rpcServerFileName          = "template/server/rpc/rpc_server.go.tpl"
+	mainFileName               = "template/server/main.go.tpl"
 )

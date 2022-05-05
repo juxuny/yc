@@ -18,6 +18,11 @@ func (t *wrapper) {{.MethodName}}(ctx context.Context, req *{{.PackageAlias}}.{{
 		log.Error(err)
 		return nil, err
 	}
+	defer func () {
+		if err != nil {
+			log.Error(err)
+		}
+	} ()
 	return t.handler.{{.MethodName}}(ctx, req)
 }
 

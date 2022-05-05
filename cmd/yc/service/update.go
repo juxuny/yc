@@ -86,8 +86,11 @@ func (t *UpdateCommand) initEnvConfig(service services.ServiceEntity) error {
 	if err := utils.TouchDir(configDir, 0755); err != nil {
 		log.Fatal(err)
 	}
-	if err := template.RunEmbedFile(templateFs, envConfigFileName, path.Join(t.WorkDir, "config", "env.go"), service); err != nil {
-		log.Fatal("create env.go failed:", err)
+	outEnvFile := path.Join(t.WorkDir, "config", "env.go")
+	if _, err := os.Stat(outEnvFile); os.IsNotExist(err) {
+		if err := template.RunEmbedFile(templateFs, envConfigFileName, outEnvFile, service); err != nil {
+			log.Fatal("create env.go failed:", err)
+		}
 	}
 	return nil
 }
@@ -170,6 +173,15 @@ func (t *UpdateCommand) genService(service services.ServiceEntity, svc []*parser
 		GoModuleName:  moduleName,
 	}); err != nil {
 		log.Fatal(err)
+	}
+
+	// init main.go
+	log.Println("create main file")
+	outMainFile := path.Join(t.WorkDir, "server", "main.go")
+	if _, err := os.Stat(outMainFile); os.IsNotExist(err) {
+		if err := template.RunEmbedFile(templateFs, mainFileName, outMainFile, service); err != nil {
+			log.Fatal("create main file error:", err)
+		}
 	}
 }
 

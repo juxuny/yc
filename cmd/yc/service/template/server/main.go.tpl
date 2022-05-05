@@ -3,9 +3,8 @@ package main
 import (
 	"context"
 	"github.com/juxuny/yc/log"
-	"github.com/juxuny/yc/services/log-server/handler"
-	"github.com/juxuny/yc/services/log-server/server/http"
-	"github.com/juxuny/yc/services/log-server/server/rpc"
+	"github.com/juxuny/yc/services/{{.ServiceDir}}/server/http"
+	"github.com/juxuny/yc/services/{{.ServiceDir}}/server/rpc"
 	"github.com/juxuny/yc/trace"
 	"os"
 	"os/signal"
@@ -24,7 +23,7 @@ func main() {
 	// kill -2 is syscall.SIGINT
 	// kill -9 is syscall.SIGKILL but can"t be catch, so don't need add it
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-	<-quit
+	{{.Lt}}-quit
 	log.Info("received shutdown server signal ...")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
@@ -32,18 +31,15 @@ func main() {
 	finished := make(chan bool)
 	go func() {
 		trace.InitContext()
-		if err := handler.Flush(); err != nil {
-			log.Error(err)
-		}
 		trace.Wait()
-		finished <- true
+		finished {{.Lt}}- true
 	}()
 	// catching ctx.Done(). timeout of 5 seconds.
 	select {
-	case <-finished:
+	case {{.Lt}}-finished:
 		serverCanceler()
 		log.Info("server shutdown gracefully")
-	case <-ctx.Done():
+	case {{.Lt}}-ctx.Done():
 		log.Info("timeout of 15 seconds.")
 	}
 }
