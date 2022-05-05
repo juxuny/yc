@@ -37,6 +37,7 @@ var SystemError = struct {
 	RpcCallLevelNotAllow          Error `code:"-10033" msg:"rpc level not allow"`
 	RpcCallMetaEmpty              Error `code:"-10034" msg:"rpc call metadata empty"`
 	InvalidRpcCallerLevel         Error `code:"-10035" msg:"invalid rpc caller level"`
+	NotFoundRpcCallerLevel        Error `code:"-10036" msg:"not found rpc caller level"`
 }{}
 
 func init() {
