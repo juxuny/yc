@@ -15,7 +15,7 @@ const (
 func GetCallerLevelFromMd(md metadata.MD) (level int, err error) {
 	v := md.Get(MdContextCallerLevel)
 	if len(v) == 0 {
-		return 0, errors.SystemError.NotFound
+		return 0, errors.SystemError.NotFoundRpcCallerLevel
 	}
 	levelInt64, err := strconv.ParseInt(v[0], 10, 64)
 	if err != nil {
