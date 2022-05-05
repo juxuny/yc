@@ -29,6 +29,7 @@ type QueryWrapper interface {
 	Select(fields ...FieldName) QueryWrapper
 	LeftJoin(tableName TableName, where WhereWrapper) QueryWrapper
 	RightJoin(tableName TableName, where WhereWrapper) QueryWrapper
+	SetWhere(where WhereWrapper) QueryWrapper
 }
 
 type queryWrapper struct {
@@ -39,6 +40,11 @@ type queryWrapper struct {
 	selectFields      []FieldName
 	selectValueHolder []interface{}
 	joinList          []Join
+}
+
+func (t *queryWrapper) SetWhere(where WhereWrapper) QueryWrapper {
+	t.WhereWrapper = where
+	return t
 }
 
 func (t *queryWrapper) LeftJoin(tableName TableName, where WhereWrapper) QueryWrapper {

@@ -25,7 +25,7 @@ func CreateModel(model interface{}) Model {
 		out := m.Call(nil)
 		for _, v := range out {
 			if v.Kind() == reflect.String {
-				ret.TableName = TableName(TablePrefix + "_" + v.String())
+				ret.TableName = TableName(strings.Trim(TablePrefix+"_"+v.String(), "_"))
 			}
 		}
 	}

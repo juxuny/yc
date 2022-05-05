@@ -2,7 +2,6 @@ package orm
 
 import (
 	"database/sql"
-	"fmt"
 	"github.com/juxuny/yc/dt"
 	"reflect"
 	"strconv"
@@ -19,7 +18,7 @@ func (t *dataTypeConverter) Convert(in reflect.Value, dstType reflect.Type) refl
 		in = in.Elem()
 	}
 	var ret reflect.Value
-	fmt.Println("in: ", in.Type().String(), " to:", dstType.String(), " kind:", in.Kind())
+	//fmt.Println("in: ", in.Type().String(), " to:", dstType.String(), " kind:", in.Kind())
 	switch in.Kind() {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		ret = t.convertInt(in, dstType)

@@ -13,6 +13,7 @@ type UpdateWrapper interface {
 	Updates(object interface{}, ignoreFields ...FieldName) UpdateWrapper
 	Build() (statement string, values []interface{}, err error)
 	Table(tableName TableName) UpdateWrapper
+	SetWhere(w WhereWrapper) UpdateWrapper
 }
 
 type updateWrapper struct {
@@ -23,13 +24,18 @@ type updateWrapper struct {
 	expressions []UpdateExpression
 }
 
+func (t *updateWrapper) SetWhere(w WhereWrapper) UpdateWrapper {
+	t.WhereWrapper = w
+	return t
+}
+
 func (t *updateWrapper) Inc(field FieldName, value interface{}) UpdateWrapper {
 	t.expressions = append(t.expressions, NewIncreaseExpression(field, value))
 	return t
 }
 
 func (t *updateWrapper) Updates(modelOrMap interface{}, ignoreFields ...FieldName) UpdateWrapper {
-	t.expressions = append(t.expressions, NewUpdateExpression(modelOrMap))
+	t.expressions = append(t.expressions, NewUpdateExpression(modelOrMap, ignoreFields...))
 	return t
 }
 

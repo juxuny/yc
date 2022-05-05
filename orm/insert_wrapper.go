@@ -101,7 +101,7 @@ func (t *insertWrapper) Build() (statement string, values []interface{}, next bo
 			}
 			if v, b := valueMap[f.String()]; b {
 				holderStatement += "?"
-				rowValues = append(rowValues, reflect.ValueOf(v))
+				rowValues = append(rowValues, v)
 			} else {
 				holderStatement += "NULL"
 			}
