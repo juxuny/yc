@@ -1,0 +1,214 @@
+syntax = "proto3";
+
+package cos;
+option go_package = "./;cos";
+
+import "dt/juxuny_yc_dt_base.proto";
+
+service Cos {
+  // @group: devops
+  // @ignore-auth
+  rpc Health(HealthRequest) returns (HealthResponse) {}
+
+  // @group: auth
+  // @ignore-auth
+  rpc Login(LoginRequest) returns (LoginResponse) {}
+
+  // @group: user
+  rpc UserInfo(UserInfoRequest) returns (UserInfoResponse) {}
+  // @group: user
+  rpc UpdateInfo(UpdateInfoRequest) returns(UpdateInfoResponse) {}
+  // @group: user
+  rpc ModifyPassword(ModifyPasswordRequest) returns (ModifyPasswordResponse) {}
+
+  // @group: user
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {}
+
+  // @group: namespace
+  rpc SaveNamespace(SaveNamespaceRequest) returns (SaveNamespaceResponse) {}
+  // @group: namespace
+  rpc ListNamespace(ListNamespaceRequest) returns(ListNamespaceResponse) {}
+  // @group: namespace
+  rpc DeleteNamespace(DeleteNamespaceRequest) returns(DeleteNamespaceResponse) {}
+}
+
+message HealthRequest {}
+
+message HealthResponse {
+  string currentTime = 1;
+}
+
+enum LoginType {
+  LoginTypeUnknown = 0;
+  LoginTypePassword = 1;
+}
+
+message LoginRequest {
+  string userName = 1;
+  string password = 2;
+  // @v: in: 1
+  // @msg: 无效登录类型: {{LoginType}}
+  LoginType loginType = 3;
+}
+
+message LoginResponse {
+  uint64  userId = 1;
+  string name = 2;
+  string token = 3;
+}
+
+message UserInfoRequest {
+  dt.ID userId = 1;
+}
+
+message UserInfoSimple {
+  dt.ID userId = 1;
+  string name = 2;
+  string userName = 3;
+  LoginType loginType = 4;
+}
+
+message UserInfoResponse {
+  dt.ID userId = 1;
+  string name = 2;
+  string userName = 3;
+  LoginType loginType = 4;
+}
+
+
+message UpdateInfoRequest {
+  dt.ID userId = 1;
+  string name = 2;
+}
+
+message UpdateInfoResponse {}
+
+enum ModifyPasswordType {
+  Unknown = 0;
+  // 通过旧密码修改
+  OldPassword = 1;
+  // 通过临时token修改
+  Token = 2;
+}
+
+message ModifyPasswordRequest {
+  dt.ID userId = 1;
+  ModifyPasswordType type = 2;
+  string oldPassword = 3;
+  string newPassword = 4;
+  // @v: length.min=5
+  // @v: length.max=32
+  // @msg: 无效凭证
+  string token = 5;
+}
+
+message ModifyPasswordResponse {}
+
+enum AccountType {
+  AccountTypeUnknown = 0;
+  AccountTypePassword = 1;
+}
+
+message ModelAccount {
+  // @index
+  dt.ID id = 1;
+  // @index
+  string identifier = 2;
+  string credential = 3;
+  // @index
+  AccountType accountType = 4;
+  int64 createTime = 5;
+  int64 updateTime = 6;
+  int64 deletedAt = 7;
+  bool isDisabled = 8;
+  // @index
+  dt.ID creatorId = 9;
+}
+
+message ModelNamespace {
+  // @index
+  dt.ID id = 1;
+  // @index
+  string namespace = 2;
+  int64 createTime = 3;
+  int64 updateTime = 4;
+  int64 deletedAt = 5;
+  bool isDisabled = 6;
+  // @index
+  dt.ID creatorId = 7;
+}
+message ModelConfig {
+  // @index
+  dt.ID id = 1;
+  int64 createTime = 2;
+  int64 updateTime = 3;
+  int64 deletedAt = 4;
+  // @index
+  string configId = 5;
+  bool isDisabled = 6;
+  // @index
+  dt.ID creatorId = 7;
+}
+
+enum ValueType {
+  ValueTypeUnknown = 0;
+  ValueTypeInt = 1;
+  ValueTypeFloat64 = 2;
+  ValueTypeBool = 3;
+  ValueTypeString = 4;
+}
+
+message ModelKeyValue {
+  // @index
+  dt.ID id = 1;
+  int64 createTime = 2;
+  int64 updateTime = 3;
+  int64 deletedAt = 4;
+  bool isDisabled = 5;
+  // @index
+  string configKey = 6;
+  string configValue = 7;
+  ValueType valueType = 8;
+  // @index
+  string configId = 9;
+  // @index
+  dt.ID creatorId = 10;
+}
+
+message CreateUserRequest {
+  string identifier = 1;
+  string credential = 2;
+  AccountType AccountType = 3;
+}
+
+message CreateUserResponse {
+  dt.ID userId = 1;
+}
+
+message SaveNamespaceRequest {
+  string namespace = 1;
+  dt.ID id = 2;
+}
+
+message SaveNamespaceResponse {}
+
+message ListNamespaceRequest {
+  dt.Pagination pagination = 1;
+  string searchKey = 2;
+}
+
+message ListNamespaceItem {
+  dt.ID id = 1;
+  string namespace = 2;
+}
+
+message ListNamespaceResponse {
+  dt.PaginationResp pagination = 1;
+  repeated ListNamespaceItem list = 2;
+}
+
+message DeleteNamespaceRequest {
+  dt.ID id = 1;
+}
+
+message DeleteNamespaceResponse {}
