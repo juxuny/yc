@@ -7,12 +7,17 @@ import (
 	"os"
 )
 
+var funcMap = map[string]interface{}{
+	"upperFirst": toUpperFirst,
+	"lowerFirst": toLowerFirst,
+}
+
 func RunEmbedFile(fs embed.FS, templateFileName string, outputFileName string, data interface{}) error {
 	buf, err := fs.ReadFile(templateFileName)
 	if err != nil {
 		return errors.SystemError.FsReadTemplateDataFailed.Wrap(err)
 	}
-	tpl, err := template.New(templateFileName).Parse(string(buf))
+	tpl, err := template.New(templateFileName).Funcs(funcMap).Parse(string(buf))
 	if err != nil {
 		return errors.SystemError.TemplateSyntaxError.Wrap(err)
 	}
@@ -31,7 +36,7 @@ func AppendFromEmbedFile(fs embed.FS, templateFileName string, outputFileName st
 	if err != nil {
 		return errors.SystemError.FsReadTemplateDataFailed.Wrap(err)
 	}
-	tpl, err := template.New(templateFileName).Parse(string(buf))
+	tpl, err := template.New(templateFileName).Funcs(funcMap).Parse(string(buf))
 	if err != nil {
 		return errors.SystemError.TemplateSyntaxError.Wrap(err)
 	}

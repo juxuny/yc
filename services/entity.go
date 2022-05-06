@@ -89,19 +89,27 @@ type EntrypointEntity struct {
 }
 
 type ModelField struct {
-	FieldName    string
-	OrmFieldName string
-	HasIndex     bool
+	TableName     string
+	ModelName     string
+	FieldName     string
+	OrmFieldName  string
+	JsonFieldName string
+	ModelDataType string
+	Ignore        bool
+	HasIndex      bool
+	HasDeletedAt  bool
 }
 
 type Model struct {
-	Fields       []ModelField
-	TableName    string
-	HasDeletedAt bool
+	Fields                        []ModelField
+	TableName                     string
+	ModelName                     string
+	TableNameWithoutServicePrefix string
+	HasDeletedAt                  bool
 }
 
 type ModelEntity struct {
 	ServiceEntity
-	NoDuplicatedFields []ModelField
-	Models             []Model
+	GoModuleName string
+	Model
 }
