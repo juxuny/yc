@@ -161,3 +161,11 @@ func (m NullBool) MarshalJSON() (data []byte, err error) {
 func (m NullBool) Equal(input NullBool) bool {
 	return m.Valid == input.Valid && m.Bool == input.Bool
 }
+
+func (m Pagination) ToResp(total int64) PaginationResp {
+	return PaginationResp{
+		PageNum:  m.PageNum,
+		PageSize: m.PageSize,
+		Total:    total,
+	}
+}
