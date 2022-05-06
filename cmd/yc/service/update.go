@@ -231,6 +231,7 @@ func (t *UpdateCommand) genHandler(service services.ServiceEntity, svc []*parser
 			MethodName:        rpc.RPCName,
 			Request:           rpc.RPCRequest.MessageType,
 			Response:          rpc.RPCResponse.MessageType,
+			UseAuth:           getAuthFromRpcCommentsOfProto(rpc.Comments),
 		}
 		methodsMap[groupName] = append(methodsMap[groupName], method)
 	}

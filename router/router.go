@@ -49,7 +49,7 @@ func (t *Router) Register(groupName string, handler interface{}) error {
 		methodName := strings.ReplaceAll(utils.ToUnderLine(methodType.Name), "_", "-")
 		path := t.Prefix + "/" + groupName + "/" + methodName
 		t.m[path] = method
-		log.Debug("register method: ", path)
+		log.Info("register method: ", path)
 	}
 	return nil
 }
@@ -110,7 +110,7 @@ func (t *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			_ = r.Body.Close()
-			log.Info("request:", string(data))
+			log.Info("request:", strings.ReplaceAll(string(data), "\n", ""))
 			if err := json.Unmarshal(data, requestParamInstance); err != nil {
 				statusCode = http.StatusBadRequest
 				WriteJson(w, errors.SystemError.InvalidJsonData.Wrap(err), http.StatusBadRequest)

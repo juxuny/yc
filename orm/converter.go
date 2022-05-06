@@ -192,6 +192,8 @@ func (t *dataTypeConverter) convertInt(in reflect.Value, dstType reflect.Type) r
 		} else {
 			panic("unknown dest type: " + dstType.String())
 		}
+	case reflect.Bool:
+		holder.SetBool(in.Int() > 0)
 	default:
 		panic("unknown dest type: " + dstType.String())
 	}

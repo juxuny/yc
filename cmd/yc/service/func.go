@@ -20,3 +20,20 @@ func getGroupNameFromRpcCommentsOfProto(comments []*parser.Comment) (groupName s
 	}
 	return
 }
+
+func getAuthFromRpcCommentsOfProto(comments []*parser.Comment) (auth bool) {
+	for _, c := range comments {
+		lines := c.Lines()
+		for _, line := range lines {
+			line = strings.TrimSpace(line)
+			if strings.Index(line, "@auth") == 0 {
+				return true
+			}
+
+			if strings.Index(line, "@ignore-auth") == 0 {
+				return false
+			}
+		}
+	}
+	return true
+}

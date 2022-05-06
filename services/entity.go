@@ -25,6 +25,7 @@ func (baseEntity) Ge() template.HTML {
 }
 
 type ServiceEntity struct {
+	baseEntity
 	ServiceName   string
 	PackageName   string
 	ServiceStruct string
@@ -78,10 +79,29 @@ type MethodEntity struct {
 	MethodName string
 	Request    string
 	Response   string
+	UseAuth    bool
 }
 
 type EntrypointEntity struct {
 	baseEntity
 	ServiceEntity
 	GoModuleName string
+}
+
+type ModelField struct {
+	FieldName    string
+	OrmFieldName string
+	HasIndex     bool
+}
+
+type Model struct {
+	Fields       []ModelField
+	TableName    string
+	HasDeletedAt bool
+}
+
+type ModelEntity struct {
+	ServiceEntity
+	NoDuplicatedFields []ModelField
+	Models             []Model
 }

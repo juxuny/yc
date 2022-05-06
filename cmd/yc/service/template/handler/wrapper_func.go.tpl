@@ -1,7 +1,15 @@
 func (t *wrapper) {{.MethodName}}(ctx context.Context, req *{{.PackageAlias}}.{{.Request}}) (resp *{{.PackageAlias}}.{{.Response}}, err error) {
+	var isEnd bool
 	trace.WithContext(ctx)
-	defer trace.Clean()
-	isEnd, err := t.beforeHandler.Run(ctx)
+	defer trace.Clean(){{if .UseAuth}}
+	isEnd, err = t.authHandler.Run(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if isEnd {
+		return nil, nil
+	}{{end}}
+	isEnd, err = t.beforeHandler.Run(ctx)
 	if err != nil {
 		return nil, err
 	}
