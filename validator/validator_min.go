@@ -1,8 +1,8 @@
 package validator
 
 import (
-	"fmt"
 	"github.com/juxuny/yc/errors"
+	"github.com/juxuny/yc/utils"
 	"strconv"
 )
 
@@ -10,8 +10,7 @@ type minValidator struct {
 }
 
 func (t *minValidator) Run(v interface{}, refValueString string) (bool, error) {
-	inputString := fmt.Sprintf("%v", v)
-	inputValue, err := strconv.ParseFloat(inputString, 64)
+	inputValue, err := utils.Converter.ToFloat64(v)
 	if err != nil {
 		return false, nil
 	}
