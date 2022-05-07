@@ -1,6 +1,10 @@
 package template
 
-import "strings"
+import (
+	"fmt"
+	"html/template"
+	"strings"
+)
 
 func toUpperFirst(s string) string {
 	ret := []byte(s)
@@ -20,4 +24,8 @@ func toLowerFirst(s string) string {
 
 func trimPointer(s string) string {
 	return strings.Trim(s, "*")
+}
+
+func raw(s interface{}) template.HTML {
+	return template.HTML(fmt.Sprintf("%v", s))
 }

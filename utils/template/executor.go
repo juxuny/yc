@@ -23,7 +23,7 @@ func (t *executor) Exists(templateData string) bool {
 }
 
 func (t *executor) Prepare(templateData string) error {
-	tpl, err := template.New(templateData).Parse(templateData)
+	tpl, err := template.New(templateData).Funcs(funcMap).Parse(templateData)
 	if err != nil {
 		return errors.SystemError.InvalidValidatorErrorTemplate.Wrap(err)
 	}

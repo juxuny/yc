@@ -11,6 +11,7 @@ var funcMap = map[string]interface{}{
 	"upperFirst":  toUpperFirst,
 	"lowerFirst":  toLowerFirst,
 	"trimPointer": trimPointer,
+	"raw":         raw,
 }
 
 func RunEmbedFile(fs embed.FS, templateFileName string, outputFileName string, data interface{}) error {
