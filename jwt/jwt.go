@@ -20,12 +20,13 @@ func SetTokenValidityPeriod(duration time.Duration) {
 }
 
 type Claims struct {
-	UserId   dt.ID  `json:"uid"`
-	UserName string `json:"user"`
+	UserId   dt.ID     `json:"uid,omitempty"`
+	UserName string    `json:"user,omitempty"`
+	Roles    []dt.Role `json:"roles,omitempty"`
 	jwt.RegisteredClaims
 }
 
-func GenerateToken(userId dt.ID, userName string) (string, error) {
+func GenerateToken(userId dt.ID, userName string, roles ...dt.Role) (string, error) {
 	if len(jwtSecret) == 0 {
 		return "", fmt.Errorf("secret is empty")
 	}
@@ -35,6 +36,7 @@ func GenerateToken(userId dt.ID, userName string) (string, error) {
 	claims := Claims{
 		UserId:   userId,
 		UserName: userName,
+		Roles:    roles,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ID:        fmt.Sprintf("%v", userId.Uint64),
 			ExpiresAt: jwt.NewNumericDate(expireTime),

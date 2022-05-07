@@ -341,11 +341,19 @@ func (t *UpdateCommand) genValidator(service services.ServiceEntity, msgs []*par
 				for _, l := range comment.Lines() {
 					l = strings.TrimSpace(l)
 					if strings.Index(l, "@v:") == 0 {
-						kvs := strings.Split(strings.TrimSpace(utils.StringHelper.TrimSubSequenceLeft(l, "@v:")), "=")
-						if len(kvs) >= 2 {
+						l = strings.TrimSpace(utils.StringHelper.TrimSubSequenceLeft(l, "@v:"))
+						stopIndex := strings.Index(l, "=")
+						if stopIndex > 0 {
+							pattern := l[:stopIndex]
+							refValue := l[(stopIndex + 1):]
 							formulas = append(formulas, services.ValidatorFormula{
-								Pattern:  strings.TrimSpace(kvs[0]),
-								RefValue: strings.TrimSpace(kvs[1]),
+								Pattern:  strings.TrimSpace(pattern),
+								RefValue: strings.TrimSpace(refValue),
+							})
+						} else {
+							formulas = append(formulas, services.ValidatorFormula{
+								Pattern:  strings.TrimSpace(l),
+								RefValue: "",
 							})
 						}
 						continue

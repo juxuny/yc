@@ -13,7 +13,7 @@ func (t *patternValidator) Run(v interface{}, refValueString string) (bool, erro
 	inputString := fmt.Sprintf("%v", v)
 	matched, err := regexp.MatchString(refValueString, inputString)
 	if err != nil {
-		return false, errors.SystemError.InvalidRefValueDefinition.WithField("pattern", refValueString)
+		return false, errors.SystemError.InvalidRefValueDefinition.Wrap(err).WithField("pattern", refValueString)
 	}
 	return matched, nil
 }

@@ -18,6 +18,9 @@ func (converter) ToFloat64(v interface{}) (float64, error) {
 		return 0, fmt.Errorf("invalid value: %v", v)
 	}
 	if in.Kind() == reflect.Ptr {
+		if in.IsZero() {
+			return 0, fmt.Errorf("invalid value: %v", v)
+		}
 		in = in.Elem()
 	}
 	inType := in.Type().String()
