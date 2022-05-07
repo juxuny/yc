@@ -1,6 +1,9 @@
 package jwt
 
-import "testing"
+import (
+	"github.com/juxuny/yc/dt"
+	"testing"
+)
 
 func TestMain(m *testing.M) {
 	SetSecret("123456")
@@ -8,7 +11,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestGenerateToken(t *testing.T) {
-	token, err := GenerateToken(100, "admin")
+	token, err := GenerateToken(dt.NewID(100), "admin")
 	if err != nil {
 		t.Fatal(err)
 	}
