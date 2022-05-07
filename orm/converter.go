@@ -2,6 +2,7 @@ package orm
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/juxuny/yc/dt"
 	"reflect"
 	"strconv"
@@ -35,11 +36,13 @@ func (t *dataTypeConverter) Convert(in reflect.Value, dstType reflect.Type) refl
 }
 
 func (t *dataTypeConverter) convertStruct(in reflect.Value, dstType reflect.Type) reflect.Value {
-	ret := reflect.New(dstType)
-	holder := ret
-	if holder.Kind() == reflect.Ptr {
-		holder = holder.Elem()
+	var ret reflect.Value
+	if dstType.Kind() == reflect.Ptr {
+		ret = reflect.New(dstType.Elem())
+	} else {
+		ret = reflect.New(dstType)
 	}
+	holder := ret.Elem()
 	inTypeName := in.Type().String()
 	holderTypeName := holder.Type().String()
 	if inTypeName == "sql.NullInt64" {
@@ -51,7 +54,7 @@ func (t *dataTypeConverter) convertStruct(in reflect.Value, dstType reflect.Type
 				Valid: value.Valid,
 				Int64: value.Int64,
 			}))
-		} else if holderTypeName == "dt.ID" {
+		} else if strings.Contains(holderTypeName, "dt.ID") {
 			holder.Set(reflect.ValueOf(dt.ID{
 				Valid:  value.Valid,
 				Uint64: uint64(value.Int64),
@@ -157,32 +160,46 @@ func (t *dataTypeConverter) convertStruct(in reflect.Value, dstType reflect.Type
 	} else {
 		panic("unknown struct: " + inTypeName)
 	}
-	return ret.Elem()
+	if dstType.Kind() == reflect.Ptr {
+		return ret
+	} else {
+		return ret.Elem()
+	}
 }
 
 func (t *dataTypeConverter) convertUint(in reflect.Value, dstType reflect.Type) reflect.Value {
-	ret := reflect.New(dstType)
-	holder := ret
-	if holder.Kind() == reflect.Ptr {
-		holder = holder.Elem()
+	var ret reflect.Value
+	if dstType.Kind() == reflect.Ptr {
+		ret = reflect.New(dstType.Elem())
+	} else {
+		ret = reflect.New(dstType)
 	}
+	holder := ret.Elem()
 	switch holder.Kind() {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 		holder.Set(in.Convert(dstType))
 	case reflect.Struct:
 		if holder.Type().String() == "dt.ID" {
 			holder.Set(reflect.ValueOf(dt.NewID(in.Uint())))
+		} else {
+			panic(fmt.Errorf("unknown dstType: %v", dstType.String()))
 		}
 	}
-	return ret.Elem()
+	if dstType.Kind() == reflect.Ptr {
+		return ret
+	} else {
+		return ret.Elem()
+	}
 }
 
 func (t *dataTypeConverter) convertInt(in reflect.Value, dstType reflect.Type) reflect.Value {
-	ret := reflect.New(dstType)
-	holder := ret
-	if holder.Kind() == reflect.Ptr {
-		holder = holder.Elem()
+	var ret reflect.Value
+	if dstType.Kind() == reflect.Ptr {
+		ret = reflect.New(dstType.Elem())
+	} else {
+		ret = reflect.New(dstType)
 	}
+	holder := ret.Elem()
 	switch holder.Kind() {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 		holder.Set(in.Convert(dstType))
@@ -197,15 +214,21 @@ func (t *dataTypeConverter) convertInt(in reflect.Value, dstType reflect.Type) r
 	default:
 		panic("unknown dest type: " + dstType.String())
 	}
-	return ret.Elem()
+	if dstType.Kind() == reflect.Ptr {
+		return ret
+	} else {
+		return ret.Elem()
+	}
 }
 
 func (t *dataTypeConverter) convertSlice(in reflect.Value, dstType reflect.Type) reflect.Value {
-	ret := reflect.New(dstType)
-	holder := ret
-	if holder.Kind() == reflect.Ptr {
-		holder = holder.Elem()
+	var ret reflect.Value
+	if dstType.Kind() == reflect.Ptr {
+		ret = reflect.New(dstType.Elem())
+	} else {
+		ret = reflect.New(dstType)
 	}
+	holder := ret.Elem()
 	inTypeName := in.Type().String()
 	holderTypeName := holder.Type().String()
 	if inTypeName == "sql.RawBytes" {
@@ -239,5 +262,9 @@ func (t *dataTypeConverter) convertSlice(in reflect.Value, dstType reflect.Type)
 	} else {
 		panic("unknown in type: " + inTypeName)
 	}
-	return ret.Elem()
+	if dstType.Kind() == reflect.Ptr {
+		return ret
+	} else {
+		return ret.Elem()
+	}
 }

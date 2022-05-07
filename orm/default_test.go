@@ -28,6 +28,7 @@ type testUserInfo struct {
 	DeletedAt   *time.Time
 	Description string
 	Started     int
+	SeqId       *dt.ID
 }
 
 func TestQueryScan(t *testing.T) {
