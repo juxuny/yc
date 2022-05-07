@@ -14,7 +14,7 @@ func TestNewID(t *testing.T) {
 		UserId ID `json:"userId"`
 	}{
 		Id:     NewID(1000),
-		UserId: NewID(rand.Int63()),
+		UserId: NewID(rand.Uint64()),
 	}
 	jsonData, _ := json.Marshal(data)
 	t.Log(string(jsonData))
