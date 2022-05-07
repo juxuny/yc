@@ -8,8 +8,9 @@ import (
 )
 
 var funcMap = map[string]interface{}{
-	"upperFirst": toUpperFirst,
-	"lowerFirst": toLowerFirst,
+	"upperFirst":  toUpperFirst,
+	"lowerFirst":  toLowerFirst,
+	"trimPointer": trimPointer,
 }
 
 func RunEmbedFile(fs embed.FS, templateFileName string, outputFileName string, data interface{}) error {

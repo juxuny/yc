@@ -1,5 +1,7 @@
 package template
 
+import "strings"
+
 func toUpperFirst(s string) string {
 	ret := []byte(s)
 	if len(ret) > 0 && ret[0] >= 'a' && ret[0] <= 'z' {
@@ -14,4 +16,8 @@ func toLowerFirst(s string) string {
 		ret[0] = ret[0] + ('a' - 'A')
 	}
 	return string(ret)
+}
+
+func trimPointer(s string) string {
+	return strings.Trim(s, "*")
 }
