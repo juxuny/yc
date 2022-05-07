@@ -23,6 +23,7 @@ const (
 	FormulaDate         Formula = "date"
 	FormulaTime         Formula = "time"
 	FormulaTimestampLog Formula = "timestamp.log"
+	FormulaPassword     Formula = "password"
 )
 
 var validatorSet = map[Formula]IValidator{
@@ -36,6 +37,7 @@ var validatorSet = map[Formula]IValidator{
 	FormulaDate:         &timeValidator{layout: "2006-01-02"},
 	FormulaTime:         &timeValidator{layout: "15:04:05"},
 	FormulaTimestampLog: &timeValidator{layout: "2006-01-02 15:04:05.000"},
+	FormulaPassword:     &passwordValidator{},
 }
 
 type Action struct {

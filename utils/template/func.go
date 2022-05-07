@@ -3,6 +3,7 @@ package template
 import (
 	"fmt"
 	"html/template"
+	"reflect"
 	"strings"
 )
 
@@ -28,4 +29,23 @@ func trimPointer(s string) string {
 
 func raw(s interface{}) template.HTML {
 	return template.HTML(fmt.Sprintf("%v", s))
+}
+
+func CaseNumber(v interface{}) string {
+	in := reflect.ValueOf(v)
+	if !in.IsValid() {
+		return ""
+	}
+	if in.Kind() == reflect.Ptr {
+		if in.IsZero() {
+			return ""
+		}
+		in = in.Elem()
+	}
+	switch in.Kind() {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Float32, reflect.Float64:
+		return fmt.Sprintf("%v", in.Convert(reflect.TypeOf(float64(0))).Interface())
+	default:
+	}
+	return fmt.Sprintf("%v", in.Interface())
 }
