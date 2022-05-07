@@ -29,6 +29,12 @@ func (t {{$modelName}}) To{{$ref.ModelName}}() {{$packageAlias}}.{{$ref.ModelNam
 	{{end}}}
 }{{end}}
 
+{{range $ref := .Refs}}
+func (t {{$modelName}}) To{{$ref.ModelName}}AsPointer() *{{$packageAlias}}.{{$ref.ModelName}} {
+	ret := t.To{{$ref.ModelName}}()
+	return &ret
+}{{end}}
+
 type {{.TableName|lowerFirst}} struct {
 {{range $field := .Fields}}	{{.FieldName|upperFirst}} orm.FieldName
 {{end}}}
@@ -37,7 +43,7 @@ func ({{.TableName|lowerFirst}}) TableName() string {
 	return cos.Name + "_" + "{{.TableNameWithoutServicePrefix}}"
 }
 {{range $field := .Fields}}{{if $field.HasIndex}}
-func ({{.TableName|lowerFirst}}) FindOneBy{{$field.FieldName|upperFirst}}(ctx context.Context, {{$field.FieldName|lowerFirst}} {{$field.ModelDataType}}) (data {{$field.ModelName}}, found bool, err error) {
+func ({{.TableName|lowerFirst}}) FindOneBy{{$field.FieldName|upperFirst}}(ctx context.Context, {{$field.FieldName|lowerFirst}} {{$field.ModelDataType|trimPointer}}) (data {{$field.ModelName}}, found bool, err error) {
 	w := orm.NewQueryWrapper(data).Limit(1)
 	w.Eq({{$field.TableName}}.{{$field.FieldName|upperFirst}}, {{$field.FieldName|lowerFirst}}){{if $field.HasDeletedAt}}
 	w.Nested(orm.NewOrWhereWrapper().Eq({{$field.TableName}}.DeletedAt, 0).IsNull({{$field.TableName}}.DeletedAt)){{end}}
@@ -53,7 +59,7 @@ func ({{.TableName|lowerFirst}}) FindOneBy{{$field.FieldName|upperFirst}}(ctx co
 {{end}}{{end}}
 
 {{range $field := .Fields}}{{if $field.HasIndex}}
-func ({{.TableName|lowerFirst}}) UpdateBy{{$field.FieldName|upperFirst}}(ctx context.Context, {{$field.FieldName|lowerFirst}} {{$field.ModelDataType}}, update orm.H) (rowsAffected int64, err error) {
+func ({{.TableName|lowerFirst}}) UpdateBy{{$field.FieldName|upperFirst}}(ctx context.Context, {{$field.FieldName|lowerFirst}} {{$field.ModelDataType|trimPointer}}, update orm.H) (rowsAffected int64, err error) {
 	w := orm.NewUpdateWrapper({{.ModelName}}{})
 	w.Eq({{.TableName}}.{{$field.FieldName|upperFirst}}, {{$field.FieldName|lowerFirst}}){{if .HasDeletedAt}}
 	w.Nested(orm.NewOrWhereWrapper().Eq({{.TableName}}.DeletedAt, 0).IsNull({{.TableName}}.DeletedAt)){{end}}
@@ -78,7 +84,7 @@ func ({{.TableName|lowerFirst}}) Update(ctx context.Context, update orm.H, where
 }
 
 {{range $field := .Fields}}{{if $field.HasIndex}}
-func ({{.TableName|lowerFirst}}) DeleteBy{{$field.FieldName|upperFirst}}(ctx context.Context, {{$field.FieldName|lowerFirst}} {{$field.ModelDataType}}) (rowsAffected int64, err error) {
+func ({{.TableName|lowerFirst}}) DeleteBy{{$field.FieldName|upperFirst}}(ctx context.Context, {{$field.FieldName|lowerFirst}} {{$field.ModelDataType|trimPointer}}) (rowsAffected int64, err error) {
 	w := orm.NewDeleteWrapper({{.ModelName}}{})
 	w.Eq({{.TableName}}.{{$field.FieldName|upperFirst}}, {{$field.FieldName|lowerFirst}})
 	result, err := orm.Delete(ctx, cos.Name, w)
@@ -90,7 +96,7 @@ func ({{.TableName|lowerFirst}}) DeleteBy{{$field.FieldName|upperFirst}}(ctx con
 {{end}}{{end}}
 
 {{range $field := .Fields}}{{if $field.HasIndex}}
-func ({{.TableName|lowerFirst}}) SoftDeleteBy{{$field.FieldName|upperFirst}}(ctx context.Context, {{$field.FieldName|lowerFirst}} {{$field.ModelDataType}}) (rowsAffected int64, err error) {
+func ({{.TableName|lowerFirst}}) SoftDeleteBy{{$field.FieldName|upperFirst}}(ctx context.Context, {{$field.FieldName|lowerFirst}} {{$field.ModelDataType|trimPointer}}) (rowsAffected int64, err error) {
 	w := orm.NewUpdateWrapper({{.ModelName}}{})
 	w.SetValue({{.TableName}}.DeletedAt, orm.Now())
 	w.Eq({{.TableName}}.{{$field.FieldName|upperFirst}}, {{$field.FieldName|lowerFirst}})
@@ -113,7 +119,7 @@ func ({{.TableName|lowerFirst}}) Find(ctx context.Context, where orm.WhereWrappe
 }
 
 {{range $field := .Fields}}{{if $field.HasIndex}}
-func ({{.TableName|lowerFirst}}) FindBy{{.FieldName|upperFirst}}(ctx context.Context, {{$field.FieldName|lowerFirst}} {{$field.ModelDataType}}) (list []{{.ModelName}}, err error) {
+func ({{.TableName|lowerFirst}}) FindBy{{.FieldName|upperFirst}}(ctx context.Context, {{$field.FieldName|lowerFirst}} {{$field.ModelDataType|trimPointer}}) (list []{{.ModelName}}, err error) {
 	w := orm.NewQueryWrapper({{.ModelName}}{})
 	w.Eq({{.TableName}}.{{.FieldName|upperFirst}}, {{.FieldName|lowerFirst}}){{if .HasDeletedAt}}
 	w.Nested(orm.NewOrWhereWrapper().Eq({{.TableName}}.DeletedAt, 0).IsNull({{.TableName}}.DeletedAt)){{end}}
@@ -137,7 +143,7 @@ func ({{.TableName|lowerFirst}}) Page(ctx context.Context, pageNum, pageSize int
 }
 
 {{range $field := .Fields}}{{if $field.HasIndex}}
-func ({{.TableName|lowerFirst}}) PageBy{{.FieldName|upperFirst}}(ctx context.Context, pageNum, pageSize int, {{$field.FieldName|lowerFirst}} {{$field.ModelDataType}}) (list []{{.ModelName}}, err error) {
+func ({{.TableName|lowerFirst}}) PageBy{{.FieldName|upperFirst}}(ctx context.Context, pageNum, pageSize int, {{$field.FieldName|lowerFirst}} {{$field.ModelDataType|trimPointer}}) (list []{{.ModelName}}, err error) {
 	w := orm.NewQueryWrapper({{.ModelName}}{})
 	w.Eq({{.TableName}}.{{.FieldName|upperFirst}}, {{.FieldName|lowerFirst}}){{if .HasDeletedAt}}
 	w.Nested(orm.NewOrWhereWrapper().Eq({{.TableName}}.DeletedAt, 0).IsNull({{.TableName}}.DeletedAt)){{end}}
@@ -160,7 +166,7 @@ func ({{.TableName|lowerFirst}}) Count(ctx context.Context, where orm.WhereWrapp
 }
 
 {{range $field := .Fields}}{{if $field.HasIndex}}
-func ({{.TableName|lowerFirst}}) CountBy{{.FieldName|upperFirst}}(ctx context.Context, {{$field.FieldName|lowerFirst}} {{$field.ModelDataType}}) (count int, err error) {
+func ({{.TableName|lowerFirst}}) CountBy{{.FieldName|upperFirst}}(ctx context.Context, {{$field.FieldName|lowerFirst}} {{$field.ModelDataType|trimPointer}}) (count int, err error) {
 	w := orm.NewQueryWrapper({{.ModelName}}{})
 	w.Eq({{.TableName}}.{{.FieldName|upperFirst}}, {{.FieldName|lowerFirst}}){{if .HasDeletedAt}}
 	w.Nested(orm.NewOrWhereWrapper().Eq({{.TableName}}.DeletedAt, 0).IsNull({{.TableName}}.DeletedAt)){{end}}

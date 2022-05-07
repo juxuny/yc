@@ -1,7 +1,15 @@
 func (t *wrapper) {{.MethodName}}(ctx context.Context, req *{{.PackageAlias}}.{{.Request}}) (resp *{{.PackageAlias}}.{{.Response}}, err error) {
 	var isEnd bool
 	trace.WithContext(ctx)
-	defer trace.Clean(){{if .UseAuth}}
+	defer trace.Clean()
+	defer func() {
+		if recoverError := recover(); recoverError != nil {
+			err = errors.SystemError.InternalError
+				debug.PrintStack()
+				handleRecover(ctx, recoverError)
+			return
+		}
+	}(){{if .UseAuth}}
 	isEnd, err = t.authHandler.Run(ctx)
 	if err != nil {
 		return nil, err

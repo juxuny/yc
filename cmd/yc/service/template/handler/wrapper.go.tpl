@@ -22,7 +22,7 @@ func NewWrapper() *wrapper {
 	return &wrapper{
 		authHandler: middle.NewGroup().Add(&authValidator{}),
 		beforeHandler: middle.NewGroup().Add(&levelValidator{}),
-		afterHandler: middle.NewGroup().Add(&middle.RecoverHandler{}),
+		afterHandler: middle.NewGroup(),
 		handler: &handler{},
 	}
 }
@@ -45,4 +45,7 @@ type authValidator struct {}
 
 func (t *authValidator) Run(ctx context.Context) (isEnd bool, err error) {
 	return
+}
+
+func handleRecover(ctx context.Context, err interface{}) {
 }
