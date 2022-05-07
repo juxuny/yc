@@ -42,9 +42,19 @@ func (t ModelNamespace) ToNamespaceResp() cos.NamespaceResp {
 		CreatorId:  t.CreatorId,
 	}
 }
+func (t ModelNamespace) ToListNamespaceItem() cos.ListNamespaceItem {
+	return cos.ListNamespaceItem{
+		Id:        t.Id,
+		Namespace: t.Namespace,
+	}
+}
 
 func (t ModelNamespace) ToNamespaceRespAsPointer() *cos.NamespaceResp {
 	ret := t.ToNamespaceResp()
+	return &ret
+}
+func (t ModelNamespace) ToListNamespaceItemAsPointer() *cos.ListNamespaceItem {
+	ret := t.ToListNamespaceItem()
 	return &ret
 }
 
@@ -62,10 +72,11 @@ func (tableNamespace) TableName() string {
 	return cos.Name + "_" + "namespace"
 }
 
-func (tableNamespace) FindOneById(ctx context.Context, id dt.ID) (data ModelNamespace, found bool, err error) {
+func (tableNamespace) FindOneById(ctx context.Context, id dt.ID, orderBy ...orm.Order) (data ModelNamespace, found bool, err error) {
 	w := orm.NewQueryWrapper(data).Limit(1)
 	w.Eq(TableNamespace.Id, id)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableNamespace.DeletedAt, 0).IsNull(TableNamespace.DeletedAt))
+	w.Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &data)
 	if err != nil {
 		if e, ok := err.(errors.Error); ok && e.Code == errors.SystemError.DatabaseNoData.Code {
@@ -76,10 +87,11 @@ func (tableNamespace) FindOneById(ctx context.Context, id dt.ID) (data ModelName
 	return data, true, nil
 }
 
-func (tableNamespace) FindOneByNamespace(ctx context.Context, namespace string) (data ModelNamespace, found bool, err error) {
+func (tableNamespace) FindOneByNamespace(ctx context.Context, namespace string, orderBy ...orm.Order) (data ModelNamespace, found bool, err error) {
 	w := orm.NewQueryWrapper(data).Limit(1)
 	w.Eq(TableNamespace.Namespace, namespace)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableNamespace.DeletedAt, 0).IsNull(TableNamespace.DeletedAt))
+	w.Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &data)
 	if err != nil {
 		if e, ok := err.(errors.Error); ok && e.Code == errors.SystemError.DatabaseNoData.Code {
@@ -90,10 +102,11 @@ func (tableNamespace) FindOneByNamespace(ctx context.Context, namespace string) 
 	return data, true, nil
 }
 
-func (tableNamespace) FindOneByCreatorId(ctx context.Context, creatorId dt.ID) (data ModelNamespace, found bool, err error) {
+func (tableNamespace) FindOneByCreatorId(ctx context.Context, creatorId dt.ID, orderBy ...orm.Order) (data ModelNamespace, found bool, err error) {
 	w := orm.NewQueryWrapper(data).Limit(1)
 	w.Eq(TableNamespace.CreatorId, creatorId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableNamespace.DeletedAt, 0).IsNull(TableNamespace.DeletedAt))
+	w.Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &data)
 	if err != nil {
 		if e, ok := err.(errors.Error); ok && e.Code == errors.SystemError.DatabaseNoData.Code {
@@ -214,9 +227,10 @@ func (tableNamespace) SoftDeleteByCreatorId(ctx context.Context, creatorId dt.ID
 	return result.RowsAffected()
 }
 
-func (tableNamespace) Find(ctx context.Context, where orm.WhereWrapper) (list []ModelNamespace, err error) {
+func (tableNamespace) Find(ctx context.Context, where orm.WhereWrapper, orderBy ...orm.Order) (list []ModelNamespace, err error) {
 	w := orm.NewQueryWrapper(ModelNamespace{})
-	w.SetWhere(where)
+	w.Nested(orm.NewOrWhereWrapper().Eq(TableNamespace.DeletedAt, 0).IsNull(TableNamespace.DeletedAt))
+	w.SetWhere(where).Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &list)
 	if err != nil {
 		return nil, err
@@ -224,10 +238,25 @@ func (tableNamespace) Find(ctx context.Context, where orm.WhereWrapper) (list []
 	return
 }
 
-func (tableNamespace) FindById(ctx context.Context, id dt.ID) (list []ModelNamespace, err error) {
+func (tableNamespace) FindOne(ctx context.Context, where orm.WhereWrapper, orderBy ...orm.Order) (ret ModelNamespace, found bool, err error) {
+	w := orm.NewQueryWrapper(ModelNamespace{})
+	w.Nested(orm.NewOrWhereWrapper().Eq(TableNamespace.DeletedAt, 0).IsNull(TableNamespace.DeletedAt))
+	w.SetWhere(where).Order(orderBy...)
+	err = orm.Select(ctx, cos.Name, w, &ret)
+	if err != nil {
+		if e, ok := err.(errors.Error); ok && e.Code == errors.SystemError.DatabaseNoData.Code {
+			return ret, false, nil
+		}
+		return ret, false, err
+	}
+	return ret, true, nil
+}
+
+func (tableNamespace) FindById(ctx context.Context, id dt.ID, orderBy ...orm.Order) (list []ModelNamespace, err error) {
 	w := orm.NewQueryWrapper(ModelNamespace{})
 	w.Eq(TableNamespace.Id, id)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableNamespace.DeletedAt, 0).IsNull(TableNamespace.DeletedAt))
+	w.Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &list)
 	if err != nil {
 		return nil, err
@@ -235,10 +264,11 @@ func (tableNamespace) FindById(ctx context.Context, id dt.ID) (list []ModelNames
 	return
 }
 
-func (tableNamespace) FindByNamespace(ctx context.Context, namespace string) (list []ModelNamespace, err error) {
+func (tableNamespace) FindByNamespace(ctx context.Context, namespace string, orderBy ...orm.Order) (list []ModelNamespace, err error) {
 	w := orm.NewQueryWrapper(ModelNamespace{})
 	w.Eq(TableNamespace.Namespace, namespace)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableNamespace.DeletedAt, 0).IsNull(TableNamespace.DeletedAt))
+	w.Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &list)
 	if err != nil {
 		return nil, err
@@ -246,10 +276,11 @@ func (tableNamespace) FindByNamespace(ctx context.Context, namespace string) (li
 	return
 }
 
-func (tableNamespace) FindByCreatorId(ctx context.Context, creatorId dt.ID) (list []ModelNamespace, err error) {
+func (tableNamespace) FindByCreatorId(ctx context.Context, creatorId dt.ID, orderBy ...orm.Order) (list []ModelNamespace, err error) {
 	w := orm.NewQueryWrapper(ModelNamespace{})
 	w.Eq(TableNamespace.CreatorId, creatorId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableNamespace.DeletedAt, 0).IsNull(TableNamespace.DeletedAt))
+	w.Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &list)
 	if err != nil {
 		return nil, err
@@ -257,10 +288,11 @@ func (tableNamespace) FindByCreatorId(ctx context.Context, creatorId dt.ID) (lis
 	return
 }
 
-func (tableNamespace) Page(ctx context.Context, pageNum, pageSize int, where orm.WhereWrapper) (list []ModelNamespace, err error) {
+func (tableNamespace) Page(ctx context.Context, pageNum, pageSize int64, where orm.WhereWrapper, orderBy ...orm.Order) (list []ModelNamespace, err error) {
 	w := orm.NewQueryWrapper(ModelAccount{})
 	w.SetWhere(where).Offset((pageNum - 1) * pageSize).Limit(pageSize)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableNamespace.DeletedAt, 0).IsNull(TableNamespace.DeletedAt))
+	w.Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &list)
 	if err != nil {
 		return nil, err
@@ -268,11 +300,11 @@ func (tableNamespace) Page(ctx context.Context, pageNum, pageSize int, where orm
 	return
 }
 
-func (tableNamespace) PageById(ctx context.Context, pageNum, pageSize int, id dt.ID) (list []ModelNamespace, err error) {
+func (tableNamespace) PageById(ctx context.Context, pageNum, pageSize int64, id dt.ID, orderBy ...orm.Order) (list []ModelNamespace, err error) {
 	w := orm.NewQueryWrapper(ModelNamespace{})
 	w.Eq(TableNamespace.Id, id)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableNamespace.DeletedAt, 0).IsNull(TableNamespace.DeletedAt))
-	w.Offset((pageNum - 1) * pageSize).Limit(pageSize)
+	w.Offset((pageNum - 1) * pageSize).Limit(pageSize).Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &list)
 	if err != nil {
 		return nil, err
@@ -280,11 +312,11 @@ func (tableNamespace) PageById(ctx context.Context, pageNum, pageSize int, id dt
 	return
 }
 
-func (tableNamespace) PageByNamespace(ctx context.Context, pageNum, pageSize int, namespace string) (list []ModelNamespace, err error) {
+func (tableNamespace) PageByNamespace(ctx context.Context, pageNum, pageSize int64, namespace string, orderBy ...orm.Order) (list []ModelNamespace, err error) {
 	w := orm.NewQueryWrapper(ModelNamespace{})
 	w.Eq(TableNamespace.Namespace, namespace)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableNamespace.DeletedAt, 0).IsNull(TableNamespace.DeletedAt))
-	w.Offset((pageNum - 1) * pageSize).Limit(pageSize)
+	w.Offset((pageNum - 1) * pageSize).Limit(pageSize).Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &list)
 	if err != nil {
 		return nil, err
@@ -292,11 +324,11 @@ func (tableNamespace) PageByNamespace(ctx context.Context, pageNum, pageSize int
 	return
 }
 
-func (tableNamespace) PageByCreatorId(ctx context.Context, pageNum, pageSize int, creatorId dt.ID) (list []ModelNamespace, err error) {
+func (tableNamespace) PageByCreatorId(ctx context.Context, pageNum, pageSize int64, creatorId dt.ID, orderBy ...orm.Order) (list []ModelNamespace, err error) {
 	w := orm.NewQueryWrapper(ModelNamespace{})
 	w.Eq(TableNamespace.CreatorId, creatorId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableNamespace.DeletedAt, 0).IsNull(TableNamespace.DeletedAt))
-	w.Offset((pageNum - 1) * pageSize).Limit(pageSize)
+	w.Offset((pageNum - 1) * pageSize).Limit(pageSize).Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &list)
 	if err != nil {
 		return nil, err
@@ -304,7 +336,7 @@ func (tableNamespace) PageByCreatorId(ctx context.Context, pageNum, pageSize int
 	return
 }
 
-func (tableNamespace) Count(ctx context.Context, where orm.WhereWrapper) (count int, err error) {
+func (tableNamespace) Count(ctx context.Context, where orm.WhereWrapper) (count int64, err error) {
 	w := orm.NewQueryWrapper(ModelAccount{})
 	w.SetWhere(where)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableNamespace.DeletedAt, 0).IsNull(TableNamespace.DeletedAt))
@@ -313,7 +345,7 @@ func (tableNamespace) Count(ctx context.Context, where orm.WhereWrapper) (count 
 	return count, err
 }
 
-func (tableNamespace) CountById(ctx context.Context, id dt.ID) (count int, err error) {
+func (tableNamespace) CountById(ctx context.Context, id dt.ID) (count int64, err error) {
 	w := orm.NewQueryWrapper(ModelNamespace{})
 	w.Eq(TableNamespace.Id, id)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableNamespace.DeletedAt, 0).IsNull(TableNamespace.DeletedAt))
@@ -322,7 +354,7 @@ func (tableNamespace) CountById(ctx context.Context, id dt.ID) (count int, err e
 	return count, err
 }
 
-func (tableNamespace) CountByNamespace(ctx context.Context, namespace string) (count int, err error) {
+func (tableNamespace) CountByNamespace(ctx context.Context, namespace string) (count int64, err error) {
 	w := orm.NewQueryWrapper(ModelNamespace{})
 	w.Eq(TableNamespace.Namespace, namespace)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableNamespace.DeletedAt, 0).IsNull(TableNamespace.DeletedAt))
@@ -331,7 +363,7 @@ func (tableNamespace) CountByNamespace(ctx context.Context, namespace string) (c
 	return count, err
 }
 
-func (tableNamespace) CountByCreatorId(ctx context.Context, creatorId dt.ID) (count int, err error) {
+func (tableNamespace) CountByCreatorId(ctx context.Context, creatorId dt.ID) (count int64, err error) {
 	w := orm.NewQueryWrapper(ModelNamespace{})
 	w.Eq(TableNamespace.CreatorId, creatorId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableNamespace.DeletedAt, 0).IsNull(TableNamespace.DeletedAt))

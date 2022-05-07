@@ -68,10 +68,11 @@ func (tableAccount) TableName() string {
 	return cos.Name + "_" + "account"
 }
 
-func (tableAccount) FindOneById(ctx context.Context, id dt.ID) (data ModelAccount, found bool, err error) {
+func (tableAccount) FindOneById(ctx context.Context, id dt.ID, orderBy ...orm.Order) (data ModelAccount, found bool, err error) {
 	w := orm.NewQueryWrapper(data).Limit(1)
 	w.Eq(TableAccount.Id, id)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableAccount.DeletedAt, 0).IsNull(TableAccount.DeletedAt))
+	w.Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &data)
 	if err != nil {
 		if e, ok := err.(errors.Error); ok && e.Code == errors.SystemError.DatabaseNoData.Code {
@@ -82,10 +83,11 @@ func (tableAccount) FindOneById(ctx context.Context, id dt.ID) (data ModelAccoun
 	return data, true, nil
 }
 
-func (tableAccount) FindOneByIdentifier(ctx context.Context, identifier string) (data ModelAccount, found bool, err error) {
+func (tableAccount) FindOneByIdentifier(ctx context.Context, identifier string, orderBy ...orm.Order) (data ModelAccount, found bool, err error) {
 	w := orm.NewQueryWrapper(data).Limit(1)
 	w.Eq(TableAccount.Identifier, identifier)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableAccount.DeletedAt, 0).IsNull(TableAccount.DeletedAt))
+	w.Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &data)
 	if err != nil {
 		if e, ok := err.(errors.Error); ok && e.Code == errors.SystemError.DatabaseNoData.Code {
@@ -96,10 +98,11 @@ func (tableAccount) FindOneByIdentifier(ctx context.Context, identifier string) 
 	return data, true, nil
 }
 
-func (tableAccount) FindOneByAccountType(ctx context.Context, accountType cos.AccountType) (data ModelAccount, found bool, err error) {
+func (tableAccount) FindOneByAccountType(ctx context.Context, accountType cos.AccountType, orderBy ...orm.Order) (data ModelAccount, found bool, err error) {
 	w := orm.NewQueryWrapper(data).Limit(1)
 	w.Eq(TableAccount.AccountType, accountType)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableAccount.DeletedAt, 0).IsNull(TableAccount.DeletedAt))
+	w.Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &data)
 	if err != nil {
 		if e, ok := err.(errors.Error); ok && e.Code == errors.SystemError.DatabaseNoData.Code {
@@ -110,10 +113,11 @@ func (tableAccount) FindOneByAccountType(ctx context.Context, accountType cos.Ac
 	return data, true, nil
 }
 
-func (tableAccount) FindOneByCreatorId(ctx context.Context, creatorId dt.ID) (data ModelAccount, found bool, err error) {
+func (tableAccount) FindOneByCreatorId(ctx context.Context, creatorId dt.ID, orderBy ...orm.Order) (data ModelAccount, found bool, err error) {
 	w := orm.NewQueryWrapper(data).Limit(1)
 	w.Eq(TableAccount.CreatorId, creatorId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableAccount.DeletedAt, 0).IsNull(TableAccount.DeletedAt))
+	w.Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &data)
 	if err != nil {
 		if e, ok := err.(errors.Error); ok && e.Code == errors.SystemError.DatabaseNoData.Code {
@@ -267,9 +271,10 @@ func (tableAccount) SoftDeleteByCreatorId(ctx context.Context, creatorId dt.ID) 
 	return result.RowsAffected()
 }
 
-func (tableAccount) Find(ctx context.Context, where orm.WhereWrapper) (list []ModelAccount, err error) {
+func (tableAccount) Find(ctx context.Context, where orm.WhereWrapper, orderBy ...orm.Order) (list []ModelAccount, err error) {
 	w := orm.NewQueryWrapper(ModelAccount{})
-	w.SetWhere(where)
+	w.Nested(orm.NewOrWhereWrapper().Eq(TableAccount.DeletedAt, 0).IsNull(TableAccount.DeletedAt))
+	w.SetWhere(where).Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &list)
 	if err != nil {
 		return nil, err
@@ -277,10 +282,25 @@ func (tableAccount) Find(ctx context.Context, where orm.WhereWrapper) (list []Mo
 	return
 }
 
-func (tableAccount) FindById(ctx context.Context, id dt.ID) (list []ModelAccount, err error) {
+func (tableAccount) FindOne(ctx context.Context, where orm.WhereWrapper, orderBy ...orm.Order) (ret ModelAccount, found bool, err error) {
+	w := orm.NewQueryWrapper(ModelAccount{})
+	w.Nested(orm.NewOrWhereWrapper().Eq(TableAccount.DeletedAt, 0).IsNull(TableAccount.DeletedAt))
+	w.SetWhere(where).Order(orderBy...)
+	err = orm.Select(ctx, cos.Name, w, &ret)
+	if err != nil {
+		if e, ok := err.(errors.Error); ok && e.Code == errors.SystemError.DatabaseNoData.Code {
+			return ret, false, nil
+		}
+		return ret, false, err
+	}
+	return ret, true, nil
+}
+
+func (tableAccount) FindById(ctx context.Context, id dt.ID, orderBy ...orm.Order) (list []ModelAccount, err error) {
 	w := orm.NewQueryWrapper(ModelAccount{})
 	w.Eq(TableAccount.Id, id)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableAccount.DeletedAt, 0).IsNull(TableAccount.DeletedAt))
+	w.Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &list)
 	if err != nil {
 		return nil, err
@@ -288,10 +308,11 @@ func (tableAccount) FindById(ctx context.Context, id dt.ID) (list []ModelAccount
 	return
 }
 
-func (tableAccount) FindByIdentifier(ctx context.Context, identifier string) (list []ModelAccount, err error) {
+func (tableAccount) FindByIdentifier(ctx context.Context, identifier string, orderBy ...orm.Order) (list []ModelAccount, err error) {
 	w := orm.NewQueryWrapper(ModelAccount{})
 	w.Eq(TableAccount.Identifier, identifier)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableAccount.DeletedAt, 0).IsNull(TableAccount.DeletedAt))
+	w.Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &list)
 	if err != nil {
 		return nil, err
@@ -299,10 +320,11 @@ func (tableAccount) FindByIdentifier(ctx context.Context, identifier string) (li
 	return
 }
 
-func (tableAccount) FindByAccountType(ctx context.Context, accountType cos.AccountType) (list []ModelAccount, err error) {
+func (tableAccount) FindByAccountType(ctx context.Context, accountType cos.AccountType, orderBy ...orm.Order) (list []ModelAccount, err error) {
 	w := orm.NewQueryWrapper(ModelAccount{})
 	w.Eq(TableAccount.AccountType, accountType)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableAccount.DeletedAt, 0).IsNull(TableAccount.DeletedAt))
+	w.Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &list)
 	if err != nil {
 		return nil, err
@@ -310,10 +332,11 @@ func (tableAccount) FindByAccountType(ctx context.Context, accountType cos.Accou
 	return
 }
 
-func (tableAccount) FindByCreatorId(ctx context.Context, creatorId dt.ID) (list []ModelAccount, err error) {
+func (tableAccount) FindByCreatorId(ctx context.Context, creatorId dt.ID, orderBy ...orm.Order) (list []ModelAccount, err error) {
 	w := orm.NewQueryWrapper(ModelAccount{})
 	w.Eq(TableAccount.CreatorId, creatorId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableAccount.DeletedAt, 0).IsNull(TableAccount.DeletedAt))
+	w.Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &list)
 	if err != nil {
 		return nil, err
@@ -321,10 +344,11 @@ func (tableAccount) FindByCreatorId(ctx context.Context, creatorId dt.ID) (list 
 	return
 }
 
-func (tableAccount) Page(ctx context.Context, pageNum, pageSize int, where orm.WhereWrapper) (list []ModelAccount, err error) {
+func (tableAccount) Page(ctx context.Context, pageNum, pageSize int64, where orm.WhereWrapper, orderBy ...orm.Order) (list []ModelAccount, err error) {
 	w := orm.NewQueryWrapper(ModelAccount{})
 	w.SetWhere(where).Offset((pageNum - 1) * pageSize).Limit(pageSize)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableAccount.DeletedAt, 0).IsNull(TableAccount.DeletedAt))
+	w.Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &list)
 	if err != nil {
 		return nil, err
@@ -332,11 +356,11 @@ func (tableAccount) Page(ctx context.Context, pageNum, pageSize int, where orm.W
 	return
 }
 
-func (tableAccount) PageById(ctx context.Context, pageNum, pageSize int, id dt.ID) (list []ModelAccount, err error) {
+func (tableAccount) PageById(ctx context.Context, pageNum, pageSize int64, id dt.ID, orderBy ...orm.Order) (list []ModelAccount, err error) {
 	w := orm.NewQueryWrapper(ModelAccount{})
 	w.Eq(TableAccount.Id, id)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableAccount.DeletedAt, 0).IsNull(TableAccount.DeletedAt))
-	w.Offset((pageNum - 1) * pageSize).Limit(pageSize)
+	w.Offset((pageNum - 1) * pageSize).Limit(pageSize).Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &list)
 	if err != nil {
 		return nil, err
@@ -344,11 +368,11 @@ func (tableAccount) PageById(ctx context.Context, pageNum, pageSize int, id dt.I
 	return
 }
 
-func (tableAccount) PageByIdentifier(ctx context.Context, pageNum, pageSize int, identifier string) (list []ModelAccount, err error) {
+func (tableAccount) PageByIdentifier(ctx context.Context, pageNum, pageSize int64, identifier string, orderBy ...orm.Order) (list []ModelAccount, err error) {
 	w := orm.NewQueryWrapper(ModelAccount{})
 	w.Eq(TableAccount.Identifier, identifier)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableAccount.DeletedAt, 0).IsNull(TableAccount.DeletedAt))
-	w.Offset((pageNum - 1) * pageSize).Limit(pageSize)
+	w.Offset((pageNum - 1) * pageSize).Limit(pageSize).Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &list)
 	if err != nil {
 		return nil, err
@@ -356,11 +380,11 @@ func (tableAccount) PageByIdentifier(ctx context.Context, pageNum, pageSize int,
 	return
 }
 
-func (tableAccount) PageByAccountType(ctx context.Context, pageNum, pageSize int, accountType cos.AccountType) (list []ModelAccount, err error) {
+func (tableAccount) PageByAccountType(ctx context.Context, pageNum, pageSize int64, accountType cos.AccountType, orderBy ...orm.Order) (list []ModelAccount, err error) {
 	w := orm.NewQueryWrapper(ModelAccount{})
 	w.Eq(TableAccount.AccountType, accountType)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableAccount.DeletedAt, 0).IsNull(TableAccount.DeletedAt))
-	w.Offset((pageNum - 1) * pageSize).Limit(pageSize)
+	w.Offset((pageNum - 1) * pageSize).Limit(pageSize).Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &list)
 	if err != nil {
 		return nil, err
@@ -368,11 +392,11 @@ func (tableAccount) PageByAccountType(ctx context.Context, pageNum, pageSize int
 	return
 }
 
-func (tableAccount) PageByCreatorId(ctx context.Context, pageNum, pageSize int, creatorId dt.ID) (list []ModelAccount, err error) {
+func (tableAccount) PageByCreatorId(ctx context.Context, pageNum, pageSize int64, creatorId dt.ID, orderBy ...orm.Order) (list []ModelAccount, err error) {
 	w := orm.NewQueryWrapper(ModelAccount{})
 	w.Eq(TableAccount.CreatorId, creatorId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableAccount.DeletedAt, 0).IsNull(TableAccount.DeletedAt))
-	w.Offset((pageNum - 1) * pageSize).Limit(pageSize)
+	w.Offset((pageNum - 1) * pageSize).Limit(pageSize).Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &list)
 	if err != nil {
 		return nil, err
@@ -380,7 +404,7 @@ func (tableAccount) PageByCreatorId(ctx context.Context, pageNum, pageSize int, 
 	return
 }
 
-func (tableAccount) Count(ctx context.Context, where orm.WhereWrapper) (count int, err error) {
+func (tableAccount) Count(ctx context.Context, where orm.WhereWrapper) (count int64, err error) {
 	w := orm.NewQueryWrapper(ModelAccount{})
 	w.SetWhere(where)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableAccount.DeletedAt, 0).IsNull(TableAccount.DeletedAt))
@@ -389,7 +413,7 @@ func (tableAccount) Count(ctx context.Context, where orm.WhereWrapper) (count in
 	return count, err
 }
 
-func (tableAccount) CountById(ctx context.Context, id dt.ID) (count int, err error) {
+func (tableAccount) CountById(ctx context.Context, id dt.ID) (count int64, err error) {
 	w := orm.NewQueryWrapper(ModelAccount{})
 	w.Eq(TableAccount.Id, id)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableAccount.DeletedAt, 0).IsNull(TableAccount.DeletedAt))
@@ -398,7 +422,7 @@ func (tableAccount) CountById(ctx context.Context, id dt.ID) (count int, err err
 	return count, err
 }
 
-func (tableAccount) CountByIdentifier(ctx context.Context, identifier string) (count int, err error) {
+func (tableAccount) CountByIdentifier(ctx context.Context, identifier string) (count int64, err error) {
 	w := orm.NewQueryWrapper(ModelAccount{})
 	w.Eq(TableAccount.Identifier, identifier)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableAccount.DeletedAt, 0).IsNull(TableAccount.DeletedAt))
@@ -407,7 +431,7 @@ func (tableAccount) CountByIdentifier(ctx context.Context, identifier string) (c
 	return count, err
 }
 
-func (tableAccount) CountByAccountType(ctx context.Context, accountType cos.AccountType) (count int, err error) {
+func (tableAccount) CountByAccountType(ctx context.Context, accountType cos.AccountType) (count int64, err error) {
 	w := orm.NewQueryWrapper(ModelAccount{})
 	w.Eq(TableAccount.AccountType, accountType)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableAccount.DeletedAt, 0).IsNull(TableAccount.DeletedAt))
@@ -416,7 +440,7 @@ func (tableAccount) CountByAccountType(ctx context.Context, accountType cos.Acco
 	return count, err
 }
 
-func (tableAccount) CountByCreatorId(ctx context.Context, creatorId dt.ID) (count int, err error) {
+func (tableAccount) CountByCreatorId(ctx context.Context, creatorId dt.ID) (count int64, err error) {
 	w := orm.NewQueryWrapper(ModelAccount{})
 	w.Eq(TableAccount.CreatorId, creatorId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableAccount.DeletedAt, 0).IsNull(TableAccount.DeletedAt))

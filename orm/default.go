@@ -3,6 +3,7 @@ package orm
 import (
 	"context"
 	"database/sql"
+	"github.com/juxuny/yc/errors"
 )
 
 type execResult struct {
@@ -53,7 +54,7 @@ func Insert(ctx context.Context, configName string, w InsertWrapper) (result sql
 	}
 	result, err = connectManagerInstance.Exec(ctx, configName, statement, values...)
 	if err != nil {
-		return result, err
+		return result, errors.SystemError.DatabaseExecError.Wrap(err)
 	}
 	totalResult := execResult{}
 	if affected, err := result.RowsAffected(); err != nil {
@@ -72,15 +73,15 @@ func Insert(ctx context.Context, configName string, w InsertWrapper) (result sql
 			return result, err
 		}
 		if batchResult, err := connectManagerInstance.Exec(ctx, configName, statement, values...); err != nil {
-			return result, err
+			return result, errors.SystemError.DatabaseExecError.Wrap(err)
 		} else {
 			if rowsAffected, err := batchResult.RowsAffected(); err != nil {
-				return totalResult, err
+				return totalResult, errors.SystemError.DatabaseExecError.Wrap(err)
 			} else {
 				totalResult.rowsAffected += rowsAffected
 			}
 			if lastInsertId, err := batchResult.LastInsertId(); err != nil {
-				return totalResult, err
+				return totalResult, errors.SystemError.DatabaseExecError.Wrap(err)
 			} else {
 				totalResult.lastInsertId = lastInsertId
 			}

@@ -14,6 +14,7 @@ var Error = struct {
 	AccountForbidden           errors.Error `code:"10004" msg:"account forbidden"`
 	NoPermissionAccessUserInfo errors.Error `code:"10005" msg:"no permission access user info"`
 	NoDataModified             errors.Error `code:"10006" msg:"no data modified"`
+	NamespaceNotFound          errors.Error `code:"10007" msg:"namespace not found"`
 }{}
 
 func init() {

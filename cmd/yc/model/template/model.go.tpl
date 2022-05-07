@@ -43,10 +43,11 @@ func ({{.TableName|lowerFirst}}) TableName() string {
 	return cos.Name + "_" + "{{.TableNameWithoutServicePrefix}}"
 }
 {{range $field := .Fields}}{{if $field.HasIndex}}
-func ({{.TableName|lowerFirst}}) FindOneBy{{$field.FieldName|upperFirst}}(ctx context.Context, {{$field.FieldName|lowerFirst}} {{$field.ModelDataType|trimPointer}}) (data {{$field.ModelName}}, found bool, err error) {
+func ({{.TableName|lowerFirst}}) FindOneBy{{$field.FieldName|upperFirst}}(ctx context.Context, {{$field.FieldName|lowerFirst}} {{$field.ModelDataType|trimPointer}}, orderBy ...orm.Order) (data {{$field.ModelName}}, found bool, err error) {
 	w := orm.NewQueryWrapper(data).Limit(1)
 	w.Eq({{$field.TableName}}.{{$field.FieldName|upperFirst}}, {{$field.FieldName|lowerFirst}}){{if $field.HasDeletedAt}}
 	w.Nested(orm.NewOrWhereWrapper().Eq({{$field.TableName}}.DeletedAt, 0).IsNull({{$field.TableName}}.DeletedAt)){{end}}
+	w.Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &data)
 	if err != nil {
 		if e, ok := err.(errors.Error); ok && e.Code == errors.SystemError.DatabaseNoData.Code {
@@ -108,9 +109,10 @@ func ({{.TableName|lowerFirst}}) SoftDeleteBy{{$field.FieldName|upperFirst}}(ctx
 }
 {{end}}{{end}}
 
-func ({{.TableName|lowerFirst}}) Find(ctx context.Context, where orm.WhereWrapper) (list []{{.ModelName}}, err error) {
-	w := orm.NewQueryWrapper({{.ModelName}}{})
-	w.SetWhere(where)
+func ({{.TableName|lowerFirst}}) Find(ctx context.Context, where orm.WhereWrapper, orderBy ...orm.Order) (list []{{.ModelName}}, err error) {
+	w := orm.NewQueryWrapper({{.ModelName}}{}){{if .HasDeletedAt}}
+	w.Nested(orm.NewOrWhereWrapper().Eq({{.TableName}}.DeletedAt, 0).IsNull({{.TableName}}.DeletedAt)){{end}}
+	w.SetWhere(where).Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &list)
 	if err != nil {
 		return nil, err
@@ -118,11 +120,26 @@ func ({{.TableName|lowerFirst}}) Find(ctx context.Context, where orm.WhereWrappe
 	return
 }
 
+func ({{.TableName|lowerFirst}}) FindOne(ctx context.Context, where orm.WhereWrapper, orderBy ...orm.Order) (ret {{.ModelName}}, found bool, err error) {
+	w := orm.NewQueryWrapper({{.ModelName}}{}){{if .HasDeletedAt}}
+	w.Nested(orm.NewOrWhereWrapper().Eq({{.TableName}}.DeletedAt, 0).IsNull({{.TableName}}.DeletedAt)){{end}}
+	w.SetWhere(where).Order(orderBy...)
+	err = orm.Select(ctx, cos.Name, w, &ret)
+	if err != nil {
+		if e, ok := err.(errors.Error); ok && e.Code == errors.SystemError.DatabaseNoData.Code {
+			return ret, false, nil
+		}
+		return ret, false, err
+	}
+	return ret, true, nil
+}
+
 {{range $field := .Fields}}{{if $field.HasIndex}}
-func ({{.TableName|lowerFirst}}) FindBy{{.FieldName|upperFirst}}(ctx context.Context, {{$field.FieldName|lowerFirst}} {{$field.ModelDataType|trimPointer}}) (list []{{.ModelName}}, err error) {
+func ({{.TableName|lowerFirst}}) FindBy{{.FieldName|upperFirst}}(ctx context.Context, {{$field.FieldName|lowerFirst}} {{$field.ModelDataType|trimPointer}}, orderBy ...orm.Order) (list []{{.ModelName}}, err error) {
 	w := orm.NewQueryWrapper({{.ModelName}}{})
 	w.Eq({{.TableName}}.{{.FieldName|upperFirst}}, {{.FieldName|lowerFirst}}){{if .HasDeletedAt}}
 	w.Nested(orm.NewOrWhereWrapper().Eq({{.TableName}}.DeletedAt, 0).IsNull({{.TableName}}.DeletedAt)){{end}}
+	w.Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &list)
 	if err != nil {
 		return nil, err
@@ -131,10 +148,11 @@ func ({{.TableName|lowerFirst}}) FindBy{{.FieldName|upperFirst}}(ctx context.Con
 }
 {{end}}{{end}}
 
-func ({{.TableName|lowerFirst}}) Page(ctx context.Context, pageNum, pageSize int, where orm.WhereWrapper) (list []{{.ModelName}}, err error) {
+func ({{.TableName|lowerFirst}}) Page(ctx context.Context, pageNum, pageSize int64, where orm.WhereWrapper, orderBy ...orm.Order) (list []{{.ModelName}}, err error) {
 	w := orm.NewQueryWrapper(ModelAccount{})
 	w.SetWhere(where).Offset((pageNum - 1) * pageSize).Limit(pageSize){{if .HasDeletedAt}}
 	w.Nested(orm.NewOrWhereWrapper().Eq({{.TableName}}.DeletedAt, 0).IsNull({{.TableName}}.DeletedAt)){{end}}
+	w.Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &list)
 	if err != nil {
 		return nil, err
@@ -143,11 +161,11 @@ func ({{.TableName|lowerFirst}}) Page(ctx context.Context, pageNum, pageSize int
 }
 
 {{range $field := .Fields}}{{if $field.HasIndex}}
-func ({{.TableName|lowerFirst}}) PageBy{{.FieldName|upperFirst}}(ctx context.Context, pageNum, pageSize int, {{$field.FieldName|lowerFirst}} {{$field.ModelDataType|trimPointer}}) (list []{{.ModelName}}, err error) {
+func ({{.TableName|lowerFirst}}) PageBy{{.FieldName|upperFirst}}(ctx context.Context, pageNum, pageSize int64, {{$field.FieldName|lowerFirst}} {{$field.ModelDataType|trimPointer}}, orderBy ...orm.Order) (list []{{.ModelName}}, err error) {
 	w := orm.NewQueryWrapper({{.ModelName}}{})
 	w.Eq({{.TableName}}.{{.FieldName|upperFirst}}, {{.FieldName|lowerFirst}}){{if .HasDeletedAt}}
 	w.Nested(orm.NewOrWhereWrapper().Eq({{.TableName}}.DeletedAt, 0).IsNull({{.TableName}}.DeletedAt)){{end}}
-	w.Offset((pageNum - 1) * pageSize).Limit(pageSize)
+	w.Offset((pageNum - 1) * pageSize).Limit(pageSize).Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &list)
 	if err != nil {
 		return nil, err
@@ -156,7 +174,7 @@ func ({{.TableName|lowerFirst}}) PageBy{{.FieldName|upperFirst}}(ctx context.Con
 }
 {{end}}{{end}}
 
-func ({{.TableName|lowerFirst}}) Count(ctx context.Context, where orm.WhereWrapper) (count int, err error) {
+func ({{.TableName|lowerFirst}}) Count(ctx context.Context, where orm.WhereWrapper) (count int64, err error) {
 	w := orm.NewQueryWrapper(ModelAccount{})
 	w.SetWhere(where){{if .HasDeletedAt}}
 	w.Nested(orm.NewOrWhereWrapper().Eq({{.TableName}}.DeletedAt, 0).IsNull({{.TableName}}.DeletedAt)){{end}}
@@ -166,7 +184,7 @@ func ({{.TableName|lowerFirst}}) Count(ctx context.Context, where orm.WhereWrapp
 }
 
 {{range $field := .Fields}}{{if $field.HasIndex}}
-func ({{.TableName|lowerFirst}}) CountBy{{.FieldName|upperFirst}}(ctx context.Context, {{$field.FieldName|lowerFirst}} {{$field.ModelDataType|trimPointer}}) (count int, err error) {
+func ({{.TableName|lowerFirst}}) CountBy{{.FieldName|upperFirst}}(ctx context.Context, {{$field.FieldName|lowerFirst}} {{$field.ModelDataType|trimPointer}}) (count int64, err error) {
 	w := orm.NewQueryWrapper({{.ModelName}}{})
 	w.Eq({{.TableName}}.{{.FieldName|upperFirst}}, {{.FieldName|lowerFirst}}){{if .HasDeletedAt}}
 	w.Nested(orm.NewOrWhereWrapper().Eq({{.TableName}}.DeletedAt, 0).IsNull({{.TableName}}.DeletedAt)){{end}}

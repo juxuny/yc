@@ -12,6 +12,25 @@ const (
 	JoinStatementRightJoin = JoinStatement("RIGHT JOIN")
 )
 
+type Order struct {
+	IsAsc     bool
+	FieldName FieldName
+}
+
+func ASC(field FieldName) Order {
+	return Order{
+		IsAsc:     true,
+		FieldName: field,
+	}
+}
+
+func DESC(field FieldName) Order {
+	return Order{
+		IsAsc:     false,
+		FieldName: field,
+	}
+}
+
 type Join struct {
 	Statement    JoinStatement
 	TableName    TableName
@@ -23,9 +42,10 @@ type QueryWrapper interface {
 	WhereWrapper
 	OrderDesc(fields ...FieldName) QueryWrapper
 	OrderAsc(fields ...FieldName) QueryWrapper
-	Offset(offset int) QueryWrapper
-	Limit(limit int) QueryWrapper
-	Page(pageNum, pageSize int) QueryWrapper
+	Order(orderBy ...Order) QueryWrapper
+	Offset(offset int64) QueryWrapper
+	Limit(limit int64) QueryWrapper
+	Page(pageNum, pageSize int64) QueryWrapper
 	Select(fields ...FieldName) QueryWrapper
 	LeftJoin(tableName TableName, where WhereWrapper) QueryWrapper
 	RightJoin(tableName TableName, where WhereWrapper) QueryWrapper
@@ -35,11 +55,22 @@ type QueryWrapper interface {
 type queryWrapper struct {
 	WhereWrapper
 	model             Model
-	offset, limit     int
+	offset, limit     int64
 	orderStatement    string
 	selectFields      []FieldName
 	selectValueHolder []interface{}
 	joinList          []Join
+}
+
+func (t *queryWrapper) Order(orderBy ...Order) QueryWrapper {
+	for _, item := range orderBy {
+		if item.IsAsc {
+			t.OrderAsc(item.FieldName)
+		} else {
+			t.OrderDesc(item.FieldName)
+		}
+	}
+	return t
 }
 
 func (t *queryWrapper) SetWhere(where WhereWrapper) QueryWrapper {
@@ -78,7 +109,10 @@ func (t *queryWrapper) SelectWithHolder(fields []FieldName, v ...interface{}) Qu
 
 func (t *queryWrapper) OrderDesc(fields ...FieldName) QueryWrapper {
 	if t.orderStatement != "" {
-		t.orderStatement += " AND "
+		t.orderStatement += ", "
+	}
+	for i := range fields {
+		fields[i] = fields[i].Wrap()
 	}
 	t.orderStatement += strings.TrimSpace(JoinFieldNames(fields, ", ")) + " DESC"
 	return t
@@ -86,34 +120,29 @@ func (t *queryWrapper) OrderDesc(fields ...FieldName) QueryWrapper {
 
 func (t *queryWrapper) OrderAsc(fields ...FieldName) QueryWrapper {
 	if t.orderStatement != "" {
-		t.orderStatement += " AND "
+		t.orderStatement += ", "
+	}
+	for i := range fields {
+		fields[i] = fields[i].Wrap()
 	}
 	t.orderStatement += strings.TrimSpace(JoinFieldNames(fields, ", ")) + " ASC"
 	return t
 }
 
-func (t *queryWrapper) Offset(offset int) QueryWrapper {
+func (t *queryWrapper) Offset(offset int64) QueryWrapper {
 	t.offset = offset
 	return t
 }
 
-func (t *queryWrapper) Limit(limit int) QueryWrapper {
+func (t *queryWrapper) Limit(limit int64) QueryWrapper {
 	t.limit = limit
 	return t
 }
 
-func (t *queryWrapper) Page(pageNum, pageSize int) QueryWrapper {
+func (t *queryWrapper) Page(pageNum, pageSize int64) QueryWrapper {
 	t.offset = (pageNum - 1) * pageSize
 	t.limit = pageSize
 	return t
-}
-
-func (t *queryWrapper) Order(asc bool, fields ...FieldName) QueryWrapper {
-	if asc {
-		return t.OrderAsc(fields...)
-	} else {
-		return t.OrderDesc(fields...)
-	}
 }
 
 func (t *queryWrapper) Model(model interface{}) QueryWrapper {
@@ -159,7 +188,9 @@ func (t *queryWrapper) Build() (statement string, values []interface{}, err erro
 		statement += " WHERE " + where
 		values = append(values, whereValueHolder...)
 	}
-	statement += t.orderStatement
+	if t.orderStatement != "" {
+		statement += " ORDER BY " + t.orderStatement
+	}
 	if t.limit > 0 {
 		statement += " LIMIT ? OFFSET ?"
 		values = append(values, t.limit, t.offset)

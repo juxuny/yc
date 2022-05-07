@@ -11,6 +11,7 @@ const (
 	ValidatorTemplateModifyPasswordRequestOldPassword   = "invalid old password: {{.OldPassword}}"
 	ValidatorTemplateModifyPasswordRequestNewPassword   = "invalid new password: {{.NewPassword}}"
 	ValidatorTemplateSaveOrCreateUserRequestAccountType = "invalid accountType: {{.AccountType|num}}"
+	ValidatorTemplateSaveNamespaceRequestNamespace      = "invalid namespace: {{.Namespace}}"
 )
 
 var templateList = []string{
@@ -19,6 +20,7 @@ var templateList = []string{
 	ValidatorTemplateModifyPasswordRequestOldPassword,
 	ValidatorTemplateModifyPasswordRequestNewPassword,
 	ValidatorTemplateSaveOrCreateUserRequestAccountType,
+	ValidatorTemplateSaveNamespaceRequestNamespace,
 }
 
 func init() {
@@ -73,6 +75,9 @@ func (m *SaveOrCreateUserRequest) Validate() error {
 	return nil
 }
 func (m *SaveNamespaceRequest) Validate() error {
+	if err := validator.Run(m.Namespace, validator.CreateAction("length.min", `3`, ValidatorTemplateSaveNamespaceRequestNamespace), m, "namespace"); err != nil {
+		return err
+	}
 	return nil
 }
 func (m *ListNamespaceRequest) Validate() error {

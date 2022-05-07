@@ -6,6 +6,10 @@ import (
 	"strings"
 )
 
+func (m *ID) NewPointer() *ID {
+	return NewIDPointer(m.Uint64)
+}
+
 func (m *ID) UnmarshalJSON(data []byte) error {
 	input := strings.Trim(string(data), "\" ")
 	if input == "" || strings.Contains(input, "null") {
@@ -167,6 +171,14 @@ func (m NullBool) Equal(input NullBool) bool {
 
 func (m Pagination) ToResp(total int64) PaginationResp {
 	return PaginationResp{
+		PageNum:  m.PageNum,
+		PageSize: m.PageSize,
+		Total:    total,
+	}
+}
+
+func (m Pagination) ToRespPointer(total int64) *PaginationResp {
+	return &PaginationResp{
 		PageNum:  m.PageNum,
 		PageSize: m.PageSize,
 		Total:    total,

@@ -20,7 +20,6 @@ service Cos {
   rpc UpdateInfo(UpdateInfoRequest) returns(UpdateInfoResponse) {}
   // @group: user
   rpc ModifyPassword(ModifyPasswordRequest) returns (ModifyPasswordResponse) {}
-
   // @group: user
   rpc SaveOrCreateUser(SaveOrCreateUserRequest) returns (SaveOrCreateUserResponse) {}
 
@@ -236,6 +235,8 @@ message SaveOrCreateUserResponse {
 }
 
 message SaveNamespaceRequest {
+  // @v: length.min=3
+  // @msg: invalid namespace: {{.Namespace}}
   string namespace = 1;
   dt.ID id = 2;
 }
@@ -247,6 +248,7 @@ message ListNamespaceRequest {
   string searchKey = 2;
 }
 
+// @ref: ModelNamespace
 message ListNamespaceItem {
   dt.ID id = 1;
   string namespace = 2;
