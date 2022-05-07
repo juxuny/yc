@@ -67,5 +67,22 @@ func (t *handler) ListNamespace(ctx context.Context, req *cos.ListNamespaceReque
 }
 
 func (t *handler) DeleteNamespace(ctx context.Context, req *cos.DeleteNamespaceRequest) (resp *cos.DeleteNamespaceResponse, err error) {
-	return &cos.DeleteNamespaceResponse{}, nil
+	currentId, err := yc.GetUserId(ctx)
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+	modelNamespace, found, err := db.TableNamespace.FindOneById(ctx, *req.Id)
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+	if !found {
+		return nil, cos.Error.NamespaceNotFound
+	}
+	if !modelNamespace.CreatorId.Equal(currentId) {
+		return nil, cos.Error.NoPermissionDeleteNamespace
+	}
+	_, err = db.TableNamespace.SoftDeleteById(ctx, *req.Id)
+	return nil, err
 }

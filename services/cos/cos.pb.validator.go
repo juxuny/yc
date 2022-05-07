@@ -12,6 +12,7 @@ const (
 	ValidatorTemplateModifyPasswordRequestNewPassword   = "invalid new password: {{.NewPassword}}"
 	ValidatorTemplateSaveOrCreateUserRequestAccountType = "invalid accountType: {{.AccountType|num}}"
 	ValidatorTemplateSaveNamespaceRequestNamespace      = "invalid namespace: {{.Namespace}}"
+	ValidatorTemplateDeleteNamespaceRequestId           = "invalid id"
 )
 
 var templateList = []string{
@@ -21,6 +22,7 @@ var templateList = []string{
 	ValidatorTemplateModifyPasswordRequestNewPassword,
 	ValidatorTemplateSaveOrCreateUserRequestAccountType,
 	ValidatorTemplateSaveNamespaceRequestNamespace,
+	ValidatorTemplateDeleteNamespaceRequestId,
 }
 
 func init() {
@@ -84,5 +86,8 @@ func (m *ListNamespaceRequest) Validate() error {
 	return nil
 }
 func (m *DeleteNamespaceRequest) Validate() error {
+	if err := validator.Run(m.Id, validator.CreateAction("min", `1`, ValidatorTemplateDeleteNamespaceRequestId), m, "id"); err != nil {
+		return err
+	}
 	return nil
 }

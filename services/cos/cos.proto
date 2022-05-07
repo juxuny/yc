@@ -260,6 +260,8 @@ message ListNamespaceResponse {
 }
 
 message DeleteNamespaceRequest {
+  // @v: min=1
+  // @msg: invalid id
   dt.ID id = 1;
 }
 
