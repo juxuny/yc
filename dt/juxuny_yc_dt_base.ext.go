@@ -12,6 +12,9 @@ func (m *ID) UnmarshalJSON(data []byte) error {
 		m.Valid = false
 		return nil
 	}
+	if strings.ContainsAny(input, "-. \r\n") {
+		return fmt.Errorf("invalid ID: %v", input)
+	}
 	id, err := strconv.ParseUint(input, 10, 64)
 	if err != nil {
 		return err
