@@ -22,7 +22,7 @@ service Cos {
   rpc ModifyPassword(ModifyPasswordRequest) returns (ModifyPasswordResponse) {}
 
   // @group: user
-  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {}
+  rpc SaveOrCreateUser(SaveOrCreateUserRequest) returns (SaveOrCreateUserResponse) {}
 
   // @group: namespace
   rpc SaveNamespace(SaveNamespaceRequest) returns (SaveNamespaceResponse) {}
@@ -137,6 +137,18 @@ message ModelNamespace {
   // @index
   dt.ID creatorId = 7;
 }
+
+// @ref: ModelNamespace
+message NamespaceResp {
+  dt.ID id = 1;
+  string namespace = 2;
+  int64 createTime = 3;
+  int64 updateTime = 4;
+  reserved 5;
+  bool isDisabled = 6;
+  dt.ID creatorId = 7;
+}
+
 message ModelConfig {
   // @index
   dt.ID id = 1;
@@ -148,6 +160,19 @@ message ModelConfig {
   bool isDisabled = 6;
   // @index
   dt.ID creatorId = 7;
+  // @index
+  dt.ID baseId = 8;
+}
+
+message ConfigResp {
+  dt.ID id = 1;
+  int64 createTime = 2;
+  int64 updateTime = 3;
+  int64 deletedAt = 4;
+  string configId = 5;
+  bool isDisabled = 6;
+  dt.ID creatorId = 7;
+  dt.ID baseId = 8;
 }
 
 enum ValueType {
@@ -173,16 +198,34 @@ message ModelKeyValue {
   string configId = 9;
   // @index
   dt.ID creatorId = 10;
+  // @index
+  bool isHot = 11;
 }
 
-message CreateUserRequest {
+// @ref: ModelKeyValue
+message KeyValueResp {
+  dt.ID id = 1;
+  int64 createTime = 2;
+  int64 updateTime = 3;
+  int64 deletedAt = 4;
+  bool isDisabled = 5;
+  string configKey = 6;
+  string configValue = 7;
+  ValueType valueType = 8;
+  string configId = 9;
+  dt.ID creatorId = 10;
+  bool isHot = 11;
+}
+
+message SaveOrCreateUserRequest {
   string identifier = 1;
   string credential = 2;
   AccountType AccountType = 3;
 }
 
-message CreateUserResponse {
+message SaveOrCreateUserResponse {
   dt.ID userId = 1;
+  bool isNew = 2;
 }
 
 message SaveNamespaceRequest {

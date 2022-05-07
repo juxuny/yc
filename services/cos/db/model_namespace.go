@@ -19,17 +19,28 @@ var TableNamespace = tableNamespace{
 }
 
 type ModelNamespace struct {
-	Id         dt.ID  `json:"id" orm:"id"`
+	Id         *dt.ID `json:"id" orm:"id"`
 	Namespace  string `json:"namespace" orm:"namespace"`
 	CreateTime int64  `json:"createTime" orm:"create_time"`
 	UpdateTime int64  `json:"updateTime" orm:"update_time"`
 	DeletedAt  int64  `json:"deletedAt" orm:"deleted_at"`
 	IsDisabled bool   `json:"isDisabled" orm:"is_disabled"`
-	CreatorId  dt.ID  `json:"creatorId" orm:"creator_id"`
+	CreatorId  *dt.ID `json:"creatorId" orm:"creator_id"`
 }
 
 func (ModelNamespace) TableName() string {
 	return cos.Name + "_" + "namespace"
+}
+
+func (t ModelNamespace) ToNamespaceResp() cos.NamespaceResp {
+	return cos.NamespaceResp{
+		Id:         t.Id,
+		Namespace:  t.Namespace,
+		CreateTime: t.CreateTime,
+		UpdateTime: t.UpdateTime,
+		IsDisabled: t.IsDisabled,
+		CreatorId:  t.CreatorId,
+	}
 }
 
 type tableNamespace struct {
@@ -46,7 +57,7 @@ func (tableNamespace) TableName() string {
 	return cos.Name + "_" + "namespace"
 }
 
-func (tableNamespace) FindOneById(ctx context.Context, id dt.ID) (data ModelNamespace, found bool, err error) {
+func (tableNamespace) FindOneById(ctx context.Context, id *dt.ID) (data ModelNamespace, found bool, err error) {
 	w := orm.NewQueryWrapper(data).Limit(1)
 	w.Eq(TableNamespace.Id, id)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableNamespace.DeletedAt, 0).IsNull(TableNamespace.DeletedAt))
@@ -74,7 +85,7 @@ func (tableNamespace) FindOneByNamespace(ctx context.Context, namespace string) 
 	return data, true, nil
 }
 
-func (tableNamespace) FindOneByCreatorId(ctx context.Context, creatorId dt.ID) (data ModelNamespace, found bool, err error) {
+func (tableNamespace) FindOneByCreatorId(ctx context.Context, creatorId *dt.ID) (data ModelNamespace, found bool, err error) {
 	w := orm.NewQueryWrapper(data).Limit(1)
 	w.Eq(TableNamespace.CreatorId, creatorId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableNamespace.DeletedAt, 0).IsNull(TableNamespace.DeletedAt))
@@ -88,7 +99,7 @@ func (tableNamespace) FindOneByCreatorId(ctx context.Context, creatorId dt.ID) (
 	return data, true, nil
 }
 
-func (tableNamespace) UpdateById(ctx context.Context, id dt.ID, update orm.H) (rowsAffected int64, err error) {
+func (tableNamespace) UpdateById(ctx context.Context, id *dt.ID, update orm.H) (rowsAffected int64, err error) {
 	w := orm.NewUpdateWrapper(ModelNamespace{})
 	w.Eq(TableNamespace.Id, id)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableNamespace.DeletedAt, 0).IsNull(TableNamespace.DeletedAt))
@@ -112,7 +123,7 @@ func (tableNamespace) UpdateByNamespace(ctx context.Context, namespace string, u
 	return result.RowsAffected()
 }
 
-func (tableNamespace) UpdateByCreatorId(ctx context.Context, creatorId dt.ID, update orm.H) (rowsAffected int64, err error) {
+func (tableNamespace) UpdateByCreatorId(ctx context.Context, creatorId *dt.ID, update orm.H) (rowsAffected int64, err error) {
 	w := orm.NewUpdateWrapper(ModelNamespace{})
 	w.Eq(TableNamespace.CreatorId, creatorId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableNamespace.DeletedAt, 0).IsNull(TableNamespace.DeletedAt))
@@ -135,7 +146,7 @@ func (tableNamespace) Update(ctx context.Context, update orm.H, where orm.WhereW
 	return result.RowsAffected()
 }
 
-func (tableNamespace) DeleteById(ctx context.Context, id dt.ID) (rowsAffected int64, err error) {
+func (tableNamespace) DeleteById(ctx context.Context, id *dt.ID) (rowsAffected int64, err error) {
 	w := orm.NewDeleteWrapper(ModelNamespace{})
 	w.Eq(TableNamespace.Id, id)
 	result, err := orm.Delete(ctx, cos.Name, w)
@@ -155,7 +166,7 @@ func (tableNamespace) DeleteByNamespace(ctx context.Context, namespace string) (
 	return result.RowsAffected()
 }
 
-func (tableNamespace) DeleteByCreatorId(ctx context.Context, creatorId dt.ID) (rowsAffected int64, err error) {
+func (tableNamespace) DeleteByCreatorId(ctx context.Context, creatorId *dt.ID) (rowsAffected int64, err error) {
 	w := orm.NewDeleteWrapper(ModelNamespace{})
 	w.Eq(TableNamespace.CreatorId, creatorId)
 	result, err := orm.Delete(ctx, cos.Name, w)
@@ -165,7 +176,7 @@ func (tableNamespace) DeleteByCreatorId(ctx context.Context, creatorId dt.ID) (r
 	return result.RowsAffected()
 }
 
-func (tableNamespace) SoftDeleteById(ctx context.Context, id dt.ID) (rowsAffected int64, err error) {
+func (tableNamespace) SoftDeleteById(ctx context.Context, id *dt.ID) (rowsAffected int64, err error) {
 	w := orm.NewUpdateWrapper(ModelNamespace{})
 	w.SetValue(TableNamespace.DeletedAt, orm.Now())
 	w.Eq(TableNamespace.Id, id)
@@ -187,7 +198,7 @@ func (tableNamespace) SoftDeleteByNamespace(ctx context.Context, namespace strin
 	return result.RowsAffected()
 }
 
-func (tableNamespace) SoftDeleteByCreatorId(ctx context.Context, creatorId dt.ID) (rowsAffected int64, err error) {
+func (tableNamespace) SoftDeleteByCreatorId(ctx context.Context, creatorId *dt.ID) (rowsAffected int64, err error) {
 	w := orm.NewUpdateWrapper(ModelNamespace{})
 	w.SetValue(TableNamespace.DeletedAt, orm.Now())
 	w.Eq(TableNamespace.CreatorId, creatorId)
@@ -208,7 +219,7 @@ func (tableNamespace) Find(ctx context.Context, where orm.WhereWrapper) (list []
 	return
 }
 
-func (tableNamespace) FindById(ctx context.Context, id dt.ID) (list []ModelNamespace, err error) {
+func (tableNamespace) FindById(ctx context.Context, id *dt.ID) (list []ModelNamespace, err error) {
 	w := orm.NewQueryWrapper(ModelNamespace{})
 	w.Eq(TableNamespace.Id, id)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableNamespace.DeletedAt, 0).IsNull(TableNamespace.DeletedAt))
@@ -230,7 +241,7 @@ func (tableNamespace) FindByNamespace(ctx context.Context, namespace string) (li
 	return
 }
 
-func (tableNamespace) FindByCreatorId(ctx context.Context, creatorId dt.ID) (list []ModelNamespace, err error) {
+func (tableNamespace) FindByCreatorId(ctx context.Context, creatorId *dt.ID) (list []ModelNamespace, err error) {
 	w := orm.NewQueryWrapper(ModelNamespace{})
 	w.Eq(TableNamespace.CreatorId, creatorId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableNamespace.DeletedAt, 0).IsNull(TableNamespace.DeletedAt))
@@ -252,7 +263,7 @@ func (tableNamespace) Page(ctx context.Context, pageNum, pageSize int, where orm
 	return
 }
 
-func (tableNamespace) PageById(ctx context.Context, pageNum, pageSize int, id dt.ID) (list []ModelNamespace, err error) {
+func (tableNamespace) PageById(ctx context.Context, pageNum, pageSize int, id *dt.ID) (list []ModelNamespace, err error) {
 	w := orm.NewQueryWrapper(ModelNamespace{})
 	w.Eq(TableNamespace.Id, id)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableNamespace.DeletedAt, 0).IsNull(TableNamespace.DeletedAt))
@@ -276,7 +287,7 @@ func (tableNamespace) PageByNamespace(ctx context.Context, pageNum, pageSize int
 	return
 }
 
-func (tableNamespace) PageByCreatorId(ctx context.Context, pageNum, pageSize int, creatorId dt.ID) (list []ModelNamespace, err error) {
+func (tableNamespace) PageByCreatorId(ctx context.Context, pageNum, pageSize int, creatorId *dt.ID) (list []ModelNamespace, err error) {
 	w := orm.NewQueryWrapper(ModelNamespace{})
 	w.Eq(TableNamespace.CreatorId, creatorId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableNamespace.DeletedAt, 0).IsNull(TableNamespace.DeletedAt))
@@ -297,7 +308,7 @@ func (tableNamespace) Count(ctx context.Context, where orm.WhereWrapper) (count 
 	return count, err
 }
 
-func (tableNamespace) CountById(ctx context.Context, id dt.ID) (count int, err error) {
+func (tableNamespace) CountById(ctx context.Context, id *dt.ID) (count int, err error) {
 	w := orm.NewQueryWrapper(ModelNamespace{})
 	w.Eq(TableNamespace.Id, id)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableNamespace.DeletedAt, 0).IsNull(TableNamespace.DeletedAt))
@@ -315,7 +326,7 @@ func (tableNamespace) CountByNamespace(ctx context.Context, namespace string) (c
 	return count, err
 }
 
-func (tableNamespace) CountByCreatorId(ctx context.Context, creatorId dt.ID) (count int, err error) {
+func (tableNamespace) CountByCreatorId(ctx context.Context, creatorId *dt.ID) (count int, err error) {
 	w := orm.NewQueryWrapper(ModelNamespace{})
 	w.Eq(TableNamespace.CreatorId, creatorId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableNamespace.DeletedAt, 0).IsNull(TableNamespace.DeletedAt))

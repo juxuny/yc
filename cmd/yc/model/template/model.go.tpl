@@ -20,6 +20,15 @@ func ({{.ModelName}}) TableName() string {
 	return cos.Name + "_" + "{{.TableNameWithoutServicePrefix}}"
 }
 
+{{$modelName := .ModelName}}
+{{$packageAlias := .PackageAlias}}
+{{range $ref := .Refs}}
+func (t {{$modelName}}) To{{$ref.ModelName}}() {{$packageAlias}}.{{$ref.ModelName}} {
+	return {{$packageAlias}}.{{$ref.ModelName}}{
+	{{range $refField := $ref.Fields}}	{{$refField.FieldName|upperFirst}}: t.{{$refField.FieldName|upperFirst}},
+	{{end}}}
+}{{end}}
+
 type {{.TableName|lowerFirst}} struct {
 {{range $field := .Fields}}	{{.FieldName|upperFirst}} orm.FieldName
 {{end}}}

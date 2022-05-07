@@ -31,7 +31,7 @@ type CosClient interface {
 	// @group: user
 	ModifyPassword(ctx context.Context, in *ModifyPasswordRequest, opts ...grpc.CallOption) (*ModifyPasswordResponse, error)
 	// @group: user
-	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error)
+	SaveOrCreateUser(ctx context.Context, in *SaveOrCreateUserRequest, opts ...grpc.CallOption) (*SaveOrCreateUserResponse, error)
 	// @group: namespace
 	SaveNamespace(ctx context.Context, in *SaveNamespaceRequest, opts ...grpc.CallOption) (*SaveNamespaceResponse, error)
 	// @group: namespace
@@ -93,9 +93,9 @@ func (c *cosClient) ModifyPassword(ctx context.Context, in *ModifyPasswordReques
 	return out, nil
 }
 
-func (c *cosClient) CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error) {
-	out := new(CreateUserResponse)
-	err := c.cc.Invoke(ctx, "/cos.Cos/CreateUser", in, out, opts...)
+func (c *cosClient) SaveOrCreateUser(ctx context.Context, in *SaveOrCreateUserRequest, opts ...grpc.CallOption) (*SaveOrCreateUserResponse, error) {
+	out := new(SaveOrCreateUserResponse)
+	err := c.cc.Invoke(ctx, "/cos.Cos/SaveOrCreateUser", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -146,7 +146,7 @@ type CosServer interface {
 	// @group: user
 	ModifyPassword(context.Context, *ModifyPasswordRequest) (*ModifyPasswordResponse, error)
 	// @group: user
-	CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error)
+	SaveOrCreateUser(context.Context, *SaveOrCreateUserRequest) (*SaveOrCreateUserResponse, error)
 	// @group: namespace
 	SaveNamespace(context.Context, *SaveNamespaceRequest) (*SaveNamespaceResponse, error)
 	// @group: namespace
@@ -175,8 +175,8 @@ func (UnimplementedCosServer) UpdateInfo(context.Context, *UpdateInfoRequest) (*
 func (UnimplementedCosServer) ModifyPassword(context.Context, *ModifyPasswordRequest) (*ModifyPasswordResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ModifyPassword not implemented")
 }
-func (UnimplementedCosServer) CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateUser not implemented")
+func (UnimplementedCosServer) SaveOrCreateUser(context.Context, *SaveOrCreateUserRequest) (*SaveOrCreateUserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SaveOrCreateUser not implemented")
 }
 func (UnimplementedCosServer) SaveNamespace(context.Context, *SaveNamespaceRequest) (*SaveNamespaceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SaveNamespace not implemented")
@@ -290,20 +290,20 @@ func _Cos_ModifyPassword_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Cos_CreateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateUserRequest)
+func _Cos_SaveOrCreateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SaveOrCreateUserRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CosServer).CreateUser(ctx, in)
+		return srv.(CosServer).SaveOrCreateUser(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/cos.Cos/CreateUser",
+		FullMethod: "/cos.Cos/SaveOrCreateUser",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CosServer).CreateUser(ctx, req.(*CreateUserRequest))
+		return srv.(CosServer).SaveOrCreateUser(ctx, req.(*SaveOrCreateUserRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -390,8 +390,8 @@ var Cos_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Cos_ModifyPassword_Handler,
 		},
 		{
-			MethodName: "CreateUser",
-			Handler:    _Cos_CreateUser_Handler,
+			MethodName: "SaveOrCreateUser",
+			Handler:    _Cos_SaveOrCreateUser_Handler,
 		},
 		{
 			MethodName: "SaveNamespace",

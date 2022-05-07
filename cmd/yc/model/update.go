@@ -14,6 +14,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"reflect"
 	"strings"
 )
 
@@ -91,26 +92,102 @@ func (t *UpdateCommand) genModel(service services.ServiceEntity) {
 			messages = append(messages, item.(*parser.Message))
 		}
 	}
+	refMap := make(map[string][]services.RefModel)
+	for _, m := range messages {
+		refModel, found := getRefFromMessageOfProto(m)
+		if found {
+			refMap[refModel] = append(refMap[refModel], t.createRefModelFromMessageOfProto(service, m, internalDataType))
+		}
+	}
 	for _, m := range messages {
 		if strings.Index(m.MessageName, "Model") == 0 {
-			t.createModel(service, m, internalDataType)
+			t.createModel(service, m, internalDataType, refMap)
 		}
 	}
 }
 
-func (t *UpdateCommand) createModel(service services.ServiceEntity, msg *parser.Message, internalDataType map[string]bool) {
+func (t *UpdateCommand) createModel(service services.ServiceEntity, msg *parser.Message, internalDataType map[string]bool, refMap map[string][]services.RefModel) {
 	log.Println("create model:", utils.ToUnderLine(msg.MessageName))
 	outModelFile := path.Join(t.WorkDir, "db", utils.ToUnderLine(msg.MessageName)+".go")
 	moduleName, err := utils.GetCurrentPackageName(t.WorkDir)
 	if err != nil {
 		log.Fatal(err)
 	}
+	model := services.ModelEntity{
+		ServiceEntity: service,
+		GoModuleName:  moduleName,
+		Model:         t.createModelFromMessageOfProto(service, msg, internalDataType, refMap[msg.MessageName]),
+	}
+	if err := template.RunEmbedFile(templateFs, modelFileName, outModelFile, model); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func (t *UpdateCommand) createModelFromMessageOfProto(service services.ServiceEntity, msg *parser.Message, internalDataType map[string]bool, refs []services.RefModel) services.Model {
+	fieldSet := utils.NewStringSet()
+	fields := make([]services.ModelField, 0)
+	hasDeletedAt := findDeletedAtFromMessageOfProto(msg)
+	interactFieldsRefs := make([]services.RefModel, 0)
+	for _, item := range msg.MessageBody {
+		f, ok := item.(*parser.Field)
+		if !ok {
+			log.Println("message name:", msg.MessageName)
+			log.Println("is not a message field: ", reflect.TypeOf(item).String())
+			continue
+		}
+		fieldSet.Add(f.FieldName)
+		field := services.ModelField{
+			TableName:     strings.Replace(msg.MessageName, "Model", "Table", 1),
+			ModelName:     msg.MessageName,
+			FieldName:     f.FieldName,
+			OrmFieldName:  utils.ToUnderLine(f.FieldName),
+			ModelDataType: f.Type,
+			HasDeletedAt:  hasDeletedAt,
+			Ignore:        getIgnoreFromMessageCommentsOfProto(f.Comments),
+			HasIndex:      getIndexFromMessageCommentsOfProto(f.Comments),
+		}
+		if internalDataType[f.Type] {
+			field.ModelDataType = strings.Join([]string{service.PackageAlias, f.Type}, ".")
+		}
+		if strings.Contains(field.ModelDataType, ".") && !strings.Contains(field.ModelDataType, service.PackageAlias+".") {
+			field.ModelDataType = "*" + field.ModelDataType
+		}
+		if columnAlias, found := getOrmAliasFromMessageOfProto(f); found {
+			field.OrmFieldName = columnAlias
+		}
+		fields = append(fields, field)
+	}
+	for _, ref := range refs {
+		interactFields := make([]services.ModelField, 0)
+		for _, f := range ref.Fields {
+			if fieldSet.Exists(f.FieldName) {
+				interactFields = append(interactFields, f)
+			}
+		}
+		interactFieldsRefs = append(interactFieldsRefs, services.RefModel{
+			ModelName: ref.ModelName,
+			Fields:    interactFields,
+		})
+	}
+	return services.Model{
+		TableNameWithoutServicePrefix: utils.ToUnderLine(strings.Trim(strings.Replace(msg.MessageName, "Model", "", 1), "_")),
+		Fields:                        fields,
+		TableName:                     strings.Replace(msg.MessageName, "Model", "Table", 1),
+		ModelName:                     msg.MessageName,
+		HasDeletedAt:                  hasDeletedAt,
+		Refs:                          interactFieldsRefs,
+	}
+}
+
+func (t *UpdateCommand) createRefModelFromMessageOfProto(service services.ServiceEntity, msg *parser.Message, internalDataType map[string]bool) services.RefModel {
 	fields := make([]services.ModelField, 0)
 	hasDeletedAt := findDeletedAtFromMessageOfProto(msg)
 	for _, item := range msg.MessageBody {
 		f, ok := item.(*parser.Field)
 		if !ok {
-			log.Fatal("is not a message field")
+			log.Println("message name:", msg.MessageName)
+			log.Println("is not a message field: ", reflect.TypeOf(item).String())
+			continue
 		}
 		field := services.ModelField{
 			TableName:     strings.Replace(msg.MessageName, "Model", "Table", 1),
@@ -125,21 +202,17 @@ func (t *UpdateCommand) createModel(service services.ServiceEntity, msg *parser.
 		if internalDataType[f.Type] {
 			field.ModelDataType = strings.Join([]string{service.PackageAlias, f.Type}, ".")
 		}
+		if strings.Contains(field.ModelDataType, ".") {
+			field.ModelDataType = "*" + field.ModelDataType
+		}
+		if columnAlias, found := getOrmAliasFromMessageOfProto(f); found {
+			field.OrmFieldName = columnAlias
+		}
 		fields = append(fields, field)
 	}
-	model := services.ModelEntity{
-		ServiceEntity: service,
-		GoModuleName:  moduleName,
-		Model: services.Model{
-			TableNameWithoutServicePrefix: utils.ToUnderLine(strings.Trim(strings.Replace(msg.MessageName, "Model", "", 1), "_")),
-			Fields:                        fields,
-			TableName:                     strings.Replace(msg.MessageName, "Model", "Table", 1),
-			ModelName:                     msg.MessageName,
-			HasDeletedAt:                  hasDeletedAt,
-		},
-	}
-	if err := template.RunEmbedFile(templateFs, modelFileName, outModelFile, model); err != nil {
-		log.Fatal(err)
+	return services.RefModel{
+		Fields:    fields,
+		ModelName: msg.MessageName,
 	}
 }
 

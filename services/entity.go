@@ -106,6 +106,19 @@ type Model struct {
 	ModelName                     string
 	TableNameWithoutServicePrefix string
 	HasDeletedAt                  bool
+	Refs                          []RefModel
+}
+
+func (t Model) ToRefModel() RefModel {
+	return RefModel{
+		ModelName: t.ModelName,
+		Fields:    t.Fields,
+	}
+}
+
+type RefModel struct {
+	ModelName string
+	Fields    []ModelField
 }
 
 type ModelEntity struct {
