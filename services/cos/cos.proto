@@ -38,17 +38,12 @@ message HealthResponse {
   string currentTime = 1;
 }
 
-enum LoginType {
-  LoginTypeUnknown = 0;
-  LoginTypePassword = 1;
-}
-
 message LoginRequest {
   string userName = 1;
   string password = 2;
   // @v: in: 1
-  // @msg: 无效登录类型: {{LoginType}}
-  LoginType loginType = 3;
+  // @msg: 无效登录类型: {{.AccountType}}
+  AccountType accountType = 3;
 }
 
 message LoginResponse {
@@ -65,20 +60,23 @@ message UserInfoSimple {
   dt.ID userId = 1;
   string name = 2;
   string userName = 3;
-  LoginType loginType = 4;
+  AccountType accountType = 4;
 }
 
+// @ref: ModelAccount
 message UserInfoResponse {
   dt.ID userId = 1;
-  string name = 2;
-  string userName = 3;
-  LoginType loginType = 4;
+  string nick = 2;
+  string identifier = 3;
+  AccountType accountType = 4;
 }
 
 
 message UpdateInfoRequest {
   dt.ID userId = 1;
-  string name = 2;
+  // @v: length.min=1
+  // @msg: missing nick name
+  string nick = 2;
 }
 
 message UpdateInfoResponse {}
@@ -93,13 +91,17 @@ enum ModifyPasswordType {
 
 message ModifyPasswordRequest {
   dt.ID userId = 1;
-  ModifyPasswordType type = 2;
+  reserved 2;
+  // @v: length.min=6
+  // @v: length.max=22
+  // @v: password=up|low|num
+  // @msg: invalid old password: {{.OldPassword}}
   string oldPassword = 3;
+  // @v: length.min=6
+  // @v: length.max=22
+  // @v: password=up|low|num
+  // @msg: invalid new password: {{.NewPassword}}
   string newPassword = 4;
-  // @v: length.min=5
-  // @v: length.max=32
-  // @msg: 无效凭证
-  string token = 5;
 }
 
 message ModifyPasswordResponse {}
@@ -123,6 +125,7 @@ message ModelAccount {
   bool isDisabled = 8;
   // @index
   dt.ID creatorId = 9;
+  string nick = 10;
 }
 
 message ModelNamespace {
@@ -220,7 +223,11 @@ message KeyValueResp {
 message SaveOrCreateUserRequest {
   string identifier = 1;
   string credential = 2;
+  // @v: in=1
+  // @msg: invalid accountType: {{.AccountType|num}}
   AccountType AccountType = 3;
+  dt.ID userId = 4;
+  string nick = 5;
 }
 
 message SaveOrCreateUserResponse {

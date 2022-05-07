@@ -49,7 +49,7 @@ func (tableConfig) TableName() string {
 	return cos.Name + "_" + "config"
 }
 
-func (tableConfig) FindOneById(ctx context.Context, id *dt.ID) (data ModelConfig, found bool, err error) {
+func (tableConfig) FindOneById(ctx context.Context, id dt.ID) (data ModelConfig, found bool, err error) {
 	w := orm.NewQueryWrapper(data).Limit(1)
 	w.Eq(TableConfig.Id, id)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableConfig.DeletedAt, 0).IsNull(TableConfig.DeletedAt))
@@ -77,7 +77,7 @@ func (tableConfig) FindOneByConfigId(ctx context.Context, configId string) (data
 	return data, true, nil
 }
 
-func (tableConfig) FindOneByCreatorId(ctx context.Context, creatorId *dt.ID) (data ModelConfig, found bool, err error) {
+func (tableConfig) FindOneByCreatorId(ctx context.Context, creatorId dt.ID) (data ModelConfig, found bool, err error) {
 	w := orm.NewQueryWrapper(data).Limit(1)
 	w.Eq(TableConfig.CreatorId, creatorId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableConfig.DeletedAt, 0).IsNull(TableConfig.DeletedAt))
@@ -91,7 +91,7 @@ func (tableConfig) FindOneByCreatorId(ctx context.Context, creatorId *dt.ID) (da
 	return data, true, nil
 }
 
-func (tableConfig) FindOneByBaseId(ctx context.Context, baseId *dt.ID) (data ModelConfig, found bool, err error) {
+func (tableConfig) FindOneByBaseId(ctx context.Context, baseId dt.ID) (data ModelConfig, found bool, err error) {
 	w := orm.NewQueryWrapper(data).Limit(1)
 	w.Eq(TableConfig.BaseId, baseId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableConfig.DeletedAt, 0).IsNull(TableConfig.DeletedAt))
@@ -105,7 +105,7 @@ func (tableConfig) FindOneByBaseId(ctx context.Context, baseId *dt.ID) (data Mod
 	return data, true, nil
 }
 
-func (tableConfig) UpdateById(ctx context.Context, id *dt.ID, update orm.H) (rowsAffected int64, err error) {
+func (tableConfig) UpdateById(ctx context.Context, id dt.ID, update orm.H) (rowsAffected int64, err error) {
 	w := orm.NewUpdateWrapper(ModelConfig{})
 	w.Eq(TableConfig.Id, id)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableConfig.DeletedAt, 0).IsNull(TableConfig.DeletedAt))
@@ -129,7 +129,7 @@ func (tableConfig) UpdateByConfigId(ctx context.Context, configId string, update
 	return result.RowsAffected()
 }
 
-func (tableConfig) UpdateByCreatorId(ctx context.Context, creatorId *dt.ID, update orm.H) (rowsAffected int64, err error) {
+func (tableConfig) UpdateByCreatorId(ctx context.Context, creatorId dt.ID, update orm.H) (rowsAffected int64, err error) {
 	w := orm.NewUpdateWrapper(ModelConfig{})
 	w.Eq(TableConfig.CreatorId, creatorId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableConfig.DeletedAt, 0).IsNull(TableConfig.DeletedAt))
@@ -141,7 +141,7 @@ func (tableConfig) UpdateByCreatorId(ctx context.Context, creatorId *dt.ID, upda
 	return result.RowsAffected()
 }
 
-func (tableConfig) UpdateByBaseId(ctx context.Context, baseId *dt.ID, update orm.H) (rowsAffected int64, err error) {
+func (tableConfig) UpdateByBaseId(ctx context.Context, baseId dt.ID, update orm.H) (rowsAffected int64, err error) {
 	w := orm.NewUpdateWrapper(ModelConfig{})
 	w.Eq(TableConfig.BaseId, baseId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableConfig.DeletedAt, 0).IsNull(TableConfig.DeletedAt))
@@ -164,7 +164,7 @@ func (tableConfig) Update(ctx context.Context, update orm.H, where orm.WhereWrap
 	return result.RowsAffected()
 }
 
-func (tableConfig) DeleteById(ctx context.Context, id *dt.ID) (rowsAffected int64, err error) {
+func (tableConfig) DeleteById(ctx context.Context, id dt.ID) (rowsAffected int64, err error) {
 	w := orm.NewDeleteWrapper(ModelConfig{})
 	w.Eq(TableConfig.Id, id)
 	result, err := orm.Delete(ctx, cos.Name, w)
@@ -184,7 +184,7 @@ func (tableConfig) DeleteByConfigId(ctx context.Context, configId string) (rowsA
 	return result.RowsAffected()
 }
 
-func (tableConfig) DeleteByCreatorId(ctx context.Context, creatorId *dt.ID) (rowsAffected int64, err error) {
+func (tableConfig) DeleteByCreatorId(ctx context.Context, creatorId dt.ID) (rowsAffected int64, err error) {
 	w := orm.NewDeleteWrapper(ModelConfig{})
 	w.Eq(TableConfig.CreatorId, creatorId)
 	result, err := orm.Delete(ctx, cos.Name, w)
@@ -194,7 +194,7 @@ func (tableConfig) DeleteByCreatorId(ctx context.Context, creatorId *dt.ID) (row
 	return result.RowsAffected()
 }
 
-func (tableConfig) DeleteByBaseId(ctx context.Context, baseId *dt.ID) (rowsAffected int64, err error) {
+func (tableConfig) DeleteByBaseId(ctx context.Context, baseId dt.ID) (rowsAffected int64, err error) {
 	w := orm.NewDeleteWrapper(ModelConfig{})
 	w.Eq(TableConfig.BaseId, baseId)
 	result, err := orm.Delete(ctx, cos.Name, w)
@@ -204,7 +204,7 @@ func (tableConfig) DeleteByBaseId(ctx context.Context, baseId *dt.ID) (rowsAffec
 	return result.RowsAffected()
 }
 
-func (tableConfig) SoftDeleteById(ctx context.Context, id *dt.ID) (rowsAffected int64, err error) {
+func (tableConfig) SoftDeleteById(ctx context.Context, id dt.ID) (rowsAffected int64, err error) {
 	w := orm.NewUpdateWrapper(ModelConfig{})
 	w.SetValue(TableConfig.DeletedAt, orm.Now())
 	w.Eq(TableConfig.Id, id)
@@ -226,7 +226,7 @@ func (tableConfig) SoftDeleteByConfigId(ctx context.Context, configId string) (r
 	return result.RowsAffected()
 }
 
-func (tableConfig) SoftDeleteByCreatorId(ctx context.Context, creatorId *dt.ID) (rowsAffected int64, err error) {
+func (tableConfig) SoftDeleteByCreatorId(ctx context.Context, creatorId dt.ID) (rowsAffected int64, err error) {
 	w := orm.NewUpdateWrapper(ModelConfig{})
 	w.SetValue(TableConfig.DeletedAt, orm.Now())
 	w.Eq(TableConfig.CreatorId, creatorId)
@@ -237,7 +237,7 @@ func (tableConfig) SoftDeleteByCreatorId(ctx context.Context, creatorId *dt.ID) 
 	return result.RowsAffected()
 }
 
-func (tableConfig) SoftDeleteByBaseId(ctx context.Context, baseId *dt.ID) (rowsAffected int64, err error) {
+func (tableConfig) SoftDeleteByBaseId(ctx context.Context, baseId dt.ID) (rowsAffected int64, err error) {
 	w := orm.NewUpdateWrapper(ModelConfig{})
 	w.SetValue(TableConfig.DeletedAt, orm.Now())
 	w.Eq(TableConfig.BaseId, baseId)
@@ -258,7 +258,7 @@ func (tableConfig) Find(ctx context.Context, where orm.WhereWrapper) (list []Mod
 	return
 }
 
-func (tableConfig) FindById(ctx context.Context, id *dt.ID) (list []ModelConfig, err error) {
+func (tableConfig) FindById(ctx context.Context, id dt.ID) (list []ModelConfig, err error) {
 	w := orm.NewQueryWrapper(ModelConfig{})
 	w.Eq(TableConfig.Id, id)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableConfig.DeletedAt, 0).IsNull(TableConfig.DeletedAt))
@@ -280,7 +280,7 @@ func (tableConfig) FindByConfigId(ctx context.Context, configId string) (list []
 	return
 }
 
-func (tableConfig) FindByCreatorId(ctx context.Context, creatorId *dt.ID) (list []ModelConfig, err error) {
+func (tableConfig) FindByCreatorId(ctx context.Context, creatorId dt.ID) (list []ModelConfig, err error) {
 	w := orm.NewQueryWrapper(ModelConfig{})
 	w.Eq(TableConfig.CreatorId, creatorId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableConfig.DeletedAt, 0).IsNull(TableConfig.DeletedAt))
@@ -291,7 +291,7 @@ func (tableConfig) FindByCreatorId(ctx context.Context, creatorId *dt.ID) (list 
 	return
 }
 
-func (tableConfig) FindByBaseId(ctx context.Context, baseId *dt.ID) (list []ModelConfig, err error) {
+func (tableConfig) FindByBaseId(ctx context.Context, baseId dt.ID) (list []ModelConfig, err error) {
 	w := orm.NewQueryWrapper(ModelConfig{})
 	w.Eq(TableConfig.BaseId, baseId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableConfig.DeletedAt, 0).IsNull(TableConfig.DeletedAt))
@@ -313,7 +313,7 @@ func (tableConfig) Page(ctx context.Context, pageNum, pageSize int, where orm.Wh
 	return
 }
 
-func (tableConfig) PageById(ctx context.Context, pageNum, pageSize int, id *dt.ID) (list []ModelConfig, err error) {
+func (tableConfig) PageById(ctx context.Context, pageNum, pageSize int, id dt.ID) (list []ModelConfig, err error) {
 	w := orm.NewQueryWrapper(ModelConfig{})
 	w.Eq(TableConfig.Id, id)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableConfig.DeletedAt, 0).IsNull(TableConfig.DeletedAt))
@@ -337,7 +337,7 @@ func (tableConfig) PageByConfigId(ctx context.Context, pageNum, pageSize int, co
 	return
 }
 
-func (tableConfig) PageByCreatorId(ctx context.Context, pageNum, pageSize int, creatorId *dt.ID) (list []ModelConfig, err error) {
+func (tableConfig) PageByCreatorId(ctx context.Context, pageNum, pageSize int, creatorId dt.ID) (list []ModelConfig, err error) {
 	w := orm.NewQueryWrapper(ModelConfig{})
 	w.Eq(TableConfig.CreatorId, creatorId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableConfig.DeletedAt, 0).IsNull(TableConfig.DeletedAt))
@@ -349,7 +349,7 @@ func (tableConfig) PageByCreatorId(ctx context.Context, pageNum, pageSize int, c
 	return
 }
 
-func (tableConfig) PageByBaseId(ctx context.Context, pageNum, pageSize int, baseId *dt.ID) (list []ModelConfig, err error) {
+func (tableConfig) PageByBaseId(ctx context.Context, pageNum, pageSize int, baseId dt.ID) (list []ModelConfig, err error) {
 	w := orm.NewQueryWrapper(ModelConfig{})
 	w.Eq(TableConfig.BaseId, baseId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableConfig.DeletedAt, 0).IsNull(TableConfig.DeletedAt))
@@ -370,7 +370,7 @@ func (tableConfig) Count(ctx context.Context, where orm.WhereWrapper) (count int
 	return count, err
 }
 
-func (tableConfig) CountById(ctx context.Context, id *dt.ID) (count int, err error) {
+func (tableConfig) CountById(ctx context.Context, id dt.ID) (count int, err error) {
 	w := orm.NewQueryWrapper(ModelConfig{})
 	w.Eq(TableConfig.Id, id)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableConfig.DeletedAt, 0).IsNull(TableConfig.DeletedAt))
@@ -388,7 +388,7 @@ func (tableConfig) CountByConfigId(ctx context.Context, configId string) (count 
 	return count, err
 }
 
-func (tableConfig) CountByCreatorId(ctx context.Context, creatorId *dt.ID) (count int, err error) {
+func (tableConfig) CountByCreatorId(ctx context.Context, creatorId dt.ID) (count int, err error) {
 	w := orm.NewQueryWrapper(ModelConfig{})
 	w.Eq(TableConfig.CreatorId, creatorId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableConfig.DeletedAt, 0).IsNull(TableConfig.DeletedAt))
@@ -397,7 +397,7 @@ func (tableConfig) CountByCreatorId(ctx context.Context, creatorId *dt.ID) (coun
 	return count, err
 }
 
-func (tableConfig) CountByBaseId(ctx context.Context, baseId *dt.ID) (count int, err error) {
+func (tableConfig) CountByBaseId(ctx context.Context, baseId dt.ID) (count int, err error) {
 	w := orm.NewQueryWrapper(ModelConfig{})
 	w.Eq(TableConfig.BaseId, baseId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableConfig.DeletedAt, 0).IsNull(TableConfig.DeletedAt))

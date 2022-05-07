@@ -56,6 +56,11 @@ func (t ModelKeyValue) ToKeyValueResp() cos.KeyValueResp {
 	}
 }
 
+func (t ModelKeyValue) ToKeyValueRespAsPointer() *cos.KeyValueResp {
+	ret := t.ToKeyValueResp()
+	return &ret
+}
+
 type tableKeyValue struct {
 	Id          orm.FieldName
 	CreateTime  orm.FieldName
@@ -74,7 +79,7 @@ func (tableKeyValue) TableName() string {
 	return cos.Name + "_" + "key_value"
 }
 
-func (tableKeyValue) FindOneById(ctx context.Context, id *dt.ID) (data ModelKeyValue, found bool, err error) {
+func (tableKeyValue) FindOneById(ctx context.Context, id dt.ID) (data ModelKeyValue, found bool, err error) {
 	w := orm.NewQueryWrapper(data).Limit(1)
 	w.Eq(TableKeyValue.Id, id)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableKeyValue.DeletedAt, 0).IsNull(TableKeyValue.DeletedAt))
@@ -116,7 +121,7 @@ func (tableKeyValue) FindOneByConfigId(ctx context.Context, configId string) (da
 	return data, true, nil
 }
 
-func (tableKeyValue) FindOneByCreatorId(ctx context.Context, creatorId *dt.ID) (data ModelKeyValue, found bool, err error) {
+func (tableKeyValue) FindOneByCreatorId(ctx context.Context, creatorId dt.ID) (data ModelKeyValue, found bool, err error) {
 	w := orm.NewQueryWrapper(data).Limit(1)
 	w.Eq(TableKeyValue.CreatorId, creatorId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableKeyValue.DeletedAt, 0).IsNull(TableKeyValue.DeletedAt))
@@ -144,7 +149,7 @@ func (tableKeyValue) FindOneByIsHot(ctx context.Context, isHot bool) (data Model
 	return data, true, nil
 }
 
-func (tableKeyValue) UpdateById(ctx context.Context, id *dt.ID, update orm.H) (rowsAffected int64, err error) {
+func (tableKeyValue) UpdateById(ctx context.Context, id dt.ID, update orm.H) (rowsAffected int64, err error) {
 	w := orm.NewUpdateWrapper(ModelKeyValue{})
 	w.Eq(TableKeyValue.Id, id)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableKeyValue.DeletedAt, 0).IsNull(TableKeyValue.DeletedAt))
@@ -180,7 +185,7 @@ func (tableKeyValue) UpdateByConfigId(ctx context.Context, configId string, upda
 	return result.RowsAffected()
 }
 
-func (tableKeyValue) UpdateByCreatorId(ctx context.Context, creatorId *dt.ID, update orm.H) (rowsAffected int64, err error) {
+func (tableKeyValue) UpdateByCreatorId(ctx context.Context, creatorId dt.ID, update orm.H) (rowsAffected int64, err error) {
 	w := orm.NewUpdateWrapper(ModelKeyValue{})
 	w.Eq(TableKeyValue.CreatorId, creatorId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableKeyValue.DeletedAt, 0).IsNull(TableKeyValue.DeletedAt))
@@ -215,7 +220,7 @@ func (tableKeyValue) Update(ctx context.Context, update orm.H, where orm.WhereWr
 	return result.RowsAffected()
 }
 
-func (tableKeyValue) DeleteById(ctx context.Context, id *dt.ID) (rowsAffected int64, err error) {
+func (tableKeyValue) DeleteById(ctx context.Context, id dt.ID) (rowsAffected int64, err error) {
 	w := orm.NewDeleteWrapper(ModelKeyValue{})
 	w.Eq(TableKeyValue.Id, id)
 	result, err := orm.Delete(ctx, cos.Name, w)
@@ -245,7 +250,7 @@ func (tableKeyValue) DeleteByConfigId(ctx context.Context, configId string) (row
 	return result.RowsAffected()
 }
 
-func (tableKeyValue) DeleteByCreatorId(ctx context.Context, creatorId *dt.ID) (rowsAffected int64, err error) {
+func (tableKeyValue) DeleteByCreatorId(ctx context.Context, creatorId dt.ID) (rowsAffected int64, err error) {
 	w := orm.NewDeleteWrapper(ModelKeyValue{})
 	w.Eq(TableKeyValue.CreatorId, creatorId)
 	result, err := orm.Delete(ctx, cos.Name, w)
@@ -265,7 +270,7 @@ func (tableKeyValue) DeleteByIsHot(ctx context.Context, isHot bool) (rowsAffecte
 	return result.RowsAffected()
 }
 
-func (tableKeyValue) SoftDeleteById(ctx context.Context, id *dt.ID) (rowsAffected int64, err error) {
+func (tableKeyValue) SoftDeleteById(ctx context.Context, id dt.ID) (rowsAffected int64, err error) {
 	w := orm.NewUpdateWrapper(ModelKeyValue{})
 	w.SetValue(TableKeyValue.DeletedAt, orm.Now())
 	w.Eq(TableKeyValue.Id, id)
@@ -298,7 +303,7 @@ func (tableKeyValue) SoftDeleteByConfigId(ctx context.Context, configId string) 
 	return result.RowsAffected()
 }
 
-func (tableKeyValue) SoftDeleteByCreatorId(ctx context.Context, creatorId *dt.ID) (rowsAffected int64, err error) {
+func (tableKeyValue) SoftDeleteByCreatorId(ctx context.Context, creatorId dt.ID) (rowsAffected int64, err error) {
 	w := orm.NewUpdateWrapper(ModelKeyValue{})
 	w.SetValue(TableKeyValue.DeletedAt, orm.Now())
 	w.Eq(TableKeyValue.CreatorId, creatorId)
@@ -330,7 +335,7 @@ func (tableKeyValue) Find(ctx context.Context, where orm.WhereWrapper) (list []M
 	return
 }
 
-func (tableKeyValue) FindById(ctx context.Context, id *dt.ID) (list []ModelKeyValue, err error) {
+func (tableKeyValue) FindById(ctx context.Context, id dt.ID) (list []ModelKeyValue, err error) {
 	w := orm.NewQueryWrapper(ModelKeyValue{})
 	w.Eq(TableKeyValue.Id, id)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableKeyValue.DeletedAt, 0).IsNull(TableKeyValue.DeletedAt))
@@ -363,7 +368,7 @@ func (tableKeyValue) FindByConfigId(ctx context.Context, configId string) (list 
 	return
 }
 
-func (tableKeyValue) FindByCreatorId(ctx context.Context, creatorId *dt.ID) (list []ModelKeyValue, err error) {
+func (tableKeyValue) FindByCreatorId(ctx context.Context, creatorId dt.ID) (list []ModelKeyValue, err error) {
 	w := orm.NewQueryWrapper(ModelKeyValue{})
 	w.Eq(TableKeyValue.CreatorId, creatorId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableKeyValue.DeletedAt, 0).IsNull(TableKeyValue.DeletedAt))
@@ -396,7 +401,7 @@ func (tableKeyValue) Page(ctx context.Context, pageNum, pageSize int, where orm.
 	return
 }
 
-func (tableKeyValue) PageById(ctx context.Context, pageNum, pageSize int, id *dt.ID) (list []ModelKeyValue, err error) {
+func (tableKeyValue) PageById(ctx context.Context, pageNum, pageSize int, id dt.ID) (list []ModelKeyValue, err error) {
 	w := orm.NewQueryWrapper(ModelKeyValue{})
 	w.Eq(TableKeyValue.Id, id)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableKeyValue.DeletedAt, 0).IsNull(TableKeyValue.DeletedAt))
@@ -432,7 +437,7 @@ func (tableKeyValue) PageByConfigId(ctx context.Context, pageNum, pageSize int, 
 	return
 }
 
-func (tableKeyValue) PageByCreatorId(ctx context.Context, pageNum, pageSize int, creatorId *dt.ID) (list []ModelKeyValue, err error) {
+func (tableKeyValue) PageByCreatorId(ctx context.Context, pageNum, pageSize int, creatorId dt.ID) (list []ModelKeyValue, err error) {
 	w := orm.NewQueryWrapper(ModelKeyValue{})
 	w.Eq(TableKeyValue.CreatorId, creatorId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableKeyValue.DeletedAt, 0).IsNull(TableKeyValue.DeletedAt))
@@ -465,7 +470,7 @@ func (tableKeyValue) Count(ctx context.Context, where orm.WhereWrapper) (count i
 	return count, err
 }
 
-func (tableKeyValue) CountById(ctx context.Context, id *dt.ID) (count int, err error) {
+func (tableKeyValue) CountById(ctx context.Context, id dt.ID) (count int, err error) {
 	w := orm.NewQueryWrapper(ModelKeyValue{})
 	w.Eq(TableKeyValue.Id, id)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableKeyValue.DeletedAt, 0).IsNull(TableKeyValue.DeletedAt))
@@ -492,7 +497,7 @@ func (tableKeyValue) CountByConfigId(ctx context.Context, configId string) (coun
 	return count, err
 }
 
-func (tableKeyValue) CountByCreatorId(ctx context.Context, creatorId *dt.ID) (count int, err error) {
+func (tableKeyValue) CountByCreatorId(ctx context.Context, creatorId dt.ID) (count int, err error) {
 	w := orm.NewQueryWrapper(ModelKeyValue{})
 	w.Eq(TableKeyValue.CreatorId, creatorId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableKeyValue.DeletedAt, 0).IsNull(TableKeyValue.DeletedAt))

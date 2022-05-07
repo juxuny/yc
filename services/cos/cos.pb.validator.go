@@ -6,11 +6,19 @@ import (
 )
 
 const (
-	ValidatorTemplateModifyPasswordRequestToken = "无效凭证"
+	ValidatorTemplateLoginRequestAccountType            = "无效登录类型: {{.AccountType}}"
+	ValidatorTemplateUpdateInfoRequestNick              = "missing nick name"
+	ValidatorTemplateModifyPasswordRequestOldPassword   = "invalid old password: {{.OldPassword}}"
+	ValidatorTemplateModifyPasswordRequestNewPassword   = "invalid new password: {{.NewPassword}}"
+	ValidatorTemplateSaveOrCreateUserRequestAccountType = "invalid accountType: {{.AccountType|num}}"
 )
 
 var templateList = []string{
-	ValidatorTemplateModifyPasswordRequestToken,
+	ValidatorTemplateLoginRequestAccountType,
+	ValidatorTemplateUpdateInfoRequestNick,
+	ValidatorTemplateModifyPasswordRequestOldPassword,
+	ValidatorTemplateModifyPasswordRequestNewPassword,
+	ValidatorTemplateSaveOrCreateUserRequestAccountType,
 }
 
 func init() {
@@ -23,24 +31,45 @@ func (m *HealthRequest) Validate() error {
 	return nil
 }
 func (m *LoginRequest) Validate() error {
+	if err := validator.Run(m.AccountType, validator.CreateAction("in: 1", ``, ValidatorTemplateLoginRequestAccountType), m, "accountType"); err != nil {
+		return err
+	}
 	return nil
 }
 func (m *UserInfoRequest) Validate() error {
 	return nil
 }
 func (m *UpdateInfoRequest) Validate() error {
+	if err := validator.Run(m.Nick, validator.CreateAction("length.min", `1`, ValidatorTemplateUpdateInfoRequestNick), m, "nick"); err != nil {
+		return err
+	}
 	return nil
 }
 func (m *ModifyPasswordRequest) Validate() error {
-	if err := validator.Run(m.Token, validator.CreateAction("length.min", "5", ValidatorTemplateModifyPasswordRequestToken), m, "token"); err != nil {
+	if err := validator.Run(m.OldPassword, validator.CreateAction("length.min", `6`, ValidatorTemplateModifyPasswordRequestOldPassword), m, "oldPassword"); err != nil {
 		return err
 	}
-	if err := validator.Run(m.Token, validator.CreateAction("length.max", "32", ValidatorTemplateModifyPasswordRequestToken), m, "token"); err != nil {
+	if err := validator.Run(m.OldPassword, validator.CreateAction("length.max", `22`, ValidatorTemplateModifyPasswordRequestOldPassword), m, "oldPassword"); err != nil {
+		return err
+	}
+	if err := validator.Run(m.OldPassword, validator.CreateAction("password", `up|low|num`, ValidatorTemplateModifyPasswordRequestOldPassword), m, "oldPassword"); err != nil {
+		return err
+	}
+	if err := validator.Run(m.NewPassword, validator.CreateAction("length.min", `6`, ValidatorTemplateModifyPasswordRequestNewPassword), m, "newPassword"); err != nil {
+		return err
+	}
+	if err := validator.Run(m.NewPassword, validator.CreateAction("length.max", `22`, ValidatorTemplateModifyPasswordRequestNewPassword), m, "newPassword"); err != nil {
+		return err
+	}
+	if err := validator.Run(m.NewPassword, validator.CreateAction("password", `up|low|num`, ValidatorTemplateModifyPasswordRequestNewPassword), m, "newPassword"); err != nil {
 		return err
 	}
 	return nil
 }
-func (m *CreateUserRequest) Validate() error {
+func (m *SaveOrCreateUserRequest) Validate() error {
+	if err := validator.Run(m.AccountType, validator.CreateAction("in", `1`, ValidatorTemplateSaveOrCreateUserRequestAccountType), m, "accountType"); err != nil {
+		return err
+	}
 	return nil
 }
 func (m *SaveNamespaceRequest) Validate() error {

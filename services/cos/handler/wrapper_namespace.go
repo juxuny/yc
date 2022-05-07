@@ -2,15 +2,25 @@ package handler
 
 import (
 	"context"
+	"github.com/juxuny/yc/errors"
 	"github.com/juxuny/yc/log"
 	cos "github.com/juxuny/yc/services/cos"
 	"github.com/juxuny/yc/trace"
+	"runtime/debug"
 )
 
 func (t *wrapper) SaveNamespace(ctx context.Context, req *cos.SaveNamespaceRequest) (resp *cos.SaveNamespaceResponse, err error) {
 	var isEnd bool
 	trace.WithContext(ctx)
 	defer trace.Clean()
+	defer func() {
+		if recoverError := recover(); recoverError != nil {
+			err = errors.SystemError.InternalError
+			debug.PrintStack()
+			handleRecover(ctx, recoverError)
+			return
+		}
+	}()
 	isEnd, err = t.authHandler.Run(ctx)
 	if err != nil {
 		return nil, err
@@ -47,6 +57,14 @@ func (t *wrapper) ListNamespace(ctx context.Context, req *cos.ListNamespaceReque
 	var isEnd bool
 	trace.WithContext(ctx)
 	defer trace.Clean()
+	defer func() {
+		if recoverError := recover(); recoverError != nil {
+			err = errors.SystemError.InternalError
+			debug.PrintStack()
+			handleRecover(ctx, recoverError)
+			return
+		}
+	}()
 	isEnd, err = t.authHandler.Run(ctx)
 	if err != nil {
 		return nil, err
@@ -83,6 +101,14 @@ func (t *wrapper) DeleteNamespace(ctx context.Context, req *cos.DeleteNamespaceR
 	var isEnd bool
 	trace.WithContext(ctx)
 	defer trace.Clean()
+	defer func() {
+		if recoverError := recover(); recoverError != nil {
+			err = errors.SystemError.InternalError
+			debug.PrintStack()
+			handleRecover(ctx, recoverError)
+			return
+		}
+	}()
 	isEnd, err = t.authHandler.Run(ctx)
 	if err != nil {
 		return nil, err
