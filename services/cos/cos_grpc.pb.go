@@ -38,6 +38,12 @@ type CosClient interface {
 	ListNamespace(ctx context.Context, in *ListNamespaceRequest, opts ...grpc.CallOption) (*ListNamespaceResponse, error)
 	// @group: namespace
 	DeleteNamespace(ctx context.Context, in *DeleteNamespaceRequest, opts ...grpc.CallOption) (*DeleteNamespaceResponse, error)
+	// @group: config
+	SaveConfig(ctx context.Context, in *SaveConfigRequest, opts ...grpc.CallOption) (*SaveConfigResponse, error)
+	// @group: config
+	DeleteConfig(ctx context.Context, in *DeleteConfigRequest, opts ...grpc.CallOption) (*DeleteConfigResponse, error)
+	// @group: config
+	ListConfig(ctx context.Context, in *ListConfigRequest, opts ...grpc.CallOption) (*ListConfigResponse, error)
 }
 
 type cosClient struct {
@@ -129,6 +135,33 @@ func (c *cosClient) DeleteNamespace(ctx context.Context, in *DeleteNamespaceRequ
 	return out, nil
 }
 
+func (c *cosClient) SaveConfig(ctx context.Context, in *SaveConfigRequest, opts ...grpc.CallOption) (*SaveConfigResponse, error) {
+	out := new(SaveConfigResponse)
+	err := c.cc.Invoke(ctx, "/cos.Cos/SaveConfig", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *cosClient) DeleteConfig(ctx context.Context, in *DeleteConfigRequest, opts ...grpc.CallOption) (*DeleteConfigResponse, error) {
+	out := new(DeleteConfigResponse)
+	err := c.cc.Invoke(ctx, "/cos.Cos/DeleteConfig", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *cosClient) ListConfig(ctx context.Context, in *ListConfigRequest, opts ...grpc.CallOption) (*ListConfigResponse, error) {
+	out := new(ListConfigResponse)
+	err := c.cc.Invoke(ctx, "/cos.Cos/ListConfig", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CosServer is the server API for Cos service.
 // All implementations must embed UnimplementedCosServer
 // for forward compatibility
@@ -153,6 +186,12 @@ type CosServer interface {
 	ListNamespace(context.Context, *ListNamespaceRequest) (*ListNamespaceResponse, error)
 	// @group: namespace
 	DeleteNamespace(context.Context, *DeleteNamespaceRequest) (*DeleteNamespaceResponse, error)
+	// @group: config
+	SaveConfig(context.Context, *SaveConfigRequest) (*SaveConfigResponse, error)
+	// @group: config
+	DeleteConfig(context.Context, *DeleteConfigRequest) (*DeleteConfigResponse, error)
+	// @group: config
+	ListConfig(context.Context, *ListConfigRequest) (*ListConfigResponse, error)
 	mustEmbedUnimplementedCosServer()
 }
 
@@ -186,6 +225,15 @@ func (UnimplementedCosServer) ListNamespace(context.Context, *ListNamespaceReque
 }
 func (UnimplementedCosServer) DeleteNamespace(context.Context, *DeleteNamespaceRequest) (*DeleteNamespaceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteNamespace not implemented")
+}
+func (UnimplementedCosServer) SaveConfig(context.Context, *SaveConfigRequest) (*SaveConfigResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SaveConfig not implemented")
+}
+func (UnimplementedCosServer) DeleteConfig(context.Context, *DeleteConfigRequest) (*DeleteConfigResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteConfig not implemented")
+}
+func (UnimplementedCosServer) ListConfig(context.Context, *ListConfigRequest) (*ListConfigResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListConfig not implemented")
 }
 func (UnimplementedCosServer) mustEmbedUnimplementedCosServer() {}
 
@@ -362,6 +410,60 @@ func _Cos_DeleteNamespace_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Cos_SaveConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SaveConfigRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CosServer).SaveConfig(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/cos.Cos/SaveConfig",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CosServer).SaveConfig(ctx, req.(*SaveConfigRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Cos_DeleteConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteConfigRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CosServer).DeleteConfig(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/cos.Cos/DeleteConfig",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CosServer).DeleteConfig(ctx, req.(*DeleteConfigRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Cos_ListConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListConfigRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CosServer).ListConfig(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/cos.Cos/ListConfig",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CosServer).ListConfig(ctx, req.(*ListConfigRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Cos_ServiceDesc is the grpc.ServiceDesc for Cos service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -404,6 +506,18 @@ var Cos_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteNamespace",
 			Handler:    _Cos_DeleteNamespace_Handler,
+		},
+		{
+			MethodName: "SaveConfig",
+			Handler:    _Cos_SaveConfig_Handler,
+		},
+		{
+			MethodName: "DeleteConfig",
+			Handler:    _Cos_DeleteConfig_Handler,
+		},
+		{
+			MethodName: "ListConfig",
+			Handler:    _Cos_ListConfig_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

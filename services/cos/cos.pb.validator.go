@@ -91,3 +91,12 @@ func (m *DeleteNamespaceRequest) Validate() error {
 	}
 	return nil
 }
+func (m *SaveConfigRequest) Validate() error {
+	return nil
+}
+func (m *DeleteConfigRequest) Validate() error {
+	return nil
+}
+func (m *ListConfigRequest) Validate() error {
+	return nil
+}

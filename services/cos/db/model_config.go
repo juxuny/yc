@@ -36,6 +36,22 @@ func (ModelConfig) TableName() string {
 	return cos.Name + "_" + "config"
 }
 
+func (t ModelConfig) ToListConfigItem() cos.ListConfigItem {
+	return cos.ListConfigItem{
+		Id:          t.Id,
+		CreateTime:  t.CreateTime,
+		UpdateTime:  t.UpdateTime,
+		BaseId:      t.BaseId,
+		NamespaceId: t.NamespaceId,
+		ConfigId:    t.ConfigId,
+	}
+}
+
+func (t ModelConfig) ToListConfigItemAsPointer() *cos.ListConfigItem {
+	ret := t.ToListConfigItem()
+	return &ret
+}
+
 type tableConfig struct {
 	Id          orm.FieldName
 	CreateTime  orm.FieldName

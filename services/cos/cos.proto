@@ -29,6 +29,14 @@ service Cos {
   rpc ListNamespace(ListNamespaceRequest) returns(ListNamespaceResponse) {}
   // @group: namespace
   rpc DeleteNamespace(DeleteNamespaceRequest) returns(DeleteNamespaceResponse) {}
+
+  // @group: config
+  rpc SaveConfig(SaveConfigRequest) returns (SaveConfigResponse) {}
+  // @group: config
+  rpc DeleteConfig(DeleteConfigRequest) returns (DeleteConfigResponse) {}
+  // @group: config
+  rpc ListConfig(ListConfigRequest) returns (ListConfigResponse) {}
+
 }
 
 message HealthRequest {}
@@ -268,3 +276,38 @@ message DeleteNamespaceRequest {
 }
 
 message DeleteNamespaceResponse {}
+
+message SaveConfigRequest {
+  dt.ID id = 1;
+  dt.ID namespaceId = 2;
+  string configId = 3;
+  dt.ID baseId = 4;
+}
+message SaveConfigResponse {}
+
+message DeleteConfigRequest {
+  dt.ID id = 1;
+}
+
+message DeleteConfigResponse {}
+
+message ListConfigRequest {
+  dt.Pagination pagination = 1;
+  dt.ID namespaceId = 2;
+  string searchKey = 3;
+}
+
+// @ref: ModelConfig
+message ListConfigItem {
+  dt.ID id = 1;
+  int64 createTime = 2;
+  int64 updateTime = 3;
+  dt.ID baseId = 4;
+  dt.ID namespaceId = 5;
+  string configId = 6;
+}
+
+message ListConfigResponse {
+  dt.PaginationResp pagination = 1;
+  repeated ListConfigItem list = 2;
+}
