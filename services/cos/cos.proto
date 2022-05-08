@@ -164,6 +164,8 @@ message ModelConfig {
   dt.ID creatorId = 7;
   // @index
   dt.ID baseId = 8;
+  // @index
+  dt.ID namespaceId = 9;
 }
 
 message ConfigResp {
