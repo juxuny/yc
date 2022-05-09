@@ -8,6 +8,7 @@ import (
 
 type UpdateExpression interface {
 	Build() (statement string, values []interface{}, err error)
+	Clone() UpdateExpression
 }
 
 type duplicatedUpdateExpression struct {
@@ -31,9 +32,22 @@ func NewDuplicatedUpdateExpression(fields ...FieldName) UpdateExpression {
 	return u
 }
 
+func (t duplicatedUpdateExpression) Clone() UpdateExpression {
+	return duplicatedUpdateExpression{
+		fields: append([]FieldName{}, t.fields...),
+	}
+}
+
 type setValueExpression struct {
 	field FieldName
 	value interface{}
+}
+
+func (t setValueExpression) Clone() UpdateExpression {
+	return setValueExpression{
+		field: t.field,
+		value: t.value,
+	}
 }
 
 func (t setValueExpression) Build() (statement string, values []interface{}, err error) {
@@ -61,6 +75,13 @@ func (t increaseExpression) Build() (statement string, values []interface{}, err
 	return
 }
 
+func (t increaseExpression) Clone() UpdateExpression {
+	return increaseExpression{
+		field: t.field,
+		value: t.value,
+	}
+}
+
 func NewIncreaseExpression(field FieldName, value interface{}) UpdateExpression {
 	return &increaseExpression{
 		field: field,
@@ -71,6 +92,17 @@ func NewIncreaseExpression(field FieldName, value interface{}) UpdateExpression 
 type updateExpression struct {
 	modelOrMap     interface{}
 	ignoreFieldMap map[FieldName]struct{}
+}
+
+func (t updateExpression) Clone() UpdateExpression {
+	ignoreFieldMap := make(map[FieldName]struct{})
+	for k := range t.ignoreFieldMap {
+		ignoreFieldMap[k] = struct{}{}
+	}
+	return updateExpression{
+		modelOrMap:     t.modelOrMap,
+		ignoreFieldMap: ignoreFieldMap,
+	}
 }
 
 func (t updateExpression) Build() (statement string, values []interface{}, err error) {

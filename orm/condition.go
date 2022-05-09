@@ -6,6 +6,7 @@ import (
 )
 
 type Condition interface {
+	Clone() Condition
 	Build() (statement string, values []interface{}, err error)
 }
 
@@ -13,6 +14,14 @@ type expressionCondition struct {
 	field    FieldName
 	operator string
 	value    interface{}
+}
+
+func (t expressionCondition) Clone() Condition {
+	return expressionCondition{
+		field:    t.field,
+		operator: t.operator,
+		value:    t.value,
+	}
 }
 
 func NewExpressionCondition(field FieldName, operator string, value interface{}) Condition {
@@ -50,6 +59,13 @@ func (t nullCondition) Build() (statement string, values []interface{}, err erro
 	return t.field.Wrap().String() + " " + t.operator, nil, nil
 }
 
+func (t nullCondition) Clone() Condition {
+	return nullCondition{
+		operator: t.operator,
+		field:    t.field,
+	}
+}
+
 func NewNotNullCondition(field FieldName) Condition {
 	return nullCondition{
 		operator: "IS NOT NULL",
@@ -78,5 +94,11 @@ func (t nestedCondition) Build() (statement string, values []interface{}, err er
 func NewNestedCondition(w WhereWrapper) Condition {
 	return nestedCondition{
 		whereWrapper: w,
+	}
+}
+
+func (t nestedCondition) Clone() Condition {
+	return nestedCondition{
+		whereWrapper: t.whereWrapper.Clone(),
 	}
 }

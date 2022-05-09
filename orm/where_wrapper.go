@@ -6,6 +6,7 @@ import (
 
 type WhereWrapper interface {
 	Eq(field FieldName, v interface{}) WhereWrapper
+	Neq(field FieldName, v interface{}) WhereWrapper
 	Le(field FieldName, v interface{}) WhereWrapper
 	Lt(field FieldName, v interface{}) WhereWrapper
 	Gt(field FieldName, v interface{}) WhereWrapper
@@ -15,6 +16,7 @@ type WhereWrapper interface {
 	IsNotNull(field FieldName) WhereWrapper
 	IsNull(field FieldName) WhereWrapper
 	Nested(w WhereWrapper) WhereWrapper
+	Clone() WhereWrapper
 	Build() (string, []interface{}, error)
 }
 
@@ -28,6 +30,17 @@ const (
 type whereWrapper struct {
 	logic      ConditionLogic
 	conditions []Condition
+}
+
+func (t *whereWrapper) Clone() WhereWrapper {
+	conditions := make([]Condition, 0)
+	for _, item := range t.conditions {
+		conditions = append(conditions, item.Clone())
+	}
+	return &whereWrapper{
+		logic:      t.logic,
+		conditions: append([]Condition{}, t.conditions...),
+	}
 }
 
 func (t *whereWrapper) Nested(w WhereWrapper) WhereWrapper {
@@ -47,6 +60,11 @@ func (t *whereWrapper) IsNull(field FieldName) WhereWrapper {
 
 func (t *whereWrapper) Eq(field FieldName, v interface{}) WhereWrapper {
 	t.conditions = append(t.conditions, NewExpressionCondition(field, "=", v))
+	return t
+}
+
+func (t *whereWrapper) Neq(field FieldName, v interface{}) WhereWrapper {
+	t.conditions = append(t.conditions, NewExpressionCondition(field, "<>", v))
 	return t
 }
 

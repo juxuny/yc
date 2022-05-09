@@ -89,6 +89,14 @@ func (t FieldName) String() string {
 	return string(t)
 }
 
+func (t FieldName) LowerFirstHump() string {
+	return utils.StringHelper.LowerFirstHump(string(t))
+}
+
+func (t FieldName) UpperFirstHump() string {
+	return utils.StringHelper.UpperFirstHump(string(t))
+}
+
 func (t FieldName) WithTableAlias(alias string) FieldName {
 	return FieldName(strings.Trim(alias, ".")) + t
 }
