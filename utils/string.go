@@ -123,3 +123,11 @@ func (stringHelper) ContainsAllKey(s string, keys []string) bool {
 	}
 	return count == len(keys)
 }
+
+func (stringHelper) LowerFirstHump(in string) string {
+	return ToLowerFirst(ToHump(in))
+}
+
+func (stringHelper) UpperFirstHump(in string) string {
+	return ToUpperFirst(ToHump(in))
+}
