@@ -25,8 +25,22 @@ func (t *handler) SaveNamespace(ctx context.Context, req *cos.SaveNamespaceReque
 		if !found {
 			return nil, cos.Error.NamespaceNotFound
 		}
+		if modelNamespace, found, err := db.TableNamespace.FindOneByNamespace(ctx, req.Namespace); err != nil {
+			log.Error(err)
+			return nil, err
+		} else if found && !modelNamespace.Id.Equal(*req.Id) {
+			return nil, cos.Error.NamespaceDuplicated
+		}
 		_, err = db.TableNamespace.UpdateById(ctx, *req.Id, orm.H{db.TableNamespace.Namespace: req.Namespace})
 	} else {
+		count, err := db.TableNamespace.CountByNamespace(ctx, req.Namespace)
+		if err != nil {
+			log.Error(err)
+			return nil, err
+		}
+		if count > 0 {
+			return nil, cos.Error.NamespaceDuplicated
+		}
 		_, err = db.TableNamespace.Create(ctx, db.ModelNamespace{
 			Namespace:  req.Namespace,
 			CreateTime: orm.Now(),

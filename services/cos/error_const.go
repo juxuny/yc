@@ -16,6 +16,7 @@ var Error = struct {
 	NoDataModified              errors.Error `code:"10006" msg:"no data modified"`
 	NamespaceNotFound           errors.Error `code:"10007" msg:"namespace not found"`
 	NoPermissionDeleteNamespace errors.Error `code:"10008" msg:"no permission delete"`
+	NamespaceDuplicated         errors.Error `code:"10009" msg:"namespace duplicated"`
 }{}
 
 func init() {
