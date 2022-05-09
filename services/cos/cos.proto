@@ -48,8 +48,8 @@ message HealthResponse {
 message LoginRequest {
   string userName = 1;
   string password = 2;
-  // @v: in: 1
-  // @msg: 无效登录类型: {{.AccountType}}
+  // @v: in= 1
+  // @msg: 无效登录类型: {{.AccountType|num}}
   AccountType accountType = 3;
 }
 
@@ -295,6 +295,7 @@ message ListConfigRequest {
   dt.Pagination pagination = 1;
   dt.ID namespaceId = 2;
   string searchKey = 3;
+  dt.NullBool isDisabled = 4;
 }
 
 // @ref: ModelConfig

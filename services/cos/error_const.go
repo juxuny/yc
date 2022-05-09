@@ -17,6 +17,10 @@ var Error = struct {
 	NamespaceNotFound           errors.Error `code:"10007" msg:"namespace not found"`
 	NoPermissionDeleteNamespace errors.Error `code:"10008" msg:"no permission delete"`
 	NamespaceDuplicated         errors.Error `code:"10009" msg:"namespace duplicated"`
+	NoPermissionToAssessConfig  errors.Error `code:"10010" msg:"no permission to assess config"`
+	ConfigIdDuplicated          errors.Error `code:"10011" msg:"configId duplicated"`
+	ConfigNotFound              errors.Error `code:"10012" msg:"config not found"`
+	Unauthorized                errors.Error `code:"10013" msg:"unauthorized"`
 }{}
 
 func init() {

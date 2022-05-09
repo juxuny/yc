@@ -3,8 +3,10 @@ package db
 import (
 	"context"
 	"github.com/juxuny/yc/dt"
+	"github.com/juxuny/yc/log"
 	"github.com/juxuny/yc/errors"
 	"github.com/juxuny/yc/orm"
+
 	{{.PackageAlias}} "{{.GoModuleName}}"
 )
 
@@ -35,6 +37,17 @@ func (t {{$modelName}}) To{{$ref.ModelName}}AsPointer() *{{$packageAlias}}.{{$re
 	return &ret
 }{{end}}
 
+type {{.ModelName}}List []{{.ModelName}}
+
+{{range $ref := .Refs}}
+func (t {{$modelName}}List) MapTo{{$ref.ModelName}}List() []*{{$packageAlias}}.{{$ref.ModelName}}  {
+	ret := make([]*{{$packageAlias}}.{{$ref.ModelName}} , 0)
+		for _, item := range t {
+		ret = append(ret, item.To{{$ref.ModelName}}AsPointer())
+	}
+	return ret
+}{{end}}
+
 type {{.TableName|lowerFirst}} struct {
 {{range $field := .Fields}}	{{.FieldName|upperFirst}} orm.FieldName
 {{end}}}
@@ -53,6 +66,7 @@ func ({{.TableName|lowerFirst}}) FindOneBy{{$field.FieldName|upperFirst}}(ctx co
 		if e, ok := err.(errors.Error); ok && e.Code == errors.SystemError.DatabaseNoData.Code {
 			return data, false, nil
 		}
+		log.Error(err)
 		return data, false, err
 	}
 	return data, true, nil
@@ -67,6 +81,7 @@ func ({{.TableName|lowerFirst}}) UpdateBy{{$field.FieldName|upperFirst}}(ctx con
 	w.Updates(update)
 	result, err := orm.Update(ctx, cos.Name, w)
 	if err != nil {
+		log.Error(err)
 		return 0, err
 	}
 	return result.RowsAffected()
@@ -79,6 +94,7 @@ func ({{.TableName|lowerFirst}}) Update(ctx context.Context, update orm.H, where
 	w.Nested(orm.NewOrWhereWrapper().Eq({{.TableName}}.DeletedAt, 0).IsNull({{.TableName}}.DeletedAt)){{end}}
 	result, err := orm.Update(ctx, cos.Name, w)
 	if err != nil {
+		log.Error(err)
 		return 0, err
 	}
 	return result.RowsAffected()
@@ -90,6 +106,7 @@ func ({{.TableName|lowerFirst}}) DeleteBy{{$field.FieldName|upperFirst}}(ctx con
 	w.Eq({{.TableName}}.{{$field.FieldName|upperFirst}}, {{$field.FieldName|lowerFirst}})
 	result, err := orm.Delete(ctx, cos.Name, w)
 	if err != nil {
+		log.Error(err)
 		return 0, err
 	}
 	return result.RowsAffected()
@@ -103,11 +120,24 @@ func ({{.TableName|lowerFirst}}) SoftDeleteBy{{$field.FieldName|upperFirst}}(ctx
 	w.Eq({{.TableName}}.{{$field.FieldName|upperFirst}}, {{$field.FieldName|lowerFirst}})
 	result, err := orm.Update(ctx, cos.Name, w)
 	if err != nil {
+		log.Error(err)
 		return 0, err
 	}
 	return result.RowsAffected()
 }
 {{end}}{{end}}
+
+func ({{.TableName|lowerFirst}}) SoftDelete(ctx context.Context, where orm.WhereWrapper) (rowsAffected int64, err error) {
+	w := orm.NewUpdateWrapper({{.ModelName}}{})
+	w.SetValue({{.TableName}}.DeletedAt, orm.Now())
+	w.SetWhere(where)
+	result, err := orm.Update(ctx, cos.Name, w)
+	if err != nil {
+		log.Error(err)
+		return 0, err
+	}
+	return result.RowsAffected()
+}
 
 func ({{.TableName|lowerFirst}}) Find(ctx context.Context, where orm.WhereWrapper, orderBy ...orm.Order) (list []{{.ModelName}}, err error) {
 	w := orm.NewQueryWrapper({{.ModelName}}{}){{if .HasDeletedAt}}
@@ -115,6 +145,7 @@ func ({{.TableName|lowerFirst}}) Find(ctx context.Context, where orm.WhereWrappe
 	w.SetWhere(where).Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &list)
 	if err != nil {
+		log.Error(err)
 		return nil, err
 	}
 	return
@@ -129,6 +160,7 @@ func ({{.TableName|lowerFirst}}) FindOne(ctx context.Context, where orm.WhereWra
 		if e, ok := err.(errors.Error); ok && e.Code == errors.SystemError.DatabaseNoData.Code {
 			return ret, false, nil
 		}
+		log.Error(err)
 		return ret, false, err
 	}
 	return ret, true, nil
@@ -142,14 +174,15 @@ func ({{.TableName|lowerFirst}}) FindBy{{.FieldName|upperFirst}}(ctx context.Con
 	w.Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &list)
 	if err != nil {
+		log.Error(err)
 		return nil, err
 	}
 	return
 }
 {{end}}{{end}}
 
-func ({{.TableName|lowerFirst}}) Page(ctx context.Context, pageNum, pageSize int64, where orm.WhereWrapper, orderBy ...orm.Order) (list []{{.ModelName}}, err error) {
-	w := orm.NewQueryWrapper(ModelAccount{})
+func ({{.TableName|lowerFirst}}) Page(ctx context.Context, pageNum, pageSize int64, where orm.WhereWrapper, orderBy ...orm.Order) (list {{.ModelName}}List, err error) {
+	w := orm.NewQueryWrapper({{.ModelName}}{})
 	w.SetWhere(where).Offset((pageNum - 1) * pageSize).Limit(pageSize){{if .HasDeletedAt}}
 	w.Nested(orm.NewOrWhereWrapper().Eq({{.TableName}}.DeletedAt, 0).IsNull({{.TableName}}.DeletedAt)){{end}}
 	w.Order(orderBy...)
@@ -161,13 +194,14 @@ func ({{.TableName|lowerFirst}}) Page(ctx context.Context, pageNum, pageSize int
 }
 
 {{range $field := .Fields}}{{if $field.HasIndex}}
-func ({{.TableName|lowerFirst}}) PageBy{{.FieldName|upperFirst}}(ctx context.Context, pageNum, pageSize int64, {{$field.FieldName|lowerFirst}} {{$field.ModelDataType|trimPointer}}, orderBy ...orm.Order) (list []{{.ModelName}}, err error) {
+func ({{.TableName|lowerFirst}}) PageBy{{.FieldName|upperFirst}}(ctx context.Context, pageNum, pageSize int64, {{$field.FieldName|lowerFirst}} {{$field.ModelDataType|trimPointer}}, orderBy ...orm.Order) (list {{.ModelName}}List, err error) {
 	w := orm.NewQueryWrapper({{.ModelName}}{})
 	w.Eq({{.TableName}}.{{.FieldName|upperFirst}}, {{.FieldName|lowerFirst}}){{if .HasDeletedAt}}
 	w.Nested(orm.NewOrWhereWrapper().Eq({{.TableName}}.DeletedAt, 0).IsNull({{.TableName}}.DeletedAt)){{end}}
 	w.Offset((pageNum - 1) * pageSize).Limit(pageSize).Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &list)
 	if err != nil {
+		log.Error(err)
 		return nil, err
 	}
 	return
@@ -175,11 +209,14 @@ func ({{.TableName|lowerFirst}}) PageBy{{.FieldName|upperFirst}}(ctx context.Con
 {{end}}{{end}}
 
 func ({{.TableName|lowerFirst}}) Count(ctx context.Context, where orm.WhereWrapper) (count int64, err error) {
-	w := orm.NewQueryWrapper(ModelAccount{})
+	w := orm.NewQueryWrapper({{.ModelName}}{})
 	w.SetWhere(where){{if .HasDeletedAt}}
 	w.Nested(orm.NewOrWhereWrapper().Eq({{.TableName}}.DeletedAt, 0).IsNull({{.TableName}}.DeletedAt)){{end}}
 	w.Select("COUNT(*)")
 	err = orm.Select(ctx, cos.Name, w, &count)
+	if err != nil {
+		log.Error(err)
+	}
 	return count, err
 }
 
@@ -190,6 +227,9 @@ func ({{.TableName|lowerFirst}}) CountBy{{.FieldName|upperFirst}}(ctx context.Co
 	w.Nested(orm.NewOrWhereWrapper().Eq({{.TableName}}.DeletedAt, 0).IsNull({{.TableName}}.DeletedAt)){{end}}
 	w.Select("COUNT(*)")
 	err = orm.Select(ctx, cos.Name, w, &count)
+	if err != nil {
+		log.Error(err)
+	}
 	return count, err
 }
 {{end}}{{end}}
@@ -201,6 +241,19 @@ func ({{.TableName|lowerFirst}}) Create(ctx context.Context, data ...{{.ModelNam
 	}
 	result, err := orm.Insert(ctx, cos.Name, w)
 	if err != nil {
+		log.Error(err)
+		return 0, err
+	}
+	return result.RowsAffected()
+}
+
+func ({{.TableName|lowerFirst}})  ResetDeletedAt(ctx context.Context, where orm.WhereWrapper) (rowsAffected int64, err error) {
+	w := orm.NewUpdateWrapper({{.ModelName}}{})
+	w.SetWhere(where)
+	w.SetValue(TableConfig.DeletedAt, 0)
+	result, err := orm.Update(ctx, cos.Name, w)
+	if err != nil {
+		log.Error(err)
 		return 0, err
 	}
 	return result.RowsAffected()

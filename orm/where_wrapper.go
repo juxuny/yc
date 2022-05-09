@@ -2,6 +2,8 @@ package orm
 
 import (
 	"fmt"
+	"github.com/juxuny/yc/log"
+	"reflect"
 )
 
 type WhereWrapper interface {
@@ -16,6 +18,7 @@ type WhereWrapper interface {
 	IsNotNull(field FieldName) WhereWrapper
 	IsNull(field FieldName) WhereWrapper
 	Nested(w WhereWrapper) WhereWrapper
+	Like(field FieldName, v interface{}) WhereWrapper
 	Clone() WhereWrapper
 	Build() (string, []interface{}, error)
 }
@@ -43,6 +46,16 @@ func (t *whereWrapper) Clone() WhereWrapper {
 	}
 }
 
+func (t *whereWrapper) Like(field FieldName, v interface{}) WhereWrapper {
+	vv := reflect.ValueOf(v)
+	if vv.Kind() == reflect.Ptr && vv.IsNil() {
+		log.Debug("ignore nil: ", field)
+		return t
+	}
+	t.conditions = append(t.conditions, NewExpressionCondition(field, "LIKE", v))
+	return t
+}
+
 func (t *whereWrapper) Nested(w WhereWrapper) WhereWrapper {
 	t.conditions = append(t.conditions, NewNestedCondition(w))
 	return t
@@ -59,41 +72,81 @@ func (t *whereWrapper) IsNull(field FieldName) WhereWrapper {
 }
 
 func (t *whereWrapper) Eq(field FieldName, v interface{}) WhereWrapper {
+	vv := reflect.ValueOf(v)
+	if vv.Kind() == reflect.Ptr && vv.IsNil() {
+		log.Debug("ignore nil: ", field)
+		return t
+	}
 	t.conditions = append(t.conditions, NewExpressionCondition(field, "=", v))
 	return t
 }
 
 func (t *whereWrapper) Neq(field FieldName, v interface{}) WhereWrapper {
+	vv := reflect.ValueOf(v)
+	if vv.Kind() == reflect.Ptr && vv.IsNil() {
+		log.Debug("ignore nil: ", field)
+		return t
+	}
 	t.conditions = append(t.conditions, NewExpressionCondition(field, "<>", v))
 	return t
 }
 
 func (t *whereWrapper) Le(field FieldName, v interface{}) WhereWrapper {
+	vv := reflect.ValueOf(v)
+	if vv.Kind() == reflect.Ptr && vv.IsNil() {
+		log.Debug("ignore nil: ", field)
+		return t
+	}
 	t.conditions = append(t.conditions, NewExpressionCondition(field, "<=", v))
 	return t
 }
 
 func (t *whereWrapper) Lt(field FieldName, v interface{}) WhereWrapper {
+	vv := reflect.ValueOf(v)
+	if vv.Kind() == reflect.Ptr && vv.IsNil() {
+		log.Debug("ignore nil: ", field)
+		return t
+	}
 	t.conditions = append(t.conditions, NewExpressionCondition(field, "<", v))
 	return t
 }
 
 func (t *whereWrapper) Gt(field FieldName, v interface{}) WhereWrapper {
+	vv := reflect.ValueOf(v)
+	if vv.Kind() == reflect.Ptr && vv.IsNil() {
+		log.Debug("ignore nil: ", field)
+		return t
+	}
 	t.conditions = append(t.conditions, NewExpressionCondition(field, ">", v))
 	return t
 }
 
 func (t *whereWrapper) Ge(field FieldName, v interface{}) WhereWrapper {
+	vv := reflect.ValueOf(v)
+	if vv.Kind() == reflect.Ptr && vv.IsNil() {
+		log.Debug("ignore nil: ", field)
+		return t
+	}
 	t.conditions = append(t.conditions, NewExpressionCondition(field, ">=", v))
 	return t
 }
 
 func (t *whereWrapper) In(field FieldName, v interface{}) WhereWrapper {
+	vv := reflect.ValueOf(v)
+	if vv.Kind() == reflect.Ptr && vv.IsNil() {
+		log.Debug("ignore nil: ", field)
+		return t
+	}
 	t.conditions = append(t.conditions, NewExpressionCondition(field, "IN", v))
 	return t
 }
 
 func (t *whereWrapper) NotIn(field FieldName, v interface{}) WhereWrapper {
+	vv := reflect.ValueOf(v)
+	if vv.Kind() == reflect.Ptr && vv.IsNil() {
+		log.Debug("ignore nil: ", field)
+		return t
+	}
 	t.conditions = append(t.conditions, NewExpressionCondition(field, "NOT IN", v))
 	return t
 }

@@ -38,7 +38,8 @@ var SystemError = struct {
 	RpcCallMetaEmpty              Error `code:"-10034" msg:"rpc call metadata empty"`
 	InvalidRpcCallerLevel         Error `code:"-10035" msg:"invalid rpc caller level"`
 	NotFoundRpcCallerLevel        Error `code:"-10036" msg:"not found rpc caller level"`
-	NotFoundRpcToken              Error `code:"-10037" msg:"invalid token"`
+	NotFoundRpcToken              Error `code:"-10037" msg:"no token"`
+	InvalidToken                  Error `code:"-10038" msg:"invalid token"`
 }{}
 
 func init() {

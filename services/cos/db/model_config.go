@@ -4,7 +4,9 @@ import (
 	"context"
 	"github.com/juxuny/yc/dt"
 	"github.com/juxuny/yc/errors"
+	"github.com/juxuny/yc/log"
 	"github.com/juxuny/yc/orm"
+
 	cos "github.com/juxuny/yc/services/cos"
 )
 
@@ -52,6 +54,16 @@ func (t ModelConfig) ToListConfigItemAsPointer() *cos.ListConfigItem {
 	return &ret
 }
 
+type ModelConfigList []ModelConfig
+
+func (t ModelConfigList) MapToListConfigItemList() []*cos.ListConfigItem {
+	ret := make([]*cos.ListConfigItem, 0)
+	for _, item := range t {
+		ret = append(ret, item.ToListConfigItemAsPointer())
+	}
+	return ret
+}
+
 type tableConfig struct {
 	Id          orm.FieldName
 	CreateTime  orm.FieldName
@@ -78,6 +90,7 @@ func (tableConfig) FindOneById(ctx context.Context, id dt.ID, orderBy ...orm.Ord
 		if e, ok := err.(errors.Error); ok && e.Code == errors.SystemError.DatabaseNoData.Code {
 			return data, false, nil
 		}
+		log.Error(err)
 		return data, false, err
 	}
 	return data, true, nil
@@ -93,6 +106,7 @@ func (tableConfig) FindOneByConfigId(ctx context.Context, configId string, order
 		if e, ok := err.(errors.Error); ok && e.Code == errors.SystemError.DatabaseNoData.Code {
 			return data, false, nil
 		}
+		log.Error(err)
 		return data, false, err
 	}
 	return data, true, nil
@@ -108,6 +122,7 @@ func (tableConfig) FindOneByCreatorId(ctx context.Context, creatorId dt.ID, orde
 		if e, ok := err.(errors.Error); ok && e.Code == errors.SystemError.DatabaseNoData.Code {
 			return data, false, nil
 		}
+		log.Error(err)
 		return data, false, err
 	}
 	return data, true, nil
@@ -123,6 +138,7 @@ func (tableConfig) FindOneByBaseId(ctx context.Context, baseId dt.ID, orderBy ..
 		if e, ok := err.(errors.Error); ok && e.Code == errors.SystemError.DatabaseNoData.Code {
 			return data, false, nil
 		}
+		log.Error(err)
 		return data, false, err
 	}
 	return data, true, nil
@@ -138,6 +154,7 @@ func (tableConfig) FindOneByNamespaceId(ctx context.Context, namespaceId dt.ID, 
 		if e, ok := err.(errors.Error); ok && e.Code == errors.SystemError.DatabaseNoData.Code {
 			return data, false, nil
 		}
+		log.Error(err)
 		return data, false, err
 	}
 	return data, true, nil
@@ -150,6 +167,7 @@ func (tableConfig) UpdateById(ctx context.Context, id dt.ID, update orm.H) (rows
 	w.Updates(update)
 	result, err := orm.Update(ctx, cos.Name, w)
 	if err != nil {
+		log.Error(err)
 		return 0, err
 	}
 	return result.RowsAffected()
@@ -162,6 +180,7 @@ func (tableConfig) UpdateByConfigId(ctx context.Context, configId string, update
 	w.Updates(update)
 	result, err := orm.Update(ctx, cos.Name, w)
 	if err != nil {
+		log.Error(err)
 		return 0, err
 	}
 	return result.RowsAffected()
@@ -174,6 +193,7 @@ func (tableConfig) UpdateByCreatorId(ctx context.Context, creatorId dt.ID, updat
 	w.Updates(update)
 	result, err := orm.Update(ctx, cos.Name, w)
 	if err != nil {
+		log.Error(err)
 		return 0, err
 	}
 	return result.RowsAffected()
@@ -186,6 +206,7 @@ func (tableConfig) UpdateByBaseId(ctx context.Context, baseId dt.ID, update orm.
 	w.Updates(update)
 	result, err := orm.Update(ctx, cos.Name, w)
 	if err != nil {
+		log.Error(err)
 		return 0, err
 	}
 	return result.RowsAffected()
@@ -198,6 +219,7 @@ func (tableConfig) UpdateByNamespaceId(ctx context.Context, namespaceId dt.ID, u
 	w.Updates(update)
 	result, err := orm.Update(ctx, cos.Name, w)
 	if err != nil {
+		log.Error(err)
 		return 0, err
 	}
 	return result.RowsAffected()
@@ -209,6 +231,7 @@ func (tableConfig) Update(ctx context.Context, update orm.H, where orm.WhereWrap
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableConfig.DeletedAt, 0).IsNull(TableConfig.DeletedAt))
 	result, err := orm.Update(ctx, cos.Name, w)
 	if err != nil {
+		log.Error(err)
 		return 0, err
 	}
 	return result.RowsAffected()
@@ -219,6 +242,7 @@ func (tableConfig) DeleteById(ctx context.Context, id dt.ID) (rowsAffected int64
 	w.Eq(TableConfig.Id, id)
 	result, err := orm.Delete(ctx, cos.Name, w)
 	if err != nil {
+		log.Error(err)
 		return 0, err
 	}
 	return result.RowsAffected()
@@ -229,6 +253,7 @@ func (tableConfig) DeleteByConfigId(ctx context.Context, configId string) (rowsA
 	w.Eq(TableConfig.ConfigId, configId)
 	result, err := orm.Delete(ctx, cos.Name, w)
 	if err != nil {
+		log.Error(err)
 		return 0, err
 	}
 	return result.RowsAffected()
@@ -239,6 +264,7 @@ func (tableConfig) DeleteByCreatorId(ctx context.Context, creatorId dt.ID) (rows
 	w.Eq(TableConfig.CreatorId, creatorId)
 	result, err := orm.Delete(ctx, cos.Name, w)
 	if err != nil {
+		log.Error(err)
 		return 0, err
 	}
 	return result.RowsAffected()
@@ -249,6 +275,7 @@ func (tableConfig) DeleteByBaseId(ctx context.Context, baseId dt.ID) (rowsAffect
 	w.Eq(TableConfig.BaseId, baseId)
 	result, err := orm.Delete(ctx, cos.Name, w)
 	if err != nil {
+		log.Error(err)
 		return 0, err
 	}
 	return result.RowsAffected()
@@ -259,6 +286,7 @@ func (tableConfig) DeleteByNamespaceId(ctx context.Context, namespaceId dt.ID) (
 	w.Eq(TableConfig.NamespaceId, namespaceId)
 	result, err := orm.Delete(ctx, cos.Name, w)
 	if err != nil {
+		log.Error(err)
 		return 0, err
 	}
 	return result.RowsAffected()
@@ -270,6 +298,7 @@ func (tableConfig) SoftDeleteById(ctx context.Context, id dt.ID) (rowsAffected i
 	w.Eq(TableConfig.Id, id)
 	result, err := orm.Update(ctx, cos.Name, w)
 	if err != nil {
+		log.Error(err)
 		return 0, err
 	}
 	return result.RowsAffected()
@@ -281,6 +310,7 @@ func (tableConfig) SoftDeleteByConfigId(ctx context.Context, configId string) (r
 	w.Eq(TableConfig.ConfigId, configId)
 	result, err := orm.Update(ctx, cos.Name, w)
 	if err != nil {
+		log.Error(err)
 		return 0, err
 	}
 	return result.RowsAffected()
@@ -292,6 +322,7 @@ func (tableConfig) SoftDeleteByCreatorId(ctx context.Context, creatorId dt.ID) (
 	w.Eq(TableConfig.CreatorId, creatorId)
 	result, err := orm.Update(ctx, cos.Name, w)
 	if err != nil {
+		log.Error(err)
 		return 0, err
 	}
 	return result.RowsAffected()
@@ -303,6 +334,7 @@ func (tableConfig) SoftDeleteByBaseId(ctx context.Context, baseId dt.ID) (rowsAf
 	w.Eq(TableConfig.BaseId, baseId)
 	result, err := orm.Update(ctx, cos.Name, w)
 	if err != nil {
+		log.Error(err)
 		return 0, err
 	}
 	return result.RowsAffected()
@@ -314,6 +346,19 @@ func (tableConfig) SoftDeleteByNamespaceId(ctx context.Context, namespaceId dt.I
 	w.Eq(TableConfig.NamespaceId, namespaceId)
 	result, err := orm.Update(ctx, cos.Name, w)
 	if err != nil {
+		log.Error(err)
+		return 0, err
+	}
+	return result.RowsAffected()
+}
+
+func (tableConfig) SoftDelete(ctx context.Context, where orm.WhereWrapper) (rowsAffected int64, err error) {
+	w := orm.NewUpdateWrapper(ModelConfig{})
+	w.SetValue(TableConfig.DeletedAt, orm.Now())
+	w.SetWhere(where)
+	result, err := orm.Update(ctx, cos.Name, w)
+	if err != nil {
+		log.Error(err)
 		return 0, err
 	}
 	return result.RowsAffected()
@@ -325,6 +370,7 @@ func (tableConfig) Find(ctx context.Context, where orm.WhereWrapper, orderBy ...
 	w.SetWhere(where).Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &list)
 	if err != nil {
+		log.Error(err)
 		return nil, err
 	}
 	return
@@ -339,6 +385,7 @@ func (tableConfig) FindOne(ctx context.Context, where orm.WhereWrapper, orderBy 
 		if e, ok := err.(errors.Error); ok && e.Code == errors.SystemError.DatabaseNoData.Code {
 			return ret, false, nil
 		}
+		log.Error(err)
 		return ret, false, err
 	}
 	return ret, true, nil
@@ -351,6 +398,7 @@ func (tableConfig) FindById(ctx context.Context, id dt.ID, orderBy ...orm.Order)
 	w.Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &list)
 	if err != nil {
+		log.Error(err)
 		return nil, err
 	}
 	return
@@ -363,6 +411,7 @@ func (tableConfig) FindByConfigId(ctx context.Context, configId string, orderBy 
 	w.Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &list)
 	if err != nil {
+		log.Error(err)
 		return nil, err
 	}
 	return
@@ -375,6 +424,7 @@ func (tableConfig) FindByCreatorId(ctx context.Context, creatorId dt.ID, orderBy
 	w.Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &list)
 	if err != nil {
+		log.Error(err)
 		return nil, err
 	}
 	return
@@ -387,6 +437,7 @@ func (tableConfig) FindByBaseId(ctx context.Context, baseId dt.ID, orderBy ...or
 	w.Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &list)
 	if err != nil {
+		log.Error(err)
 		return nil, err
 	}
 	return
@@ -399,13 +450,14 @@ func (tableConfig) FindByNamespaceId(ctx context.Context, namespaceId dt.ID, ord
 	w.Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &list)
 	if err != nil {
+		log.Error(err)
 		return nil, err
 	}
 	return
 }
 
-func (tableConfig) Page(ctx context.Context, pageNum, pageSize int64, where orm.WhereWrapper, orderBy ...orm.Order) (list []ModelConfig, err error) {
-	w := orm.NewQueryWrapper(ModelAccount{})
+func (tableConfig) Page(ctx context.Context, pageNum, pageSize int64, where orm.WhereWrapper, orderBy ...orm.Order) (list ModelConfigList, err error) {
+	w := orm.NewQueryWrapper(ModelConfig{})
 	w.SetWhere(where).Offset((pageNum - 1) * pageSize).Limit(pageSize)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableConfig.DeletedAt, 0).IsNull(TableConfig.DeletedAt))
 	w.Order(orderBy...)
@@ -416,72 +468,80 @@ func (tableConfig) Page(ctx context.Context, pageNum, pageSize int64, where orm.
 	return
 }
 
-func (tableConfig) PageById(ctx context.Context, pageNum, pageSize int64, id dt.ID, orderBy ...orm.Order) (list []ModelConfig, err error) {
+func (tableConfig) PageById(ctx context.Context, pageNum, pageSize int64, id dt.ID, orderBy ...orm.Order) (list ModelConfigList, err error) {
 	w := orm.NewQueryWrapper(ModelConfig{})
 	w.Eq(TableConfig.Id, id)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableConfig.DeletedAt, 0).IsNull(TableConfig.DeletedAt))
 	w.Offset((pageNum - 1) * pageSize).Limit(pageSize).Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &list)
 	if err != nil {
+		log.Error(err)
 		return nil, err
 	}
 	return
 }
 
-func (tableConfig) PageByConfigId(ctx context.Context, pageNum, pageSize int64, configId string, orderBy ...orm.Order) (list []ModelConfig, err error) {
+func (tableConfig) PageByConfigId(ctx context.Context, pageNum, pageSize int64, configId string, orderBy ...orm.Order) (list ModelConfigList, err error) {
 	w := orm.NewQueryWrapper(ModelConfig{})
 	w.Eq(TableConfig.ConfigId, configId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableConfig.DeletedAt, 0).IsNull(TableConfig.DeletedAt))
 	w.Offset((pageNum - 1) * pageSize).Limit(pageSize).Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &list)
 	if err != nil {
+		log.Error(err)
 		return nil, err
 	}
 	return
 }
 
-func (tableConfig) PageByCreatorId(ctx context.Context, pageNum, pageSize int64, creatorId dt.ID, orderBy ...orm.Order) (list []ModelConfig, err error) {
+func (tableConfig) PageByCreatorId(ctx context.Context, pageNum, pageSize int64, creatorId dt.ID, orderBy ...orm.Order) (list ModelConfigList, err error) {
 	w := orm.NewQueryWrapper(ModelConfig{})
 	w.Eq(TableConfig.CreatorId, creatorId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableConfig.DeletedAt, 0).IsNull(TableConfig.DeletedAt))
 	w.Offset((pageNum - 1) * pageSize).Limit(pageSize).Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &list)
 	if err != nil {
+		log.Error(err)
 		return nil, err
 	}
 	return
 }
 
-func (tableConfig) PageByBaseId(ctx context.Context, pageNum, pageSize int64, baseId dt.ID, orderBy ...orm.Order) (list []ModelConfig, err error) {
+func (tableConfig) PageByBaseId(ctx context.Context, pageNum, pageSize int64, baseId dt.ID, orderBy ...orm.Order) (list ModelConfigList, err error) {
 	w := orm.NewQueryWrapper(ModelConfig{})
 	w.Eq(TableConfig.BaseId, baseId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableConfig.DeletedAt, 0).IsNull(TableConfig.DeletedAt))
 	w.Offset((pageNum - 1) * pageSize).Limit(pageSize).Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &list)
 	if err != nil {
+		log.Error(err)
 		return nil, err
 	}
 	return
 }
 
-func (tableConfig) PageByNamespaceId(ctx context.Context, pageNum, pageSize int64, namespaceId dt.ID, orderBy ...orm.Order) (list []ModelConfig, err error) {
+func (tableConfig) PageByNamespaceId(ctx context.Context, pageNum, pageSize int64, namespaceId dt.ID, orderBy ...orm.Order) (list ModelConfigList, err error) {
 	w := orm.NewQueryWrapper(ModelConfig{})
 	w.Eq(TableConfig.NamespaceId, namespaceId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableConfig.DeletedAt, 0).IsNull(TableConfig.DeletedAt))
 	w.Offset((pageNum - 1) * pageSize).Limit(pageSize).Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &list)
 	if err != nil {
+		log.Error(err)
 		return nil, err
 	}
 	return
 }
 
 func (tableConfig) Count(ctx context.Context, where orm.WhereWrapper) (count int64, err error) {
-	w := orm.NewQueryWrapper(ModelAccount{})
+	w := orm.NewQueryWrapper(ModelConfig{})
 	w.SetWhere(where)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableConfig.DeletedAt, 0).IsNull(TableConfig.DeletedAt))
 	w.Select("COUNT(*)")
 	err = orm.Select(ctx, cos.Name, w, &count)
+	if err != nil {
+		log.Error(err)
+	}
 	return count, err
 }
 
@@ -491,6 +551,9 @@ func (tableConfig) CountById(ctx context.Context, id dt.ID) (count int64, err er
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableConfig.DeletedAt, 0).IsNull(TableConfig.DeletedAt))
 	w.Select("COUNT(*)")
 	err = orm.Select(ctx, cos.Name, w, &count)
+	if err != nil {
+		log.Error(err)
+	}
 	return count, err
 }
 
@@ -500,6 +563,9 @@ func (tableConfig) CountByConfigId(ctx context.Context, configId string) (count 
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableConfig.DeletedAt, 0).IsNull(TableConfig.DeletedAt))
 	w.Select("COUNT(*)")
 	err = orm.Select(ctx, cos.Name, w, &count)
+	if err != nil {
+		log.Error(err)
+	}
 	return count, err
 }
 
@@ -509,6 +575,9 @@ func (tableConfig) CountByCreatorId(ctx context.Context, creatorId dt.ID) (count
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableConfig.DeletedAt, 0).IsNull(TableConfig.DeletedAt))
 	w.Select("COUNT(*)")
 	err = orm.Select(ctx, cos.Name, w, &count)
+	if err != nil {
+		log.Error(err)
+	}
 	return count, err
 }
 
@@ -518,6 +587,9 @@ func (tableConfig) CountByBaseId(ctx context.Context, baseId dt.ID) (count int64
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableConfig.DeletedAt, 0).IsNull(TableConfig.DeletedAt))
 	w.Select("COUNT(*)")
 	err = orm.Select(ctx, cos.Name, w, &count)
+	if err != nil {
+		log.Error(err)
+	}
 	return count, err
 }
 
@@ -527,6 +599,9 @@ func (tableConfig) CountByNamespaceId(ctx context.Context, namespaceId dt.ID) (c
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableConfig.DeletedAt, 0).IsNull(TableConfig.DeletedAt))
 	w.Select("COUNT(*)")
 	err = orm.Select(ctx, cos.Name, w, &count)
+	if err != nil {
+		log.Error(err)
+	}
 	return count, err
 }
 
@@ -537,6 +612,19 @@ func (tableConfig) Create(ctx context.Context, data ...ModelConfig) (rowsAffecte
 	}
 	result, err := orm.Insert(ctx, cos.Name, w)
 	if err != nil {
+		log.Error(err)
+		return 0, err
+	}
+	return result.RowsAffected()
+}
+
+func (tableConfig) ResetDeletedAt(ctx context.Context, where orm.WhereWrapper) (rowsAffected int64, err error) {
+	w := orm.NewUpdateWrapper(ModelConfig{})
+	w.SetWhere(where)
+	w.SetValue(TableConfig.DeletedAt, 0)
+	result, err := orm.Update(ctx, cos.Name, w)
+	if err != nil {
+		log.Error(err)
 		return 0, err
 	}
 	return result.RowsAffected()

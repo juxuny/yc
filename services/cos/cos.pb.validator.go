@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	ValidatorTemplateLoginRequestAccountType            = "无效登录类型: {{.AccountType}}"
+	ValidatorTemplateLoginRequestAccountType            = "无效登录类型: {{.AccountType|num}}"
 	ValidatorTemplateUpdateInfoRequestNick              = "missing nick name"
 	ValidatorTemplateModifyPasswordRequestOldPassword   = "invalid old password: {{.OldPassword}}"
 	ValidatorTemplateModifyPasswordRequestNewPassword   = "invalid new password: {{.NewPassword}}"
@@ -35,7 +35,7 @@ func (m *HealthRequest) Validate() error {
 	return nil
 }
 func (m *LoginRequest) Validate() error {
-	if err := validator.Run(m.AccountType, validator.CreateAction("in: 1", ``, ValidatorTemplateLoginRequestAccountType), m, "accountType"); err != nil {
+	if err := validator.Run(m.AccountType, validator.CreateAction("in", `1`, ValidatorTemplateLoginRequestAccountType), m, "accountType"); err != nil {
 		return err
 	}
 	return nil

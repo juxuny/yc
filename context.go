@@ -53,7 +53,11 @@ func ParseJwt(ctx context.Context) (*jwt.Claims, error) {
 	if err != nil {
 		return nil, err
 	}
-	return jwt.ParseToken(token)
+	claim, err := jwt.ParseToken(token)
+	if err != nil {
+		return nil, errors.SystemError.InvalidToken.Wrap(err)
+	}
+	return claim, nil
 }
 
 func GetUserId(ctx context.Context) (userId dt.ID, err error) {

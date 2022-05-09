@@ -47,6 +47,7 @@ type authValidator struct{}
 func (t *authValidator) Run(ctx context.Context) (isEnd bool, err error) {
 	claims, err := yc.ParseJwt(ctx)
 	if err != nil {
+		log.Error(err)
 		return true, err
 	}
 	modelAccount, found, err := db.TableAccount.FindOneById(ctx, claims.UserId)
