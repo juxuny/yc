@@ -9,7 +9,7 @@ import (
 	"runtime/debug"
 )
 
-func (t *wrapper) SaveConfig(ctx context.Context, req *cos.SaveConfigRequest) (resp *cos.SaveConfigResponse, err error) {
+func (t *wrapper) SaveValue(ctx context.Context, req *cos.SaveValueRequest) (resp *cos.SaveValueResponse, err error) {
 	var isEnd bool
 	trace.WithContext(ctx)
 	defer trace.Clean()
@@ -50,10 +50,10 @@ func (t *wrapper) SaveConfig(ctx context.Context, req *cos.SaveConfigRequest) (r
 			log.Error(err)
 		}
 	}()
-	return t.handler.SaveConfig(ctx, req)
+	return t.handler.SaveValue(ctx, req)
 }
 
-func (t *wrapper) DeleteConfig(ctx context.Context, req *cos.DeleteConfigRequest) (resp *cos.DeleteConfigResponse, err error) {
+func (t *wrapper) DeleteValue(ctx context.Context, req *cos.DeleteValueRequest) (resp *cos.DeleteValueRequest, err error) {
 	var isEnd bool
 	trace.WithContext(ctx)
 	defer trace.Clean()
@@ -94,10 +94,10 @@ func (t *wrapper) DeleteConfig(ctx context.Context, req *cos.DeleteConfigRequest
 			log.Error(err)
 		}
 	}()
-	return t.handler.DeleteConfig(ctx, req)
+	return t.handler.DeleteValue(ctx, req)
 }
 
-func (t *wrapper) ListConfig(ctx context.Context, req *cos.ListConfigRequest) (resp *cos.ListConfigResponse, err error) {
+func (t *wrapper) ListValue(ctx context.Context, req *cos.ListValueRequest) (resp *cos.ListValueResponse, err error) {
 	var isEnd bool
 	trace.WithContext(ctx)
 	defer trace.Clean()
@@ -138,9 +138,9 @@ func (t *wrapper) ListConfig(ctx context.Context, req *cos.ListConfigRequest) (r
 			log.Error(err)
 		}
 	}()
-	return t.handler.ListConfig(ctx, req)
+	return t.handler.ListValue(ctx, req)
 }
-func (t *wrapper) CloneConfig(ctx context.Context, req *cos.CloneConfigRequest) (resp *cos.CloneConfigResponse, err error) {
+func (t *wrapper) DisableValue(ctx context.Context, req *cos.DisableValueRequest) (resp *cos.DisableValueResponse, err error) {
 	var isEnd bool
 	trace.WithContext(ctx)
 	defer trace.Clean()
@@ -181,5 +181,49 @@ func (t *wrapper) CloneConfig(ctx context.Context, req *cos.CloneConfigRequest) 
 			log.Error(err)
 		}
 	}()
-	return t.handler.CloneConfig(ctx, req)
+	return t.handler.DisableValue(ctx, req)
+}
+
+func (t *wrapper) ListAllValue(ctx context.Context, req *cos.ListAllValueRequest) (resp *cos.ListAllValueResponse, err error) {
+	var isEnd bool
+	trace.WithContext(ctx)
+	defer trace.Clean()
+	defer func() {
+		if recoverError := recover(); recoverError != nil {
+			err = errors.SystemError.InternalError
+			debug.PrintStack()
+			handleRecover(ctx, recoverError)
+			return
+		}
+	}()
+	isEnd, err = t.authHandler.Run(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if isEnd {
+		return nil, nil
+	}
+	isEnd, err = t.beforeHandler.Run(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if isEnd {
+		return nil, nil
+	}
+	defer func() {
+		_, err := t.afterHandler.Run(ctx)
+		if err != nil {
+			log.Error(err)
+		}
+	}()
+	if err := req.Validate(); err != nil {
+		log.Error(err)
+		return nil, err
+	}
+	defer func() {
+		if err != nil {
+			log.Error(err)
+		}
+	}()
+	return t.handler.ListAllValue(ctx, req)
 }

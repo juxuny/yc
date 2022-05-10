@@ -23,6 +23,10 @@ var Error = struct {
 	Unauthorized                errors.Error `code:"10013" msg:"unauthorized"`
 	DeleteNotAllowed            errors.Error `code:"10014" msg:"delete not allowed"`
 	MissingArguments            errors.Error `code:"10015" msg:"missing arguments"`
+	ConfigDisabled              errors.Error `code:"10016" msg:"config disabled"`
+	MissingConfigId             errors.Error `code:"10037" msg:"missing configId"`
+	KeyDuplicated               errors.Error `code:"10038" msg:"key duplicated"`
+	KeyNotFound                 errors.Error `code:"10039" msg:"key not found"`
 }{}
 
 func init() {

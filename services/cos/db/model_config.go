@@ -374,7 +374,7 @@ func (tableConfig) SoftDelete(ctx context.Context, where orm.WhereWrapper) (rows
 	return result.RowsAffected()
 }
 
-func (tableConfig) Find(ctx context.Context, where orm.WhereWrapper, orderBy ...orm.Order) (list []ModelConfig, err error) {
+func (tableConfig) Find(ctx context.Context, where orm.WhereWrapper, orderBy ...orm.Order) (list ModelConfigList, err error) {
 	w := orm.NewQueryWrapper(ModelConfig{})
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableConfig.DeletedAt, 0).IsNull(TableConfig.DeletedAt))
 	w.SetWhere(where).Order(orderBy...)
@@ -401,7 +401,7 @@ func (tableConfig) FindOne(ctx context.Context, where orm.WhereWrapper, orderBy 
 	return ret, true, nil
 }
 
-func (tableConfig) FindById(ctx context.Context, id dt.ID, orderBy ...orm.Order) (list []ModelConfig, err error) {
+func (tableConfig) FindById(ctx context.Context, id dt.ID, orderBy ...orm.Order) (list ModelConfigList, err error) {
 	w := orm.NewQueryWrapper(ModelConfig{})
 	w.Eq(TableConfig.Id, id)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableConfig.DeletedAt, 0).IsNull(TableConfig.DeletedAt))
@@ -414,7 +414,7 @@ func (tableConfig) FindById(ctx context.Context, id dt.ID, orderBy ...orm.Order)
 	return
 }
 
-func (tableConfig) FindByConfigId(ctx context.Context, configId string, orderBy ...orm.Order) (list []ModelConfig, err error) {
+func (tableConfig) FindByConfigId(ctx context.Context, configId string, orderBy ...orm.Order) (list ModelConfigList, err error) {
 	w := orm.NewQueryWrapper(ModelConfig{})
 	w.Eq(TableConfig.ConfigId, configId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableConfig.DeletedAt, 0).IsNull(TableConfig.DeletedAt))
@@ -427,7 +427,7 @@ func (tableConfig) FindByConfigId(ctx context.Context, configId string, orderBy 
 	return
 }
 
-func (tableConfig) FindByCreatorId(ctx context.Context, creatorId dt.ID, orderBy ...orm.Order) (list []ModelConfig, err error) {
+func (tableConfig) FindByCreatorId(ctx context.Context, creatorId dt.ID, orderBy ...orm.Order) (list ModelConfigList, err error) {
 	w := orm.NewQueryWrapper(ModelConfig{})
 	w.Eq(TableConfig.CreatorId, creatorId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableConfig.DeletedAt, 0).IsNull(TableConfig.DeletedAt))
@@ -440,7 +440,7 @@ func (tableConfig) FindByCreatorId(ctx context.Context, creatorId dt.ID, orderBy
 	return
 }
 
-func (tableConfig) FindByBaseId(ctx context.Context, baseId dt.ID, orderBy ...orm.Order) (list []ModelConfig, err error) {
+func (tableConfig) FindByBaseId(ctx context.Context, baseId dt.ID, orderBy ...orm.Order) (list ModelConfigList, err error) {
 	w := orm.NewQueryWrapper(ModelConfig{})
 	w.Eq(TableConfig.BaseId, baseId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableConfig.DeletedAt, 0).IsNull(TableConfig.DeletedAt))
@@ -453,7 +453,7 @@ func (tableConfig) FindByBaseId(ctx context.Context, baseId dt.ID, orderBy ...or
 	return
 }
 
-func (tableConfig) FindByNamespaceId(ctx context.Context, namespaceId dt.ID, orderBy ...orm.Order) (list []ModelConfig, err error) {
+func (tableConfig) FindByNamespaceId(ctx context.Context, namespaceId dt.ID, orderBy ...orm.Order) (list ModelConfigList, err error) {
 	w := orm.NewQueryWrapper(ModelConfig{})
 	w.Eq(TableConfig.NamespaceId, namespaceId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableConfig.DeletedAt, 0).IsNull(TableConfig.DeletedAt))

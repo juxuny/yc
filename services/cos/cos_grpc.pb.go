@@ -44,6 +44,18 @@ type CosClient interface {
 	DeleteConfig(ctx context.Context, in *DeleteConfigRequest, opts ...grpc.CallOption) (*DeleteConfigResponse, error)
 	// @group: config
 	ListConfig(ctx context.Context, in *ListConfigRequest, opts ...grpc.CallOption) (*ListConfigResponse, error)
+	// @group: config
+	CloneConfig(ctx context.Context, in *CloneConfigRequest, opts ...grpc.CallOption) (*CloneConfigResponse, error)
+	// @group: key_value
+	SaveValue(ctx context.Context, in *SaveValueRequest, opts ...grpc.CallOption) (*SaveValueResponse, error)
+	// @group: key_value
+	DeleteValue(ctx context.Context, in *DeleteValueRequest, opts ...grpc.CallOption) (*DeleteValueRequest, error)
+	// @group: key_value
+	ListValue(ctx context.Context, in *ListValueRequest, opts ...grpc.CallOption) (*ListValueResponse, error)
+	// @group: key_value
+	DisableValue(ctx context.Context, in *DisableValueRequest, opts ...grpc.CallOption) (*DisableValueResponse, error)
+	// @group: key_value
+	ListAllValue(ctx context.Context, in *ListAllValueRequest, opts ...grpc.CallOption) (*ListAllValueResponse, error)
 }
 
 type cosClient struct {
@@ -162,6 +174,60 @@ func (c *cosClient) ListConfig(ctx context.Context, in *ListConfigRequest, opts 
 	return out, nil
 }
 
+func (c *cosClient) CloneConfig(ctx context.Context, in *CloneConfigRequest, opts ...grpc.CallOption) (*CloneConfigResponse, error) {
+	out := new(CloneConfigResponse)
+	err := c.cc.Invoke(ctx, "/cos.Cos/CloneConfig", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *cosClient) SaveValue(ctx context.Context, in *SaveValueRequest, opts ...grpc.CallOption) (*SaveValueResponse, error) {
+	out := new(SaveValueResponse)
+	err := c.cc.Invoke(ctx, "/cos.Cos/SaveValue", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *cosClient) DeleteValue(ctx context.Context, in *DeleteValueRequest, opts ...grpc.CallOption) (*DeleteValueRequest, error) {
+	out := new(DeleteValueRequest)
+	err := c.cc.Invoke(ctx, "/cos.Cos/DeleteValue", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *cosClient) ListValue(ctx context.Context, in *ListValueRequest, opts ...grpc.CallOption) (*ListValueResponse, error) {
+	out := new(ListValueResponse)
+	err := c.cc.Invoke(ctx, "/cos.Cos/ListValue", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *cosClient) DisableValue(ctx context.Context, in *DisableValueRequest, opts ...grpc.CallOption) (*DisableValueResponse, error) {
+	out := new(DisableValueResponse)
+	err := c.cc.Invoke(ctx, "/cos.Cos/DisableValue", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *cosClient) ListAllValue(ctx context.Context, in *ListAllValueRequest, opts ...grpc.CallOption) (*ListAllValueResponse, error) {
+	out := new(ListAllValueResponse)
+	err := c.cc.Invoke(ctx, "/cos.Cos/ListAllValue", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CosServer is the server API for Cos service.
 // All implementations must embed UnimplementedCosServer
 // for forward compatibility
@@ -192,6 +258,18 @@ type CosServer interface {
 	DeleteConfig(context.Context, *DeleteConfigRequest) (*DeleteConfigResponse, error)
 	// @group: config
 	ListConfig(context.Context, *ListConfigRequest) (*ListConfigResponse, error)
+	// @group: config
+	CloneConfig(context.Context, *CloneConfigRequest) (*CloneConfigResponse, error)
+	// @group: key_value
+	SaveValue(context.Context, *SaveValueRequest) (*SaveValueResponse, error)
+	// @group: key_value
+	DeleteValue(context.Context, *DeleteValueRequest) (*DeleteValueRequest, error)
+	// @group: key_value
+	ListValue(context.Context, *ListValueRequest) (*ListValueResponse, error)
+	// @group: key_value
+	DisableValue(context.Context, *DisableValueRequest) (*DisableValueResponse, error)
+	// @group: key_value
+	ListAllValue(context.Context, *ListAllValueRequest) (*ListAllValueResponse, error)
 	mustEmbedUnimplementedCosServer()
 }
 
@@ -234,6 +312,24 @@ func (UnimplementedCosServer) DeleteConfig(context.Context, *DeleteConfigRequest
 }
 func (UnimplementedCosServer) ListConfig(context.Context, *ListConfigRequest) (*ListConfigResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListConfig not implemented")
+}
+func (UnimplementedCosServer) CloneConfig(context.Context, *CloneConfigRequest) (*CloneConfigResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CloneConfig not implemented")
+}
+func (UnimplementedCosServer) SaveValue(context.Context, *SaveValueRequest) (*SaveValueResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SaveValue not implemented")
+}
+func (UnimplementedCosServer) DeleteValue(context.Context, *DeleteValueRequest) (*DeleteValueRequest, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteValue not implemented")
+}
+func (UnimplementedCosServer) ListValue(context.Context, *ListValueRequest) (*ListValueResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListValue not implemented")
+}
+func (UnimplementedCosServer) DisableValue(context.Context, *DisableValueRequest) (*DisableValueResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DisableValue not implemented")
+}
+func (UnimplementedCosServer) ListAllValue(context.Context, *ListAllValueRequest) (*ListAllValueResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListAllValue not implemented")
 }
 func (UnimplementedCosServer) mustEmbedUnimplementedCosServer() {}
 
@@ -464,6 +560,114 @@ func _Cos_ListConfig_Handler(srv interface{}, ctx context.Context, dec func(inte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Cos_CloneConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CloneConfigRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CosServer).CloneConfig(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/cos.Cos/CloneConfig",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CosServer).CloneConfig(ctx, req.(*CloneConfigRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Cos_SaveValue_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SaveValueRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CosServer).SaveValue(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/cos.Cos/SaveValue",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CosServer).SaveValue(ctx, req.(*SaveValueRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Cos_DeleteValue_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteValueRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CosServer).DeleteValue(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/cos.Cos/DeleteValue",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CosServer).DeleteValue(ctx, req.(*DeleteValueRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Cos_ListValue_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListValueRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CosServer).ListValue(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/cos.Cos/ListValue",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CosServer).ListValue(ctx, req.(*ListValueRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Cos_DisableValue_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DisableValueRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CosServer).DisableValue(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/cos.Cos/DisableValue",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CosServer).DisableValue(ctx, req.(*DisableValueRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Cos_ListAllValue_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListAllValueRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CosServer).ListAllValue(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/cos.Cos/ListAllValue",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CosServer).ListAllValue(ctx, req.(*ListAllValueRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Cos_ServiceDesc is the grpc.ServiceDesc for Cos service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -518,6 +722,30 @@ var Cos_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListConfig",
 			Handler:    _Cos_ListConfig_Handler,
+		},
+		{
+			MethodName: "CloneConfig",
+			Handler:    _Cos_CloneConfig_Handler,
+		},
+		{
+			MethodName: "SaveValue",
+			Handler:    _Cos_SaveValue_Handler,
+		},
+		{
+			MethodName: "DeleteValue",
+			Handler:    _Cos_DeleteValue_Handler,
+		},
+		{
+			MethodName: "ListValue",
+			Handler:    _Cos_ListValue_Handler,
+		},
+		{
+			MethodName: "DisableValue",
+			Handler:    _Cos_DisableValue_Handler,
+		},
+		{
+			MethodName: "ListAllValue",
+			Handler:    _Cos_ListAllValue_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

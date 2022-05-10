@@ -142,7 +142,7 @@ func ({{.TableName|lowerFirst}}) SoftDelete(ctx context.Context, where orm.Where
 }
 {{end}}
 
-func ({{.TableName|lowerFirst}}) Find(ctx context.Context, where orm.WhereWrapper, orderBy ...orm.Order) (list []{{.ModelName}}, err error) {
+func ({{.TableName|lowerFirst}}) Find(ctx context.Context, where orm.WhereWrapper, orderBy ...orm.Order) (list {{.ModelName}}List, err error) {
 	w := orm.NewQueryWrapper({{.ModelName}}{}){{if .HasDeletedAt}}
 	w.Nested(orm.NewOrWhereWrapper().Eq({{.TableName}}.DeletedAt, 0).IsNull({{.TableName}}.DeletedAt)){{end}}
 	w.SetWhere(where).Order(orderBy...)
@@ -170,7 +170,7 @@ func ({{.TableName|lowerFirst}}) FindOne(ctx context.Context, where orm.WhereWra
 }
 
 {{range $field := .Fields}}{{if $field.HasIndex}}
-func ({{.TableName|lowerFirst}}) FindBy{{.FieldName|upperFirst}}(ctx context.Context, {{$field.FieldName|lowerFirst}} {{$field.ModelDataType|trimPointer}}, orderBy ...orm.Order) (list []{{.ModelName}}, err error) {
+func ({{.TableName|lowerFirst}}) FindBy{{.FieldName|upperFirst}}(ctx context.Context, {{$field.FieldName|lowerFirst}} {{$field.ModelDataType|trimPointer}}, orderBy ...orm.Order) (list {{.ModelName}}List, err error) {
 	w := orm.NewQueryWrapper({{.ModelName}}{})
 	w.Eq({{.TableName}}.{{.FieldName|upperFirst}}, {{.FieldName|lowerFirst}}){{if .HasDeletedAt}}
 	w.Nested(orm.NewOrWhereWrapper().Eq({{.TableName}}.DeletedAt, 0).IsNull({{.TableName}}.DeletedAt)){{end}}

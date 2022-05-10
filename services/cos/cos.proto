@@ -36,7 +36,19 @@ service Cos {
   rpc DeleteConfig(DeleteConfigRequest) returns (DeleteConfigResponse) {}
   // @group: config
   rpc ListConfig(ListConfigRequest) returns (ListConfigResponse) {}
+  // @group: config
+  rpc CloneConfig(CloneConfigRequest) returns (CloneConfigResponse) {}
 
+  // @group: key_value
+  rpc SaveValue(SaveValueRequest) returns (SaveValueResponse) {}
+  // @group: key_value
+  rpc DeleteValue(DeleteValueRequest) returns (DeleteValueRequest) {}
+  // @group: key_value
+  rpc ListValue(ListValueRequest) returns (ListValueResponse) {}
+  // @group: key_value
+  rpc DisableValue(DisableValueRequest) returns(DisableValueResponse) {}
+  // @group: key_value
+  rpc ListAllValue(ListAllValueRequest) returns (ListAllValueResponse) {}
 }
 
 message HealthRequest {}
@@ -232,11 +244,13 @@ message ModelKeyValue {
   string configValue = 7;
   ValueType valueType = 8;
   // @index
-  string configId = 9;
+  dt.ID configId = 9;
   // @index
   dt.ID creatorId = 10;
   // @index
   bool isHot = 11;
+  // @index
+  uint64 seqNo = 12;
 }
 
 // @ref: ModelKeyValue
@@ -249,7 +263,7 @@ message KeyValueResp {
   string configKey = 6;
   string configValue = 7;
   ValueType valueType = 8;
-  string configId = 9;
+  dt.ID configId = 9;
   dt.ID creatorId = 10;
   bool isHot = 11;
 }
@@ -337,4 +351,57 @@ message ListConfigItem {
 message ListConfigResponse {
   dt.PaginationResp pagination = 1;
   repeated ListConfigItem list = 2;
+}
+
+message CloneConfigRequest {
+  dt.ID id = 1;
+}
+
+message CloneConfigResponse {}
+
+message SaveValueRequest {
+  dt.ID configId = 1;
+  string key = 2;
+  string value = 3;
+  bool isHot = 4;
+  ValueType valueType = 5;
+}
+
+message SaveValueResponse {}
+
+message ListValueRequest {
+  dt.Pagination pagination = 1;
+  dt.ID configId = 2;
+  string searchKey = 3;
+  dt.NullBool isDisabled = 4;
+}
+
+message ListValueResponse {
+  dt.PaginationResp pagination = 1;
+  repeated KeyValueResp list = 2;
+}
+
+message DeleteValueRequest {
+  dt.ID id = 1;
+  // @v: length.min=1
+  // @msg: missing config key name
+  string key = 2;
+}
+
+message DeleteValueResponse {}
+
+message DisableValueRequest {
+  dt.ID id = 1;
+  bool isDisabled = 2;
+}
+
+message DisableValueResponse {}
+
+message ListAllValueRequest {
+  dt.ID configId = 1;
+  dt.NullBool isDisabled = 2;
+}
+
+message ListAllValueResponse {
+  repeated KeyValueResp list = 1;
 }

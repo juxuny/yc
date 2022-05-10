@@ -142,3 +142,6 @@ func (t *handler) ListConfig(ctx context.Context, req *cos.ListConfigRequest) (r
 		List:       list.MapToListConfigItemList(),
 	}, nil
 }
+func (t *handler) CloneConfig(ctx context.Context, req *cos.CloneConfigRequest) (resp *cos.CloneConfigResponse, err error) {
+	return &cos.CloneConfigResponse{}, nil
+}

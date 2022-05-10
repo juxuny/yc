@@ -271,7 +271,7 @@ func (tableNamespace) SoftDelete(ctx context.Context, where orm.WhereWrapper) (r
 	return result.RowsAffected()
 }
 
-func (tableNamespace) Find(ctx context.Context, where orm.WhereWrapper, orderBy ...orm.Order) (list []ModelNamespace, err error) {
+func (tableNamespace) Find(ctx context.Context, where orm.WhereWrapper, orderBy ...orm.Order) (list ModelNamespaceList, err error) {
 	w := orm.NewQueryWrapper(ModelNamespace{})
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableNamespace.DeletedAt, 0).IsNull(TableNamespace.DeletedAt))
 	w.SetWhere(where).Order(orderBy...)
@@ -298,7 +298,7 @@ func (tableNamespace) FindOne(ctx context.Context, where orm.WhereWrapper, order
 	return ret, true, nil
 }
 
-func (tableNamespace) FindById(ctx context.Context, id dt.ID, orderBy ...orm.Order) (list []ModelNamespace, err error) {
+func (tableNamespace) FindById(ctx context.Context, id dt.ID, orderBy ...orm.Order) (list ModelNamespaceList, err error) {
 	w := orm.NewQueryWrapper(ModelNamespace{})
 	w.Eq(TableNamespace.Id, id)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableNamespace.DeletedAt, 0).IsNull(TableNamespace.DeletedAt))
@@ -311,7 +311,7 @@ func (tableNamespace) FindById(ctx context.Context, id dt.ID, orderBy ...orm.Ord
 	return
 }
 
-func (tableNamespace) FindByNamespace(ctx context.Context, namespace string, orderBy ...orm.Order) (list []ModelNamespace, err error) {
+func (tableNamespace) FindByNamespace(ctx context.Context, namespace string, orderBy ...orm.Order) (list ModelNamespaceList, err error) {
 	w := orm.NewQueryWrapper(ModelNamespace{})
 	w.Eq(TableNamespace.Namespace, namespace)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableNamespace.DeletedAt, 0).IsNull(TableNamespace.DeletedAt))
@@ -324,7 +324,7 @@ func (tableNamespace) FindByNamespace(ctx context.Context, namespace string, ord
 	return
 }
 
-func (tableNamespace) FindByCreatorId(ctx context.Context, creatorId dt.ID, orderBy ...orm.Order) (list []ModelNamespace, err error) {
+func (tableNamespace) FindByCreatorId(ctx context.Context, creatorId dt.ID, orderBy ...orm.Order) (list ModelNamespaceList, err error) {
 	w := orm.NewQueryWrapper(ModelNamespace{})
 	w.Eq(TableNamespace.CreatorId, creatorId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableNamespace.DeletedAt, 0).IsNull(TableNamespace.DeletedAt))

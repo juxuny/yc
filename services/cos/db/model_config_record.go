@@ -169,7 +169,7 @@ func (tableConfigRecord) DeleteByRecordType(ctx context.Context, recordType cos.
 	return result.RowsAffected()
 }
 
-func (tableConfigRecord) Find(ctx context.Context, where orm.WhereWrapper, orderBy ...orm.Order) (list []ModelConfigRecord, err error) {
+func (tableConfigRecord) Find(ctx context.Context, where orm.WhereWrapper, orderBy ...orm.Order) (list ModelConfigRecordList, err error) {
 	w := orm.NewQueryWrapper(ModelConfigRecord{})
 	w.SetWhere(where).Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &list)
@@ -194,7 +194,7 @@ func (tableConfigRecord) FindOne(ctx context.Context, where orm.WhereWrapper, or
 	return ret, true, nil
 }
 
-func (tableConfigRecord) FindById(ctx context.Context, id dt.ID, orderBy ...orm.Order) (list []ModelConfigRecord, err error) {
+func (tableConfigRecord) FindById(ctx context.Context, id dt.ID, orderBy ...orm.Order) (list ModelConfigRecordList, err error) {
 	w := orm.NewQueryWrapper(ModelConfigRecord{})
 	w.Eq(TableConfigRecord.Id, id)
 	w.Order(orderBy...)
@@ -206,7 +206,7 @@ func (tableConfigRecord) FindById(ctx context.Context, id dt.ID, orderBy ...orm.
 	return
 }
 
-func (tableConfigRecord) FindByConfigId(ctx context.Context, configId dt.ID, orderBy ...orm.Order) (list []ModelConfigRecord, err error) {
+func (tableConfigRecord) FindByConfigId(ctx context.Context, configId dt.ID, orderBy ...orm.Order) (list ModelConfigRecordList, err error) {
 	w := orm.NewQueryWrapper(ModelConfigRecord{})
 	w.Eq(TableConfigRecord.ConfigId, configId)
 	w.Order(orderBy...)
@@ -218,7 +218,7 @@ func (tableConfigRecord) FindByConfigId(ctx context.Context, configId dt.ID, ord
 	return
 }
 
-func (tableConfigRecord) FindByRecordType(ctx context.Context, recordType cos.ConfigRecordType, orderBy ...orm.Order) (list []ModelConfigRecord, err error) {
+func (tableConfigRecord) FindByRecordType(ctx context.Context, recordType cos.ConfigRecordType, orderBy ...orm.Order) (list ModelConfigRecordList, err error) {
 	w := orm.NewQueryWrapper(ModelConfigRecord{})
 	w.Eq(TableConfigRecord.RecordType, recordType)
 	w.Order(orderBy...)
