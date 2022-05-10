@@ -449,6 +449,21 @@ func (tableNamespace) Create(ctx context.Context, data ...ModelNamespace) (rowsA
 	return result.RowsAffected()
 }
 
+func (tableNamespace) CreateWithLastId(ctx context.Context, data ModelNamespace) (lastInsertId dt.ID, err error) {
+	w := orm.NewInsertWrapper(ModelNamespace{})
+	w.Add(data)
+	result, err := orm.Insert(ctx, cos.Name, w)
+	if err != nil {
+		log.Error(err)
+		return dt.InvalidID(), err
+	}
+	if id, err := result.LastInsertId(); err != nil {
+		return dt.InvalidID(), err
+	} else {
+		return dt.NewID(uint64(id)), nil
+	}
+}
+
 func (tableNamespace) ResetDeletedAt(ctx context.Context, where orm.WhereWrapper) (rowsAffected int64, err error) {
 	w := orm.NewUpdateWrapper(ModelNamespace{})
 	w.SetWhere(where)
@@ -459,4 +474,41 @@ func (tableNamespace) ResetDeletedAt(ctx context.Context, where orm.WhereWrapper
 		return 0, err
 	}
 	return result.RowsAffected()
+}
+
+func (tableNamespace) UpdateAdvance(ctx context.Context, update orm.UpdateWrapper) (rowsAffected int64, err error) {
+	w := update
+	w.Nested(orm.NewOrWhereWrapper().Eq(TableNamespace.DeletedAt, 0).IsNull(TableNamespace.DeletedAt))
+	result, err := orm.Update(ctx, cos.Name, w)
+	if err != nil {
+		log.Error(err)
+		return 0, err
+	}
+	return result.RowsAffected()
+}
+
+func (tableNamespace) SumInt64(ctx context.Context, field orm.FieldName, where orm.WhereWrapper) (sum int64, err error) {
+	w := orm.NewQueryWrapper(ModelNamespace{})
+	w.Select("SUM(" + field.Wrap() + ")")
+	w.SetWhere(where)
+	w.Nested(orm.NewOrWhereWrapper().Eq(TableNamespace.DeletedAt, 0).IsNull(TableNamespace.DeletedAt))
+	err = orm.Select(ctx, cos.Name, w, &sum)
+	if err != nil {
+		log.Error(err)
+		return 0, err
+	}
+	return sum, err
+}
+
+func (tableNamespace) SumFloat64(ctx context.Context, field orm.FieldName, where orm.WhereWrapper) (sum float64, err error) {
+	w := orm.NewQueryWrapper(ModelNamespace{})
+	w.Select("SUM(" + field.Wrap() + ")")
+	w.SetWhere(where)
+	w.Nested(orm.NewOrWhereWrapper().Eq(TableNamespace.DeletedAt, 0).IsNull(TableNamespace.DeletedAt))
+	err = orm.Select(ctx, cos.Name, w, &sum)
+	if err != nil {
+		log.Error(err)
+		return 0, err
+	}
+	return sum, err
 }

@@ -168,17 +168,30 @@ func printSqlStatement(statement string, values ...interface{}) {
 			l[i] = "NULL"
 			continue
 		}
-		tn := vv.Type().String()
-		if item == nil {
-			l[i] = "NULL"
-		} else if tn == "time.Time" {
-			t := item.(time.Time)
-			l[i] = wrap(t.Format("2006-01-02 15:04:05.000"), "'")
-		} else if tn == "*time.Time" {
-			t := item.(*time.Time)
-			l[i] = wrap(t.Format("2006-01-02 15:04:05.000"), "'")
-		} else {
-			l[i] = fmt.Sprintf("'%v'", item)
+		switch vv.Kind() {
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+			l[i] = fmt.Sprintf("%v", vv.Int())
+		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+			l[i] = fmt.Sprintf("%v", vv.Uint())
+		case reflect.Float64, reflect.Float32:
+			l[i] = fmt.Sprintf("%v", vv.Float())
+		case reflect.String:
+			l[i] = fmt.Sprintf("%s", vv.String())
+		case reflect.Bool:
+			l[i] = fmt.Sprintf("%v", vv.Bool())
+		default:
+			tn := vv.Type().String()
+			if item == nil {
+				l[i] = "NULL"
+			} else if tn == "time.Time" {
+				t := item.(time.Time)
+				l[i] = wrap(t.Format("2006-01-02 15:04:05.000"), "'")
+			} else if tn == "*time.Time" {
+				t := item.(*time.Time)
+				l[i] = wrap(t.Format("2006-01-02 15:04:05.000"), "'")
+			} else {
+				l[i] = fmt.Sprintf("'%v'", item)
+			}
 		}
 	}
 	s = fmt.Sprintf(s, l...)

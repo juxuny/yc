@@ -8,6 +8,7 @@ import (
 	"github.com/juxuny/yc/orm"
 	cos "github.com/juxuny/yc/services/cos"
 	"github.com/juxuny/yc/services/cos/db"
+	"github.com/juxuny/yc/services/cos/impl"
 )
 
 func (t *handler) SaveConfig(ctx context.Context, req *cos.SaveConfigRequest) (resp *cos.SaveConfigResponse, err error) {
@@ -68,7 +69,7 @@ func (t *handler) SaveConfig(ctx context.Context, req *cos.SaveConfigRequest) (r
 		if count > 0 {
 			return nil, cos.Error.ConfigIdDuplicated.WithField(db.TableConfig.ConfigId.LowerFirstHump(), req.ConfigId)
 		}
-		_, err = db.TableConfig.Create(ctx, db.ModelConfig{
+		modelConfig := db.ModelConfig{
 			CreateTime:  orm.Now(),
 			UpdateTime:  orm.Now(),
 			ConfigId:    req.ConfigId,
@@ -76,7 +77,8 @@ func (t *handler) SaveConfig(ctx context.Context, req *cos.SaveConfigRequest) (r
 			CreatorId:   &currentId,
 			BaseId:      req.BaseId,
 			NamespaceId: req.NamespaceId,
-		})
+		}
+		_, err = impl.CreateConfig(ctx, modelConfig)
 		if err != nil {
 			return nil, err
 		}
@@ -85,6 +87,9 @@ func (t *handler) SaveConfig(ctx context.Context, req *cos.SaveConfigRequest) (r
 }
 
 func (t *handler) DeleteConfig(ctx context.Context, req *cos.DeleteConfigRequest) (resp *cos.DeleteConfigResponse, err error) {
+	if req.Id == nil || !req.Id.Valid {
+		return nil, cos.Error.MissingArguments.Wrap(fmt.Errorf("missing: id"))
+	}
 	currentId, err := yc.GetUserId(ctx)
 	if err != nil {
 		log.Error(err)
@@ -99,7 +104,7 @@ func (t *handler) DeleteConfig(ctx context.Context, req *cos.DeleteConfigRequest
 		log.Error("not found config:", req.Id)
 		return nil, cos.Error.ConfigNotFound
 	}
-	_, err = db.TableConfig.SoftDelete(ctx, orm.NewAndWhereWrapper().Eq(db.TableConfig.DeletedAt, modelConfig.DeletedAt).Eq(db.TableConfig.Id, req.Id))
+	err = impl.DeleteConfig(ctx, *modelConfig.Id)
 	return nil, err
 }
 

@@ -70,6 +70,7 @@ func (t *insertWrapper) Build() (statement string, values []interface{}, next bo
 		fieldStatement += f.Wrap().String()
 	}
 	statement += " (" + fieldStatement + ") VALUES "
+	startedValues := false
 	for i := 0; t.iterator+i < len(t.data) && i < t.batchSize; i++ {
 		valueMap := make(map[string]interface{})
 		item := t.data[t.iterator+i]
@@ -106,6 +107,10 @@ func (t *insertWrapper) Build() (statement string, values []interface{}, next bo
 				holderStatement += "NULL"
 			}
 		}
+		if startedValues {
+			statement += ", "
+		}
+		startedValues = true
 		statement += "(" + holderStatement + ")"
 		values = append(values, rowValues...)
 	}

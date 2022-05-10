@@ -47,42 +47,55 @@ func (t *dataTypeConverter) convertStruct(in reflect.Value, dstType reflect.Type
 	holderTypeName := holder.Type().String()
 	if inTypeName == "sql.NullInt64" {
 		value := in.Interface().(sql.NullInt64)
-		if holderTypeName == "sql.NullInt64" {
-			holder.Set(in)
-		} else if holderTypeName == "dt.NullInt64" {
-			holder.Set(reflect.ValueOf(dt.NullInt64{
-				Valid: value.Valid,
-				Int64: value.Int64,
-			}))
-		} else if strings.Contains(holderTypeName, "dt.ID") {
-			holder.Set(reflect.ValueOf(dt.ID{
-				Valid:  value.Valid,
-				Uint64: uint64(value.Int64),
-			}))
-		} else if strings.Contains(holderTypeName, "int") {
-			if strings.Contains(holderTypeName, "*") {
-				if !value.Valid {
-					holder.Set(reflect.Zero(holder.Type()))
+		switch holder.Kind() {
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+			holder.SetInt(value.Int64)
+		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+			holder.SetUint(uint64(value.Int64))
+		case reflect.Float64, reflect.Float32:
+			holder.SetFloat(float64(value.Int64))
+		case reflect.String:
+			holder.SetString(fmt.Sprintf("%v", value.Int64))
+		case reflect.Bool:
+			holder.SetBool(value.Int64 > 0)
+		default:
+			if holderTypeName == "sql.NullInt64" {
+				holder.Set(in)
+			} else if holderTypeName == "dt.NullInt64" {
+				holder.Set(reflect.ValueOf(dt.NullInt64{
+					Valid: value.Valid,
+					Int64: value.Int64,
+				}))
+			} else if strings.Contains(holderTypeName, "dt.ID") {
+				holder.Set(reflect.ValueOf(dt.ID{
+					Valid:  value.Valid,
+					Uint64: uint64(value.Int64),
+				}))
+			} else if strings.Contains(holderTypeName, "int") {
+				if strings.Contains(holderTypeName, "*") {
+					if !value.Valid {
+						holder.Set(reflect.Zero(holder.Type()))
+					} else {
+						if !strings.Contains(holderTypeName, "uint") {
+							v := reflect.New(holder.Type().Elem())
+							v.Elem().SetInt(value.Int64)
+							holder.Set(v)
+						} else {
+							v := reflect.New(holder.Type())
+							v.Elem().SetUint(uint64(value.Int64))
+							holder.Set(v.Elem())
+						}
+					}
 				} else {
 					if !strings.Contains(holderTypeName, "uint") {
-						v := reflect.New(holder.Type().Elem())
-						v.Elem().SetInt(value.Int64)
-						holder.Set(v)
+						holder.SetInt(value.Int64)
 					} else {
-						v := reflect.New(holder.Type())
-						v.Elem().SetUint(uint64(value.Int64))
-						holder.Set(v.Elem())
+						holder.SetUint(uint64(value.Int64))
 					}
 				}
 			} else {
-				if !strings.Contains(holderTypeName, "uint") {
-					holder.SetInt(value.Int64)
-				} else {
-					holder.SetUint(uint64(value.Int64))
-				}
+				panic("unknown dest type: " + holderTypeName + " in type:" + inTypeName)
 			}
-		} else {
-			panic("unknown dest type: " + holderTypeName)
 		}
 	} else if inTypeName == "sql.NullTime" {
 		nullTime := in.Interface().(sql.NullTime)

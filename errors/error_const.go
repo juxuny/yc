@@ -40,6 +40,7 @@ var SystemError = struct {
 	NotFoundRpcCallerLevel        Error `code:"-10036" msg:"not found rpc caller level"`
 	NotFoundRpcToken              Error `code:"-10037" msg:"no token"`
 	InvalidToken                  Error `code:"-10038" msg:"invalid token"`
+	NoFields                      Error `code:"-10039" msg:"no fields"`
 }{}
 
 func init() {

@@ -528,6 +528,21 @@ func (tableAccount) Create(ctx context.Context, data ...ModelAccount) (rowsAffec
 	return result.RowsAffected()
 }
 
+func (tableAccount) CreateWithLastId(ctx context.Context, data ModelAccount) (lastInsertId dt.ID, err error) {
+	w := orm.NewInsertWrapper(ModelAccount{})
+	w.Add(data)
+	result, err := orm.Insert(ctx, cos.Name, w)
+	if err != nil {
+		log.Error(err)
+		return dt.InvalidID(), err
+	}
+	if id, err := result.LastInsertId(); err != nil {
+		return dt.InvalidID(), err
+	} else {
+		return dt.NewID(uint64(id)), nil
+	}
+}
+
 func (tableAccount) ResetDeletedAt(ctx context.Context, where orm.WhereWrapper) (rowsAffected int64, err error) {
 	w := orm.NewUpdateWrapper(ModelAccount{})
 	w.SetWhere(where)
@@ -538,4 +553,41 @@ func (tableAccount) ResetDeletedAt(ctx context.Context, where orm.WhereWrapper) 
 		return 0, err
 	}
 	return result.RowsAffected()
+}
+
+func (tableAccount) UpdateAdvance(ctx context.Context, update orm.UpdateWrapper) (rowsAffected int64, err error) {
+	w := update
+	w.Nested(orm.NewOrWhereWrapper().Eq(TableAccount.DeletedAt, 0).IsNull(TableAccount.DeletedAt))
+	result, err := orm.Update(ctx, cos.Name, w)
+	if err != nil {
+		log.Error(err)
+		return 0, err
+	}
+	return result.RowsAffected()
+}
+
+func (tableAccount) SumInt64(ctx context.Context, field orm.FieldName, where orm.WhereWrapper) (sum int64, err error) {
+	w := orm.NewQueryWrapper(ModelAccount{})
+	w.Select("SUM(" + field.Wrap() + ")")
+	w.SetWhere(where)
+	w.Nested(orm.NewOrWhereWrapper().Eq(TableAccount.DeletedAt, 0).IsNull(TableAccount.DeletedAt))
+	err = orm.Select(ctx, cos.Name, w, &sum)
+	if err != nil {
+		log.Error(err)
+		return 0, err
+	}
+	return sum, err
+}
+
+func (tableAccount) SumFloat64(ctx context.Context, field orm.FieldName, where orm.WhereWrapper) (sum float64, err error) {
+	w := orm.NewQueryWrapper(ModelAccount{})
+	w.Select("SUM(" + field.Wrap() + ")")
+	w.SetWhere(where)
+	w.Nested(orm.NewOrWhereWrapper().Eq(TableAccount.DeletedAt, 0).IsNull(TableAccount.DeletedAt))
+	err = orm.Select(ctx, cos.Name, w, &sum)
+	if err != nil {
+		log.Error(err)
+		return 0, err
+	}
+	return sum, err
 }

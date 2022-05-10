@@ -11,27 +11,33 @@ import (
 )
 
 var TableConfig = tableConfig{
-	Id:          orm.FieldName("id"),
-	CreateTime:  orm.FieldName("create_time"),
-	UpdateTime:  orm.FieldName("update_time"),
-	DeletedAt:   orm.FieldName("deleted_at"),
-	ConfigId:    orm.FieldName("config_id"),
-	IsDisabled:  orm.FieldName("is_disabled"),
-	CreatorId:   orm.FieldName("creator_id"),
-	BaseId:      orm.FieldName("base_id"),
-	NamespaceId: orm.FieldName("namespace_id"),
+	Id:             orm.FieldName("id"),
+	CreateTime:     orm.FieldName("create_time"),
+	UpdateTime:     orm.FieldName("update_time"),
+	DeletedAt:      orm.FieldName("deleted_at"),
+	ConfigId:       orm.FieldName("config_id"),
+	IsDisabled:     orm.FieldName("is_disabled"),
+	CreatorId:      orm.FieldName("creator_id"),
+	BaseId:         orm.FieldName("base_id"),
+	NamespaceId:    orm.FieldName("namespace_id"),
+	LastSeqNo:      orm.FieldName("last_seq_no"),
+	LastRecordType: orm.FieldName("last_record_type"),
+	LinkCount:      orm.FieldName("link_count"),
 }
 
 type ModelConfig struct {
-	Id          *dt.ID `json:"id" orm:"id"`
-	CreateTime  int64  `json:"createTime" orm:"create_time"`
-	UpdateTime  int64  `json:"updateTime" orm:"update_time"`
-	DeletedAt   int64  `json:"deletedAt" orm:"deleted_at"`
-	ConfigId    string `json:"configId" orm:"config_id"`
-	IsDisabled  bool   `json:"isDisabled" orm:"is_disabled"`
-	CreatorId   *dt.ID `json:"creatorId" orm:"creator_id"`
-	BaseId      *dt.ID `json:"baseId" orm:"base_id"`
-	NamespaceId *dt.ID `json:"namespaceId" orm:"namespace_id"`
+	Id             *dt.ID               `json:"id" orm:"id"`
+	CreateTime     int64                `json:"createTime" orm:"create_time"`
+	UpdateTime     int64                `json:"updateTime" orm:"update_time"`
+	DeletedAt      int64                `json:"deletedAt" orm:"deleted_at"`
+	ConfigId       string               `json:"configId" orm:"config_id"`
+	IsDisabled     bool                 `json:"isDisabled" orm:"is_disabled"`
+	CreatorId      *dt.ID               `json:"creatorId" orm:"creator_id"`
+	BaseId         *dt.ID               `json:"baseId" orm:"base_id"`
+	NamespaceId    *dt.ID               `json:"namespaceId" orm:"namespace_id"`
+	LastSeqNo      uint64               `json:"lastSeqNo" orm:"last_seq_no"`
+	LastRecordType cos.ConfigRecordType `json:"lastRecordType" orm:"last_record_type"`
+	LinkCount      uint64               `json:"linkCount" orm:"link_count"`
 }
 
 func (ModelConfig) TableName() string {
@@ -46,6 +52,7 @@ func (t ModelConfig) ToListConfigItem() cos.ListConfigItem {
 		BaseId:      t.BaseId,
 		NamespaceId: t.NamespaceId,
 		ConfigId:    t.ConfigId,
+		LinkCount:   t.LinkCount,
 	}
 }
 
@@ -65,15 +72,18 @@ func (t ModelConfigList) MapToListConfigItemList() []*cos.ListConfigItem {
 }
 
 type tableConfig struct {
-	Id          orm.FieldName
-	CreateTime  orm.FieldName
-	UpdateTime  orm.FieldName
-	DeletedAt   orm.FieldName
-	ConfigId    orm.FieldName
-	IsDisabled  orm.FieldName
-	CreatorId   orm.FieldName
-	BaseId      orm.FieldName
-	NamespaceId orm.FieldName
+	Id             orm.FieldName
+	CreateTime     orm.FieldName
+	UpdateTime     orm.FieldName
+	DeletedAt      orm.FieldName
+	ConfigId       orm.FieldName
+	IsDisabled     orm.FieldName
+	CreatorId      orm.FieldName
+	BaseId         orm.FieldName
+	NamespaceId    orm.FieldName
+	LastSeqNo      orm.FieldName
+	LastRecordType orm.FieldName
+	LinkCount      orm.FieldName
 }
 
 func (tableConfig) TableName() string {
@@ -618,6 +628,21 @@ func (tableConfig) Create(ctx context.Context, data ...ModelConfig) (rowsAffecte
 	return result.RowsAffected()
 }
 
+func (tableConfig) CreateWithLastId(ctx context.Context, data ModelConfig) (lastInsertId dt.ID, err error) {
+	w := orm.NewInsertWrapper(ModelConfig{})
+	w.Add(data)
+	result, err := orm.Insert(ctx, cos.Name, w)
+	if err != nil {
+		log.Error(err)
+		return dt.InvalidID(), err
+	}
+	if id, err := result.LastInsertId(); err != nil {
+		return dt.InvalidID(), err
+	} else {
+		return dt.NewID(uint64(id)), nil
+	}
+}
+
 func (tableConfig) ResetDeletedAt(ctx context.Context, where orm.WhereWrapper) (rowsAffected int64, err error) {
 	w := orm.NewUpdateWrapper(ModelConfig{})
 	w.SetWhere(where)
@@ -628,4 +653,41 @@ func (tableConfig) ResetDeletedAt(ctx context.Context, where orm.WhereWrapper) (
 		return 0, err
 	}
 	return result.RowsAffected()
+}
+
+func (tableConfig) UpdateAdvance(ctx context.Context, update orm.UpdateWrapper) (rowsAffected int64, err error) {
+	w := update
+	w.Nested(orm.NewOrWhereWrapper().Eq(TableConfig.DeletedAt, 0).IsNull(TableConfig.DeletedAt))
+	result, err := orm.Update(ctx, cos.Name, w)
+	if err != nil {
+		log.Error(err)
+		return 0, err
+	}
+	return result.RowsAffected()
+}
+
+func (tableConfig) SumInt64(ctx context.Context, field orm.FieldName, where orm.WhereWrapper) (sum int64, err error) {
+	w := orm.NewQueryWrapper(ModelConfig{})
+	w.Select("SUM(" + field.Wrap() + ")")
+	w.SetWhere(where)
+	w.Nested(orm.NewOrWhereWrapper().Eq(TableConfig.DeletedAt, 0).IsNull(TableConfig.DeletedAt))
+	err = orm.Select(ctx, cos.Name, w, &sum)
+	if err != nil {
+		log.Error(err)
+		return 0, err
+	}
+	return sum, err
+}
+
+func (tableConfig) SumFloat64(ctx context.Context, field orm.FieldName, where orm.WhereWrapper) (sum float64, err error) {
+	w := orm.NewQueryWrapper(ModelConfig{})
+	w.Select("SUM(" + field.Wrap() + ")")
+	w.SetWhere(where)
+	w.Nested(orm.NewOrWhereWrapper().Eq(TableConfig.DeletedAt, 0).IsNull(TableConfig.DeletedAt))
+	err = orm.Select(ctx, cos.Name, w, &sum)
+	if err != nil {
+		log.Error(err)
+		return 0, err
+	}
+	return sum, err
 }

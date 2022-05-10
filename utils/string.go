@@ -131,3 +131,11 @@ func (stringHelper) LowerFirstHump(in string) string {
 func (stringHelper) UpperFirstHump(in string) string {
 	return ToUpperFirst(ToHump(in))
 }
+
+func (stringHelper) StartWith(s string, sub string) bool {
+	return strings.Index(s, sub) == 0
+}
+
+func (stringHelper) EndWith(s string, sub string) bool {
+	return strings.Index(StringHelper.Reverse(s), StringHelper.Reverse(sub)) == 0
+}

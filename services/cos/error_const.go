@@ -21,6 +21,8 @@ var Error = struct {
 	ConfigIdDuplicated          errors.Error `code:"10011" msg:"configId duplicated"`
 	ConfigNotFound              errors.Error `code:"10012" msg:"config not found"`
 	Unauthorized                errors.Error `code:"10013" msg:"unauthorized"`
+	DeleteNotAllowed            errors.Error `code:"10014" msg:"delete not allowed"`
+	MissingArguments            errors.Error `code:"10015" msg:"missing arguments"`
 }{}
 
 func init() {

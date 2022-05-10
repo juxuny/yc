@@ -113,6 +113,7 @@ func ({{.TableName|lowerFirst}}) DeleteBy{{$field.FieldName|upperFirst}}(ctx con
 }
 {{end}}{{end}}
 
+{{ if .HasDeletedAt}}
 {{range $field := .Fields}}{{if $field.HasIndex}}
 func ({{.TableName|lowerFirst}}) SoftDeleteBy{{$field.FieldName|upperFirst}}(ctx context.Context, {{$field.FieldName|lowerFirst}} {{$field.ModelDataType|trimPointer}}) (rowsAffected int64, err error) {
 	w := orm.NewUpdateWrapper({{.ModelName}}{})
@@ -125,8 +126,9 @@ func ({{.TableName|lowerFirst}}) SoftDeleteBy{{$field.FieldName|upperFirst}}(ctx
 	}
 	return result.RowsAffected()
 }
-{{end}}{{end}}
+{{end}}{{end}}{{end}}
 
+{{ if .HasDeletedAt}}
 func ({{.TableName|lowerFirst}}) SoftDelete(ctx context.Context, where orm.WhereWrapper) (rowsAffected int64, err error) {
 	w := orm.NewUpdateWrapper({{.ModelName}}{})
 	w.SetValue({{.TableName}}.DeletedAt, orm.Now())
@@ -138,6 +140,7 @@ func ({{.TableName|lowerFirst}}) SoftDelete(ctx context.Context, where orm.Where
 	}
 	return result.RowsAffected()
 }
+{{end}}
 
 func ({{.TableName|lowerFirst}}) Find(ctx context.Context, where orm.WhereWrapper, orderBy ...orm.Order) (list []{{.ModelName}}, err error) {
 	w := orm.NewQueryWrapper({{.ModelName}}{}){{if .HasDeletedAt}}
@@ -247,6 +250,22 @@ func ({{.TableName|lowerFirst}}) Create(ctx context.Context, data ...{{.ModelNam
 	return result.RowsAffected()
 }
 
+func ({{.TableName|lowerFirst}}) CreateWithLastId(ctx context.Context, data {{.ModelName}}) (lastInsertId dt.ID, err error) {
+	w := orm.NewInsertWrapper({{.ModelName}}{})
+	w.Add(data)
+	result, err := orm.Insert(ctx, cos.Name, w)
+	if err != nil {
+		log.Error(err)
+		return dt.InvalidID(), err
+	}
+	if id, err := result.LastInsertId(); err != nil {
+		return dt.InvalidID(), err
+	} else {
+		return dt.NewID(uint64(id)), nil
+	}
+}
+
+{{if .HasDeletedAt}}
 func ({{.TableName|lowerFirst}})  ResetDeletedAt(ctx context.Context, where orm.WhereWrapper) (rowsAffected int64, err error) {
 	w := orm.NewUpdateWrapper({{.ModelName}}{})
 	w.SetWhere(where)
@@ -257,4 +276,42 @@ func ({{.TableName|lowerFirst}})  ResetDeletedAt(ctx context.Context, where orm.
 		return 0, err
 	}
 	return result.RowsAffected()
+}
+{{end}}
+
+func ({{.TableName|lowerFirst}}) UpdateAdvance(ctx context.Context, update orm.UpdateWrapper) (rowsAffected int64, err error) {
+	w := update{{if .HasDeletedAt}}
+	w.Nested(orm.NewOrWhereWrapper().Eq({{.TableName}}.DeletedAt, 0).IsNull({{.TableName}}.DeletedAt)){{end}}
+	result, err := orm.Update(ctx, cos.Name, w)
+	if err != nil {
+		log.Error(err)
+		return 0, err
+	}
+	return result.RowsAffected()
+}
+
+func ({{.TableName|lowerFirst}}) SumInt64(ctx context.Context, field orm.FieldName, where orm.WhereWrapper) (sum int64, err error) {
+	w := orm.NewQueryWrapper({{.ModelName}}{})
+	w.Select("SUM(" + field.Wrap() + ")")
+	w.SetWhere(where){{if .HasDeletedAt}}
+	w.Nested(orm.NewOrWhereWrapper().Eq({{.TableName}}.DeletedAt, 0).IsNull({{.TableName}}.DeletedAt)){{end}}
+	err = orm.Select(ctx, cos.Name, w, &sum)
+	if err != nil {
+		log.Error(err)
+		return 0, err
+	}
+	return sum, err
+}
+
+func ({{.TableName|lowerFirst}}) SumFloat64(ctx context.Context, field orm.FieldName, where orm.WhereWrapper) (sum float64, err error) {
+	w := orm.NewQueryWrapper({{.ModelName}}{})
+	w.Select("SUM(" + field.Wrap() + ")")
+	w.SetWhere(where){{if .HasDeletedAt}}
+	w.Nested(orm.NewOrWhereWrapper().Eq({{.TableName}}.DeletedAt, 0).IsNull({{.TableName}}.DeletedAt)){{end}}
+	err = orm.Select(ctx, cos.Name, w, &sum)
+	if err != nil {
+		log.Error(err)
+		return 0, err
+	}
+	return sum, err
 }

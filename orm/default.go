@@ -95,7 +95,11 @@ func Update(ctx context.Context, configName string, w UpdateWrapper) (result sql
 	if err != nil {
 		return result, err
 	}
-	return connectManagerInstance.Exec(ctx, configName, statement, values...)
+	result, err = connectManagerInstance.Exec(ctx, configName, statement, values...)
+	if err != nil {
+		return result, errors.SystemError.DatabaseExecError.Wrap(err)
+	}
+	return
 }
 
 func Delete(ctx context.Context, configName string, w DeleteWrapper) (result sql.Result, err error) {
@@ -103,5 +107,9 @@ func Delete(ctx context.Context, configName string, w DeleteWrapper) (result sql
 	if err != nil {
 		return result, err
 	}
-	return connectManagerInstance.Exec(ctx, configName, statement, values...)
+	result, err = connectManagerInstance.Exec(ctx, configName, statement, values...)
+	if err != nil {
+		return result, errors.SystemError.DatabaseExecError.Wrap(err)
+	}
+	return
 }
