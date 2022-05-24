@@ -6,6 +6,7 @@ import (
 	"github.com/juxuny/yc/errors"
 	"github.com/juxuny/yc/log"
 	"github.com/juxuny/yc/middle"
+	"github.com/juxuny/yc/services/cos/config"
 	"github.com/juxuny/yc/services/cos/db"
 
 	cos "github.com/juxuny/yc/services/cos"
@@ -31,6 +32,9 @@ func NewWrapper() *wrapper {
 type levelValidator struct{}
 
 func (t *levelValidator) Run(ctx context.Context) (isEnd bool, err error) {
+	if config.Env.IgnoreCallLevel {
+		return false, nil
+	}
 	callerLevel, err := yc.GetCallerLevelFromContext(ctx)
 	if err != nil {
 		return true, err

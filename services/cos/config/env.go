@@ -13,12 +13,13 @@ var Env = struct {
 	RpcPort  int `env:"20443"`
 	HttpPort int `env:"20080"`
 
-	DbUser    string
-	DbPass    string
-	DbHost    string
-	DbPort    int
-	DbName    string
-	JwtSecret string
+	DbUser          string
+	DbPass          string
+	DbHost          string
+	DbPort          int
+	DbName          string
+	JwtSecret       string
+	IgnoreCallLevel bool `env:"true"`
 }{}
 
 func init() {
