@@ -5,7 +5,7 @@ import { history, Link } from 'umi';
 import RightContent from '@/components/RightContent';
 import Footer from '@/components/Footer';
 import { BookOutlined, LinkOutlined } from '@ant-design/icons';
-import {User} from "@/services/shop/user";
+import {User} from "@/services/cos/user";
 
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
@@ -20,13 +20,13 @@ export const initialStateConfig = {
  * */
 export async function getInitialState(): Promise<{
   settings?: Partial<LayoutSettings>;
-  currentUser?: API.UserGetInfoResp;
-  fetchUserInfo?: () => Promise<API.UserGetInfoResp | undefined>;
+  currentUser?: API.UserInfoResp;
+  fetchUserInfo?: () => Promise<API.UserInfoResp | undefined>;
 }> {
   const fetchUserInfo = async () => {
     try {
-      const data = await User.getInfo();
-      return data.result;
+      const userInfoResp = await User.userInfo();
+      return userInfoResp.data;
     } catch (error) {
       history.push(loginPath);
     }
@@ -53,7 +53,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
     rightContentRender: () => <RightContent />,
     disableContentMargin: false,
     waterMarkProps: {
-      content: initialState?.currentUser?.name,
+      content: initialState?.currentUser?.nick,
     },
     footerRender: () => <Footer />,
     onPageChange: () => {

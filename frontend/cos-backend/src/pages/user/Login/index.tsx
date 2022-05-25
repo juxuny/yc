@@ -12,10 +12,12 @@ import { Auth } from '@/services/cos/auth';
 
 import styles from './index.less';
 import {LocalStorage, StorageKey} from '@/storage';
+import {useModel} from "@@/plugin-model/useModel";
 
 const Login: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const [type, setType] = useState<string>('account');
+  const { setInitialState } = useModel('@@initialState');
 
   const intl = useIntl();
 
@@ -32,7 +34,12 @@ const Login: React.FC = () => {
         });
         message.success(defaultLoginSuccessMessage);
         LocalStorage.setItem(StorageKey.TOKEN, resp.data?.token || '');
-        await User.userInfo();
+        const userInfoResp = await User.userInfo();
+        if (userInfoResp.code !== 0) {
+          message.error(userInfoResp.msg);
+          return
+        }
+        await setInitialState((s) => ({ ...s, currentUser: userInfoResp.data }));
         /** 此方法会跳转到 redirect 参数所在的位置 */
         if (!history) return;
         const { query } = history.location;
