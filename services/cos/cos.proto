@@ -22,6 +22,8 @@ service Cos {
   rpc ModifyPassword(ModifyPasswordRequest) returns (ModifyPasswordResponse) {}
   // @group: user
   rpc SaveOrCreateUser(SaveOrCreateUserRequest) returns (SaveOrCreateUserResponse) {}
+  // @group: user
+  rpc UserList(UserListRequest) returns (UserListResponse) {}
 
   // @group: namespace
   rpc SaveNamespace(SaveNamespaceRequest) returns (SaveNamespaceResponse) {}
@@ -273,7 +275,7 @@ message SaveOrCreateUserRequest {
   string credential = 2;
   // @v: in=1
   // @msg: invalid accountType: {{.AccountType|num}}
-  AccountType AccountType = 3;
+  AccountType accountType = 3;
   dt.ID userId = 4;
   string nick = 5;
 }
@@ -281,6 +283,26 @@ message SaveOrCreateUserRequest {
 message SaveOrCreateUserResponse {
   dt.ID userId = 1;
   bool isNew = 2;
+}
+
+// @ref: ModelAccount
+message UserListItem {
+  dt.ID userId = 1;
+  string identifier = 2;
+  AccountType accountType = 3;
+  string nick = 4;
+}
+
+message UserListRequest {
+  // @v: required
+  dt.Pagination pagination = 1;
+  string searchKey = 2;
+  dt.NullBool isDisabled = 3;
+}
+
+message UserListResponse {
+  dt.PaginationResp pagination = 1;
+  repeated UserListItem list = 2;
 }
 
 message SaveNamespaceRequest {

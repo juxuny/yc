@@ -27,6 +27,9 @@ var Error = struct {
 	MissingConfigId             errors.Error `code:"10037" msg:"missing configId"`
 	KeyDuplicated               errors.Error `code:"10038" msg:"key duplicated"`
 	KeyNotFound                 errors.Error `code:"10039" msg:"key not found"`
+	NoPermissionUpdateUserInfo  errors.Error `code:"10040" msg:"not permission to update user info"`
+	IllegalUserData             errors.Error `code:"10041" msg:"illegal user data"`
+	NotAllowedCreateAccount     errors.Error `code:"10042" msg:"not allowed create account"`
 }{}
 
 func init() {

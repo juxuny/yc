@@ -364,7 +364,7 @@ func (t *UpdateCommand) genValidator(service services.ServiceEntity, msgs []*par
 					}
 				}
 			}
-			if len(formulas) > 0 && errorMessageTemplate != "" {
+			if len(formulas) > 0 {
 				fields = append(fields, services.MessageField{
 					Name:      utils.ToUpperFirst(utils.ToHump(f.FieldName)),
 					Formulas:  formulas,

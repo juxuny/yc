@@ -32,6 +32,8 @@ type CosClient interface {
 	ModifyPassword(ctx context.Context, in *ModifyPasswordRequest, opts ...grpc.CallOption) (*ModifyPasswordResponse, error)
 	// @group: user
 	SaveOrCreateUser(ctx context.Context, in *SaveOrCreateUserRequest, opts ...grpc.CallOption) (*SaveOrCreateUserResponse, error)
+	// @group: user
+	UserList(ctx context.Context, in *UserListRequest, opts ...grpc.CallOption) (*UserListResponse, error)
 	// @group: namespace
 	SaveNamespace(ctx context.Context, in *SaveNamespaceRequest, opts ...grpc.CallOption) (*SaveNamespaceResponse, error)
 	// @group: namespace
@@ -114,6 +116,15 @@ func (c *cosClient) ModifyPassword(ctx context.Context, in *ModifyPasswordReques
 func (c *cosClient) SaveOrCreateUser(ctx context.Context, in *SaveOrCreateUserRequest, opts ...grpc.CallOption) (*SaveOrCreateUserResponse, error) {
 	out := new(SaveOrCreateUserResponse)
 	err := c.cc.Invoke(ctx, "/cos.Cos/SaveOrCreateUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *cosClient) UserList(ctx context.Context, in *UserListRequest, opts ...grpc.CallOption) (*UserListResponse, error) {
+	out := new(UserListResponse)
+	err := c.cc.Invoke(ctx, "/cos.Cos/UserList", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -246,6 +257,8 @@ type CosServer interface {
 	ModifyPassword(context.Context, *ModifyPasswordRequest) (*ModifyPasswordResponse, error)
 	// @group: user
 	SaveOrCreateUser(context.Context, *SaveOrCreateUserRequest) (*SaveOrCreateUserResponse, error)
+	// @group: user
+	UserList(context.Context, *UserListRequest) (*UserListResponse, error)
 	// @group: namespace
 	SaveNamespace(context.Context, *SaveNamespaceRequest) (*SaveNamespaceResponse, error)
 	// @group: namespace
@@ -294,6 +307,9 @@ func (UnimplementedCosServer) ModifyPassword(context.Context, *ModifyPasswordReq
 }
 func (UnimplementedCosServer) SaveOrCreateUser(context.Context, *SaveOrCreateUserRequest) (*SaveOrCreateUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SaveOrCreateUser not implemented")
+}
+func (UnimplementedCosServer) UserList(context.Context, *UserListRequest) (*UserListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UserList not implemented")
 }
 func (UnimplementedCosServer) SaveNamespace(context.Context, *SaveNamespaceRequest) (*SaveNamespaceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SaveNamespace not implemented")
@@ -448,6 +464,24 @@ func _Cos_SaveOrCreateUser_Handler(srv interface{}, ctx context.Context, dec fun
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(CosServer).SaveOrCreateUser(ctx, req.(*SaveOrCreateUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Cos_UserList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CosServer).UserList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/cos.Cos/UserList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CosServer).UserList(ctx, req.(*UserListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -698,6 +732,10 @@ var Cos_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SaveOrCreateUser",
 			Handler:    _Cos_SaveOrCreateUser_Handler,
+		},
+		{
+			MethodName: "UserList",
+			Handler:    _Cos_UserList_Handler,
 		},
 		{
 			MethodName: "SaveNamespace",

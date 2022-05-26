@@ -47,9 +47,20 @@ func (t ModelAccount) ToUserInfoResponse() cos.UserInfoResponse {
 		AccountType: t.AccountType,
 	}
 }
+func (t ModelAccount) ToUserListItem() cos.UserListItem {
+	return cos.UserListItem{
+		Identifier:  t.Identifier,
+		AccountType: t.AccountType,
+		Nick:        t.Nick,
+	}
+}
 
 func (t ModelAccount) ToUserInfoResponseAsPointer() *cos.UserInfoResponse {
 	ret := t.ToUserInfoResponse()
+	return &ret
+}
+func (t ModelAccount) ToUserListItemAsPointer() *cos.UserListItem {
+	ret := t.ToUserListItem()
 	return &ret
 }
 
@@ -59,6 +70,13 @@ func (t ModelAccountList) MapToUserInfoResponseList() []*cos.UserInfoResponse {
 	ret := make([]*cos.UserInfoResponse, 0)
 	for _, item := range t {
 		ret = append(ret, item.ToUserInfoResponseAsPointer())
+	}
+	return ret
+}
+func (t ModelAccountList) MapToUserListItemList() []*cos.UserListItem {
+	ret := make([]*cos.UserListItem, 0)
+	for _, item := range t {
+		ret = append(ret, item.ToUserListItemAsPointer())
 	}
 	return ret
 }

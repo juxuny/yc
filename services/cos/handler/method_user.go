@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/juxuny/yc"
-	"github.com/juxuny/yc/dt"
 	"github.com/juxuny/yc/log"
 	"github.com/juxuny/yc/orm"
 	cos "github.com/juxuny/yc/services/cos"
@@ -89,14 +88,18 @@ func (t *handler) ModifyPassword(ctx context.Context, req *cos.ModifyPasswordReq
 }
 
 func (t *handler) SaveOrCreateUser(ctx context.Context, req *cos.SaveOrCreateUserRequest) (resp *cos.SaveOrCreateUserResponse, err error) {
+	userId, _ := yc.GetUserId(ctx)
 	if req.UserId != nil && req.GetUserId().Valid && req.GetUserId().Uint64 > 0 {
-		_, found, err := db.TableAccount.FindOneById(ctx, *req.UserId)
+		userInfo, found, err := db.TableAccount.FindOneById(ctx, *req.UserId)
 		if err != nil {
 			log.Error(err)
 			return nil, err
 		}
 		if !found {
 			return nil, cos.Error.AccountNotFound.Wrap(fmt.Errorf("userId=%v", req.UserId.Uint64))
+		}
+		if userInfo.CreatorId == nil || !userInfo.CreatorId.Valid || !userInfo.CreatorId.Equal(userId) {
+			return nil, cos.Error.NoPermissionUpdateUserInfo
 		}
 		rowsAffected, err := db.TableAccount.UpdateById(ctx, *req.UserId, orm.H{
 			db.TableAccount.Nick: req.Nick,
@@ -109,6 +112,18 @@ func (t *handler) SaveOrCreateUser(ctx context.Context, req *cos.SaveOrCreateUse
 			return nil, cos.Error.NoDataModified
 		}
 	} else {
+		currentAccount, found, err := db.TableAccount.FindOneById(ctx, userId)
+		if err != nil {
+			log.Error(err)
+			return nil, err
+		}
+		if !found {
+			log.Warn("current user data not found")
+			return nil, cos.Error.IllegalUserData
+		}
+		if currentAccount.CreatorId != nil && currentAccount.CreatorId.Uint64 != 0 {
+			return nil, cos.Error.NotAllowedCreateAccount
+		}
 		count, err := db.TableAccount.Count(ctx, orm.NewAndWhereWrapper().Eq(db.TableAccount.Identifier, req.Identifier))
 		if err != nil {
 			return nil, err
@@ -124,7 +139,7 @@ func (t *handler) SaveOrCreateUser(ctx context.Context, req *cos.SaveOrCreateUse
 			UpdateTime:  orm.Now(),
 			DeletedAt:   0,
 			IsDisabled:  false,
-			CreatorId:   dt.NewIDPointer(0),
+			CreatorId:   currentAccount.Id,
 		}
 		_, err = db.TableAccount.Create(ctx, account)
 		if err != nil {
@@ -132,4 +147,39 @@ func (t *handler) SaveOrCreateUser(ctx context.Context, req *cos.SaveOrCreateUse
 		}
 	}
 	return &cos.SaveOrCreateUserResponse{}, nil
+}
+
+func (t *handler) UserList(ctx context.Context, req *cos.UserListRequest) (resp *cos.UserListResponse, err error) {
+	userId, err := yc.GetUserId(ctx)
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+	where := orm.NewAndWhereWrapper()
+	where.Eq(db.TableAccount.CreatorId, userId).Eq(db.TableAccount.IsDisabled, req.IsDisabled)
+	if req.SearchKey != "" {
+		searchKey := fmt.Sprintf("%%%s%%", req.SearchKey)
+		where.Nested(orm.NewOrWhereWrapper().Like(db.TableAccount.Nick, searchKey).Like(db.TableAccount.Identifier, searchKey))
+	}
+	count, err := db.TableAccount.Count(ctx, where)
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+	if count == 0 {
+		return &cos.UserListResponse{
+			Pagination: req.Pagination.ToRespPointer(count),
+			List:       []*cos.UserListItem{},
+		}, nil
+	}
+	accountItems, err := db.TableAccount.Page(ctx, req.Pagination.PageNum, req.Pagination.PageSize, where)
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+	resp = &cos.UserListResponse{
+		Pagination: req.Pagination.ToRespPointer(count),
+	}
+	resp.List = accountItems.MapToUserListItemList()
+	return resp, nil
 }
