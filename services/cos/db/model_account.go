@@ -49,6 +49,7 @@ func (t ModelAccount) ToUserInfoResponse() cos.UserInfoResponse {
 }
 func (t ModelAccount) ToUserListItem() cos.UserListItem {
 	return cos.UserListItem{
+		Id:          t.Id,
 		Identifier:  t.Identifier,
 		AccountType: t.AccountType,
 		Nick:        t.Nick,

@@ -289,7 +289,7 @@ message SaveOrCreateUserResponse {
 
 // @ref: ModelAccount
 message UserListItem {
-  dt.ID userId = 1;
+  dt.ID id = 1;
   string identifier = 2;
   AccountType accountType = 3;
   string nick = 4;
