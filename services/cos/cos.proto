@@ -277,6 +277,8 @@ message SaveOrCreateUserRequest {
   // @msg: invalid accountType: {{.AccountType|num}}
   AccountType accountType = 3;
   dt.ID userId = 4;
+  // @v: length.min=1
+  // @v: length.max=16
   string nick = 5;
 }
 
@@ -291,6 +293,8 @@ message UserListItem {
   string identifier = 2;
   AccountType accountType = 3;
   string nick = 4;
+  int64 createTime = 5;
+  int64 updateTime = 6;
 }
 
 message UserListRequest {

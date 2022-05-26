@@ -140,6 +140,7 @@ func (t *handler) SaveOrCreateUser(ctx context.Context, req *cos.SaveOrCreateUse
 			DeletedAt:   0,
 			IsDisabled:  false,
 			CreatorId:   currentAccount.Id,
+			Nick:        req.Nick,
 		}
 		_, err = db.TableAccount.Create(ctx, account)
 		if err != nil {

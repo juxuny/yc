@@ -11,6 +11,7 @@ const (
 	ValidatorTemplateModifyPasswordRequestOldPassword   = "invalid old password: {{.OldPassword}}"
 	ValidatorTemplateModifyPasswordRequestNewPassword   = "invalid new password: {{.NewPassword}}"
 	ValidatorTemplateSaveOrCreateUserRequestAccountType = "invalid accountType: {{.AccountType|num}}"
+	ValidatorTemplateSaveOrCreateUserRequestNick        = ""
 	ValidatorTemplateUserListRequestPagination          = ""
 	ValidatorTemplateSaveNamespaceRequestNamespace      = "invalid namespace: {{.Namespace}}"
 	ValidatorTemplateDeleteNamespaceRequestId           = "invalid id"
@@ -23,6 +24,7 @@ var templateList = []string{
 	ValidatorTemplateModifyPasswordRequestOldPassword,
 	ValidatorTemplateModifyPasswordRequestNewPassword,
 	ValidatorTemplateSaveOrCreateUserRequestAccountType,
+	ValidatorTemplateSaveOrCreateUserRequestNick,
 	ValidatorTemplateUserListRequestPagination,
 	ValidatorTemplateSaveNamespaceRequestNamespace,
 	ValidatorTemplateDeleteNamespaceRequestId,
@@ -76,6 +78,12 @@ func (m *ModifyPasswordRequest) Validate() error {
 }
 func (m *SaveOrCreateUserRequest) Validate() error {
 	if err := validator.Run(m.AccountType, validator.CreateAction("in", `1`, ValidatorTemplateSaveOrCreateUserRequestAccountType), m, "accountType"); err != nil {
+		return err
+	}
+	if err := validator.Run(m.Nick, validator.CreateAction("length.min", `1`, ValidatorTemplateSaveOrCreateUserRequestNick), m, "nick"); err != nil {
+		return err
+	}
+	if err := validator.Run(m.Nick, validator.CreateAction("length.max", `16`, ValidatorTemplateSaveOrCreateUserRequestNick), m, "nick"); err != nil {
 		return err
 	}
 	return nil
