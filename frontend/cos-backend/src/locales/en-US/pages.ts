@@ -73,13 +73,13 @@ export default {
   'pages.status.disable.confirm': 'Are you sure to disable it ?',
   'pages.status.enable': 'Enable',
   'pages.status.disable': 'Disable',
-  'pages.status.all': "All",
+  'pages.status.all': 'All',
   'pages.action.create': 'Create',
   'pages.action.edit': 'Edit',
-  'pages.confirm.ok': "OK",
-  'pages.confirm.cancel': "Cancel",
+  'pages.confirm.ok': 'OK',
+  'pages.confirm.cancel': 'Cancel',
 
-  // 角色管理
+  // role
   'pages.system.roleManagement.column.id': 'ID',
   'pages.system.roleManagement.column.type': 'type',
   'pages.system.roleManagement.column.typeName': 'Type Name',
@@ -89,4 +89,15 @@ export default {
   'pages.system.roleManagement.column.status': 'Status',
   'pages.system.roleManagement.column.remark': 'Remark',
   'pages.system.roleManagement.column.action': 'Action',
+
+  // system
+  'pages.system.userManagement.column.id': 'ID',
+  'pages.system.userManagement.column.nick': 'Nick',
+  'pages.system.userManagement.column.identifier': 'Identifier',
+  'pages.system.userManagement.column.createTime': 'CreateTime',
+  'pages.system.userManagement.column.updateTime': 'UpdateTime',
+  'pages.system.userManagement.column.accountType': 'AccountType',
+  'pages.system.userManagement.column.isDisabled': 'IsDisabled',
+  'pages.system.userManagement.column.action': 'Action',
+  'pages.system.userManagement.query.search': 'Search',
 };

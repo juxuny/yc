@@ -1,18 +1,15 @@
-import {
-  LockOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
+import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { message, Tabs } from 'antd';
 import React, { useState } from 'react';
 import ProForm, { ProFormText } from '@ant-design/pro-form';
-import { useIntl, Link, history, FormattedMessage, SelectLang} from 'umi';
+import { useIntl, Link, history, FormattedMessage, SelectLang } from 'umi';
 import Footer from '@/components/Footer';
 import { User } from '@/services/cos/user';
 import { Auth } from '@/services/cos/auth';
 
 import styles from './index.less';
-import {LocalStorage, StorageKey} from '@/storage';
-import {useModel} from "@@/plugin-model/useModel";
+import { LocalStorage, StorageKey } from '@/storage';
+import { useModel } from '@@/plugin-model/useModel';
 
 const Login: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
@@ -37,7 +34,7 @@ const Login: React.FC = () => {
         const userInfoResp = await User.userInfo();
         if (userInfoResp.code !== 0) {
           message.error(userInfoResp.msg);
-          return
+          return;
         }
         await setInitialState((s) => ({ ...s, currentUser: userInfoResp.data }));
         /** 此方法会跳转到 redirect 参数所在的位置 */

@@ -2,18 +2,17 @@
 /* eslint-disable */
 
 import request from 'umi-request';
-import {StorageKey, LocalStorage} from '@/storage';
+import { StorageKey, LocalStorage } from '@/storage';
 import { message } from 'antd';
-import {UUID} from 'uuid-generator-ts';
+import { UUID } from 'uuid-generator-ts';
 
-
-const apiPrefix = "/api";
+const apiPrefix = '/api';
 
 const uuid = new UUID();
 
 const genReqId = () => {
   return uuid.getDashFreeUUID();
-}
+};
 
 request.use(async (ctx, next) => {
   await next();
@@ -24,19 +23,18 @@ request.use(async (ctx, next) => {
   }
 });
 
-
 export function doRequest<Type>(path: string, options?: { [key: string]: any }) {
   let token = LocalStorage.getItem(StorageKey.TOKEN);
   return request<API.BaseResp<Type>>(apiPrefix + path, {
     headers: {
-      "X-Rpc-Token": token || '',
-      "Client-Request-Id": genReqId(),
+      'X-Rpc-Token': token || '',
+      'Client-Request-Id': genReqId(),
     },
     errorHandler: (error) => {
       message.error(error.data?.msg);
     },
     ...(options || {}),
-  })
+  });
 }
 
 export function doPaginationRequest<Type>(path: string, options?: { [key: string]: any }) {

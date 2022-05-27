@@ -1,10 +1,7 @@
-
 const StorageKey = {
-  TOKEN: 'token'
-}
+  TOKEN: 'token',
+};
 
-const LocalStorage = localStorage
+const LocalStorage = localStorage;
 
-export { StorageKey, LocalStorage};
-
-
+export { StorageKey, LocalStorage };

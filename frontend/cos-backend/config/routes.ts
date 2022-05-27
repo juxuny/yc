@@ -58,22 +58,7 @@
         name: 'user-management',
         icon: 'user',
         component: './system/UserManagement',
-      },
-      {
-        path: '/system/role-management',
-        name: 'role-management',
-        component: './system/RoleManagement',
-      },
-      {
-        path: '/system/permission-management',
-        name: 'permission-management',
-        component: './system/UserManagement',
-      },
-      {
-        path: '/system/menu-management',
-        name: 'menu-management',
-        component: './system/UserManagement',
-      },
+      }
     ],
   },
   {

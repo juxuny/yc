@@ -48,6 +48,7 @@
   ],
   "dependencies": {
     "@ant-design/icons": "^4.5.0",
+    "@ant-design/pro-components": "^1.1.2",
     "@ant-design/pro-descriptions": "^1.6.8",
     "@ant-design/pro-form": "^1.18.3",
     "@ant-design/pro-layout": "^6.15.3",
@@ -93,6 +94,7 @@
     "detect-installer": "^1.0.1",
     "enzyme": "^3.11.0",
     "eslint": "^7.1.0",
+    "eslint-plugin-eslint-comments": "^3.2.0",
     "express": "^4.17.1",
     "gh-pages": "^3.0.0",
     "jsdom-global": "^3.0.2",

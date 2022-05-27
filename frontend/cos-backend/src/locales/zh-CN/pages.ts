@@ -73,8 +73,8 @@ export default {
   'pages.status.all': '全部',
   'pages.action.create': '新建',
   'pages.action.edit': '编辑',
-  'pages.confirm.ok': "确定",
-  'pages.confirm.cancel': "取消",
+  'pages.confirm.ok': '确定',
+  'pages.confirm.cancel': '取消',
 
   // 角色管理
   'pages.system.roleManagement.column.id': 'ID',
@@ -86,4 +86,15 @@ export default {
   'pages.system.roleManagement.column.status': '状态',
   'pages.system.roleManagement.column.remark': '备注',
   'pages.system.roleManagement.column.action': '操作',
+
+  // system
+  'pages.system.userManagement.column.id': 'ID',
+  'pages.system.userManagement.column.nick': '昵称',
+  'pages.system.userManagement.column.identifier': '唯一标识',
+  'pages.system.userManagement.column.createTime': '创建时间',
+  'pages.system.userManagement.column.updateTime': '修改时间',
+  'pages.system.userManagement.column.accountType': '账号类型',
+  'pages.system.userManagement.column.isDisabled': '状态',
+  'pages.system.userManagement.column.action': '操作',
+  'pages.system.userManagement.query.search': '搜索',
 };

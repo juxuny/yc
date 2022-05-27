@@ -6,3 +6,5 @@ public
 dist
 .umi
 mock
+.umi-local
+.umi-production

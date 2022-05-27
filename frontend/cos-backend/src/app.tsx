@@ -5,7 +5,7 @@ import { history, Link } from 'umi';
 import RightContent from '@/components/RightContent';
 import Footer from '@/components/Footer';
 import { BookOutlined, LinkOutlined } from '@ant-design/icons';
-import {User} from "@/services/cos/user";
+import { User } from '@/services/cos/user';
 
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
@@ -65,11 +65,11 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
     },
     links: isDev
       ? [
-          <Link to="/umi/plugin/openapi" target="_blank">
+          <Link to="/umi/plugin/openapi" target="_blank" key={'api'}>
             <LinkOutlined />
             <span>OpenAPI 文档</span>
           </Link>,
-          <Link to="/~docs">
+          <Link to="/~docs" key={'component'}>
             <BookOutlined />
             <span>业务组件文档</span>
           </Link>,

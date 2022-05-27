@@ -30,6 +30,7 @@ functions/*
 
 # umi
 .umi
+.umi-local
 .umi-production
 
 # screenshot

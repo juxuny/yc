@@ -1,7 +1,7 @@
 // @ts-ignore
 /* eslint-disable */
 
-import {doRequest} from "@/services/cos/base";
+import { doRequest } from '@/services/cos/base';
 
 export class Auth {
   static async login(body: API.LoginReq, options?: { [key: string]: any }) {
