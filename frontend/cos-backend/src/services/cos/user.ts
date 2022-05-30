@@ -19,4 +19,20 @@ export class User {
       ...(options || {}),
     });
   }
+
+  static async saveOrCreateUser(body?: API.SaveUserInfoReq, options?: { [key: string]: any }) {
+    return doRequest<API.SaveUserInfoResp>('/cos/save-or-create-user', {
+      method: 'POST',
+      data: body,
+      ...(options || {}),
+    });
+  }
+
+  static async updateStatus(body?: API.UserUpdateStatusReq, options?: { [key: string]: any }) {
+    return doRequest<API.UserUpdateStatusResp>('/cos/user-update-status', {
+      method: 'POST',
+      data: body,
+      ...(options || {}),
+    });
+  }
 }

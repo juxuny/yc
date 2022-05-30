@@ -24,6 +24,8 @@ service Cos {
   rpc SaveOrCreateUser(SaveOrCreateUserRequest) returns (SaveOrCreateUserResponse) {}
   // @group: user
   rpc UserList(UserListRequest) returns (UserListResponse) {}
+  // @group: user
+  rpc UserUpdateStatus(UserUpdateStatusRequest) returns (UserUpdateStatusResponse) {}
 
   // @group: namespace
   rpc SaveNamespace(SaveNamespaceRequest) returns (SaveNamespaceResponse) {}
@@ -295,6 +297,7 @@ message UserListItem {
   string nick = 4;
   int64 createTime = 5;
   int64 updateTime = 6;
+  bool isDisabled = 7;
 }
 
 message UserListRequest {
@@ -431,3 +434,11 @@ message ListAllValueRequest {
 message ListAllValueResponse {
   repeated KeyValueResp list = 1;
 }
+
+message UserUpdateStatusRequest {
+  // @v: required
+  dt.ID userId = 1;
+  bool isDisabled = 2;
+}
+
+message UserUpdateStatusResponse {}

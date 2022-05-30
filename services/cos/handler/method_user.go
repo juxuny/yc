@@ -184,3 +184,27 @@ func (t *handler) UserList(ctx context.Context, req *cos.UserListRequest) (resp 
 	resp.List = accountItems.MapToUserListItemList()
 	return resp, nil
 }
+
+func (t *handler) UserUpdateStatus(ctx context.Context, req *cos.UserUpdateStatusRequest) (resp *cos.UserUpdateStatusResponse, err error) {
+	userId, _ := yc.GetUserId(ctx)
+	modelAccount, found, err := db.TableAccount.FindOneById(ctx, *req.UserId)
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+	if !found {
+		return nil, cos.Error.AccountNotFound
+	}
+	if !modelAccount.CreatorId.Equal(userId) {
+		log.Error("no permission set user status")
+		return nil, cos.Error.NoPermissionAccessUserInfo
+	}
+	_, err = db.TableAccount.UpdateById(ctx, *req.UserId, orm.H{
+		db.TableAccount.IsDisabled: req.IsDisabled,
+	})
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+	return &cos.UserUpdateStatusResponse{}, nil
+}

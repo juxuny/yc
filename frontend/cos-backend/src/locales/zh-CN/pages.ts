@@ -73,8 +73,15 @@ export default {
   'pages.status.all': '全部',
   'pages.action.create': '新建',
   'pages.action.edit': '编辑',
+  'pages.action.delete': '删除',
+  'pages.action': '操作',
+  'pages.action.enable': '启用',
+  'pages.action.disable': '禁用',
+
   'pages.confirm.ok': '确定',
   'pages.confirm.cancel': '取消',
+
+  'pages.field.password': '密码',
 
   // 角色管理
   'pages.system.roleManagement.column.id': 'ID',
@@ -97,4 +104,6 @@ export default {
   'pages.system.userManagement.column.isDisabled': '状态',
   'pages.system.userManagement.column.action': '操作',
   'pages.system.userManagement.query.search': '搜索',
+  'pages.system.userManagement.confirm.disable': '确定要禁用当前用户吗？',
+  'pages.system.userManagement.confirm.enable': '确定要启用当前用户吗？',
 };

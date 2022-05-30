@@ -14,12 +14,13 @@ declare namespace API {
   };
 
   type UserListItem = {
-    userId: string;
+    id: string;
     nick: string;
     identifier: string;
     accountType: AccountType;
     createTime: number;
     updateTime: number;
+    isDisabled: boolean;
   };
 
   type UserListReq = {
@@ -29,8 +30,21 @@ declare namespace API {
   };
 
   type SaveUserInfoReq = {
-    userId: string;
+    userId?: string;
     nick: string;
     identifier: string;
+    credential?: string;
+    accountType?: AccountType;
   };
+
+  type SaveUserInfoResp = {
+    id?: string;
+  };
+
+  type UserUpdateStatusReq = {
+    userId: string;
+    isDisabled: boolean;
+  }
+
+  type UserUpdateStatusResp = {}
 }

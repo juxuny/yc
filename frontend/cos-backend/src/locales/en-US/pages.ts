@@ -76,8 +76,14 @@ export default {
   'pages.status.all': 'All',
   'pages.action.create': 'Create',
   'pages.action.edit': 'Edit',
+  'pages.action.delete': 'Delete',
+  'pages.action': 'Action',
+  'pages.action.enable': 'Enable',
+  'pages.action.disable': 'Disable',
+
   'pages.confirm.ok': 'OK',
   'pages.confirm.cancel': 'Cancel',
+  'pages.field.password': 'Password',
 
   // role
   'pages.system.roleManagement.column.id': 'ID',
@@ -100,4 +106,6 @@ export default {
   'pages.system.userManagement.column.isDisabled': 'IsDisabled',
   'pages.system.userManagement.column.action': 'Action',
   'pages.system.userManagement.query.search': 'Search',
+  'pages.system.userManagement.confirm.disable': 'Are you want to disable the user ?',
+  'pages.system.userManagement.confirm.enable': 'Are you want to enable the user ?',
 };

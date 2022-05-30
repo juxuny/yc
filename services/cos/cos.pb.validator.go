@@ -16,6 +16,7 @@ const (
 	ValidatorTemplateSaveNamespaceRequestNamespace      = "invalid namespace: {{.Namespace}}"
 	ValidatorTemplateDeleteNamespaceRequestId           = "invalid id"
 	ValidatorTemplateDeleteValueRequestKey              = "missing config key name"
+	ValidatorTemplateUserUpdateStatusRequestUserId      = ""
 )
 
 var templateList = []string{
@@ -29,6 +30,7 @@ var templateList = []string{
 	ValidatorTemplateSaveNamespaceRequestNamespace,
 	ValidatorTemplateDeleteNamespaceRequestId,
 	ValidatorTemplateDeleteValueRequestKey,
+	ValidatorTemplateUserUpdateStatusRequestUserId,
 }
 
 func init() {
@@ -137,5 +139,11 @@ func (m *DisableValueRequest) Validate() error {
 	return nil
 }
 func (m *ListAllValueRequest) Validate() error {
+	return nil
+}
+func (m *UserUpdateStatusRequest) Validate() error {
+	if err := validator.Run(m.UserId, validator.CreateAction("required", ``, ValidatorTemplateUserUpdateStatusRequestUserId), m, "userId"); err != nil {
+		return err
+	}
 	return nil
 }

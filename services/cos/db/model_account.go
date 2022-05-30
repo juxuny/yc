@@ -55,6 +55,7 @@ func (t ModelAccount) ToUserListItem() cos.UserListItem {
 		Nick:        t.Nick,
 		CreateTime:  t.CreateTime,
 		UpdateTime:  t.UpdateTime,
+		IsDisabled:  t.IsDisabled,
 	}
 }
 
