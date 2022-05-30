@@ -135,9 +135,7 @@ export default (): React.ReactNode => {
                         onConfirm={async () => {
                           await updateStatus(record, false);
             }}>
-              <a>
-                <FormattedMessage id={'pages.action.enable'}/>
-              </a>
+              <a><FormattedMessage id={'pages.action.enable'}/></a>
             </Popconfirm>
              :
             <Popconfirm key={'disable'}
@@ -148,9 +146,7 @@ export default (): React.ReactNode => {
                         okText={intl.formatMessage({id: 'pages.confirm.ok'})} onConfirm={async () => {
                           await updateStatus(record, true);
             }}>
-              <a style={{color: 'red'}}>
-                <FormattedMessage id={'pages.action.disable'}/>
-              </a>
+              <a style={{color: 'red'}}><FormattedMessage id={'pages.action.disable'}/></a>
             </Popconfirm>
         }
       </Space>,
