@@ -1,2 +1,74 @@
 # yc
 远界云微服务开发框架
+
+### Validator
+
+* length.min
+* length.max
+* min
+* max
+* pattern
+* datetime
+* date 
+* time
+* timestamp.log
+* password
+* required
+* in
+
+#### 1.length.min or length.max
+
+```text
+// @v: length.min=10
+// @msg: 长度最小值为: 10
+List []int
+
+// @v: length.max=10
+// @msg: 长度最大值为：10
+List []int
+```
+
+##### 2. min or max
+
+@msg 后面跟着一个 go template，可以通过双重花括号获取当前的值
+
+```text
+// @v: min=10
+// @msg: 最小值为10,当前值为{{.Money}}
+Money float64
+
+// @v: max=10
+// @msg: 最大值为10,当前值为{{.Money}}
+Money float64
+```
+
+##### 3. pattern
+
+```text
+// @v: pattern=^([\\d])$
+// @msg: invalid password
+Password string
+```
+
+##### 4. required
+
+表示某个参数必传，没有 @msg 就获取系统默认错误信息，（指针不能为空）
+
+```text
+// @v: required
+Pagination *dt.Pagination
+```
+
+##### 5. in
+
+表示检查取值范围,通过逗号分割表示集合 
+
+```text
+// @v: in=1,3,4
+Type int64
+```
+
+##### 6. password
+
+密码检查，如果密码规则有特别要求，可以用pattern
+
