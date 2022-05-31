@@ -69,6 +69,7 @@ export default {
   'pages.searchTable.batchApproval': 'batch approval',
 
   'pages.result.saveSuccess': 'Save Success',
+  'pages.result.modifySuccess': 'Modify Success',
   'pages.status.enable.confirm': 'Are you sure to enable it ?',
   'pages.status.disable.confirm': 'Are you sure to disable it ?',
   'pages.status.enable': 'Enable',
@@ -80,6 +81,10 @@ export default {
   'pages.action': 'Action',
   'pages.action.enable': 'Enable',
   'pages.action.disable': 'Disable',
+  'pages.action.ok': 'OK',
+  'pages.action.cancel': 'Cancel',
+  'pages.action.reset': 'Reset',
+  'pages.action.save': 'Save',
 
   'pages.confirm.ok': 'OK',
   'pages.confirm.cancel': 'Cancel',
@@ -109,4 +114,12 @@ export default {
   'pages.system.userManagement.confirm.disable': 'Are you want to disable the user ?',
   'pages.system.userManagement.confirm.enable': 'Are you want to enable the user ?',
   'pages.system.userManagement.confirm.delete': 'Are you want to delete th user ?',
+
+  // account
+  'pages.account.modifyPassword.label.old': 'Old Password',
+  'pages.account.modifyPassword.label.new': 'New Password',
+  'pages.account.modifyPassword.tips': 'At least 6 characters, maximum 22 characters alphanumeric',
+  'pages.account.modifyPassword.placeholder': 'Please input',
+  'pages.account.modifyPassword.missing.old': 'missing old password',
+  'pages.account.modifyPassword.missing.new': 'missing new password',
 };

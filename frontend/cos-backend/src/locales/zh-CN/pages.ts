@@ -66,6 +66,7 @@ export default {
   'pages.searchTable.batchApproval': '批量审批',
 
   'pages.result.saveSuccess': '保存成功',
+  'pages.result.modifySuccess': '修改成功',
   'pages.status.enable.confirm': '确定要启用吗？',
   'pages.status.disable.confirm': '确定要禁用吗？',
   'pages.status.enable': '启用',
@@ -77,6 +78,10 @@ export default {
   'pages.action': '操作',
   'pages.action.enable': '启用',
   'pages.action.disable': '禁用',
+  'pages.action.ok': '确定',
+  'pages.action.cancel': '取消',
+  'pages.action.reset': '重置',
+  'pages.action.save': '保存',
 
   'pages.confirm.ok': '确定',
   'pages.confirm.cancel': '取消',
@@ -107,4 +112,10 @@ export default {
   'pages.system.userManagement.confirm.disable': '确定要禁用当前用户吗？',
   'pages.system.userManagement.confirm.enable': '确定要启用当前用户吗？',
   'pages.system.userManagement.confirm.delete': '确定要删除当前用户吗？',
+
+  // account
+  'pages.account.modifyPassword.label.old': '旧密码',
+  'pages.account.modifyPassword.label.new': '新密码',
+  'pages.account.modifyPassword.tips': '至少6位，最长22位字母数字组合',
+  'pages.account.modifyPassword.placeholder': '请输入',
 };

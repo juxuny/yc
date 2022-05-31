@@ -43,4 +43,12 @@ export class User {
       ...(options || {}),
     });
   }
+
+  static async modifyPassword(body?: API.UserModifyPasswordReq, options?: { [key: string]: any }) {
+    return doRequest<API.UserModifyPasswordResp>('/cos/modify-password', {
+      method: 'POST',
+      data: body,
+      ...(options || {}),
+    });
+  }
 }

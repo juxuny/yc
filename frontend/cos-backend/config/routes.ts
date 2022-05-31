@@ -49,6 +49,19 @@
     component: './TableList',
   },
   {
+    path: '/account',
+    name: 'account',
+    icon: 'user',
+    routes: [
+      {
+        path: '/account/settings',
+        name: 'settings',
+        icon: 'settings',
+        component: './account/Settings'
+      }
+    ]
+  },
+  {
     path: '/system',
     name: 'system',
     icon: 'setting',

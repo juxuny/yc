@@ -50,7 +50,15 @@ declare namespace API {
 
   type UserDeleteReq = {
     userId: string;
-  }
+  };
 
   type UserDeleteResp = {};
+
+  type UserModifyPasswordReq = {
+    userId?: string;
+    oldPassword: string;
+    newPassword: string;
+  };
+
+  type UserModifyPasswordResp = {};
 }
