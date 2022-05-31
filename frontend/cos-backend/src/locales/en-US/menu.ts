@@ -50,9 +50,16 @@ export default {
   'menu.editor.mind': 'Mind Editor',
   'menu.editor.koni': 'Koni Editor',
 
+  // system
   'menu.system': 'System',
   'menu.system.user-management': 'Users',
   'menu.system.role-management': 'Roles',
   'menu.system.permission-management': 'Permission',
   'menu.system.menu-management': 'Menus',
+
+
+  // config
+  'menu.config.namespace': 'Namespace',
+  'menu.config': 'Configuration',
+  'menu.config.config-management': 'Config',
 };

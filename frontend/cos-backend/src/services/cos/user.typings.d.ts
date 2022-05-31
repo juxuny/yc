@@ -11,7 +11,7 @@ declare namespace API {
     nick?: string;
     identifier?: string;
     accountType: AccountType;
-  };
+  }
 
   type UserListItem = {
     id: string;
@@ -21,13 +21,13 @@ declare namespace API {
     createTime: number;
     updateTime: number;
     isDisabled: boolean;
-  };
+  }
 
   type UserListReq = {
     pagination: PaginationReq;
     searchKey?: string;
     isDisabled?: boolean;
-  };
+  }
 
   type SaveUserInfoReq = {
     userId?: string;
@@ -35,30 +35,30 @@ declare namespace API {
     identifier: string;
     credential?: string;
     accountType?: AccountType;
-  };
+  }
 
   type SaveUserInfoResp = {
     id?: string;
-  };
+  }
 
   type UserUpdateStatusReq = {
     userId: string;
     isDisabled: boolean;
-  };
+  }
 
-  type UserUpdateStatusResp = {};
+  type UserUpdateStatusResp = {}
 
   type UserDeleteReq = {
     userId: string;
-  };
+  }
 
-  type UserDeleteResp = {};
+  type UserDeleteResp = {}
 
   type UserModifyPasswordReq = {
     userId?: string;
     oldPassword: string;
     newPassword: string;
-  };
+  }
 
-  type UserModifyPasswordResp = {};
+  type UserModifyPasswordResp = {}
 }

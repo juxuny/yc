@@ -100,3 +100,28 @@ func (t *handler) DeleteNamespace(ctx context.Context, req *cos.DeleteNamespaceR
 	_, err = db.TableNamespace.SoftDeleteById(ctx, *req.Id)
 	return nil, err
 }
+
+func (t *handler) UpdateStatusNamespace(ctx context.Context, req *cos.UpdateStatusNamespaceRequest) (resp *cos.UpdateStatusNamespaceResponse, err error) {
+	userId, _ := yc.GetUserId(ctx)
+	modelNamespace, found, err := db.TableNamespace.FindOneById(ctx, *req.Id)
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+	if !found {
+		log.Error(err)
+		return nil, cos.Error.NamespaceNotFound
+	}
+	if !modelNamespace.CreatorId.Equal(userId) {
+		return nil, cos.Error.NoPermissionAccessNamespace
+	}
+	_, err = db.TableNamespace.UpdateById(ctx, *req.Id, orm.H{
+		db.TableNamespace.IsDisabled: req.IsDisabled,
+	})
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+	return &cos.UpdateStatusNamespaceResponse{}, nil
+}
+

@@ -82,6 +82,8 @@ export default {
   'pages.action.cancel': '取消',
   'pages.action.reset': '重置',
   'pages.action.save': '保存',
+  'pages.action.search': '搜索',
+
 
   'pages.confirm.ok': '确定',
   'pages.confirm.cancel': '取消',
@@ -118,4 +120,12 @@ export default {
   'pages.account.modifyPassword.label.new': '新密码',
   'pages.account.modifyPassword.tips': '至少6位，最长22位字母数字组合',
   'pages.account.modifyPassword.placeholder': '请输入',
+
+  // config
+  'pages.config.namespace.column.id': 'ID',
+  'pages.config.namespace.column.namespace': '命名空间',
+  'pages.config.namespace.column.createTime': '创建时间',
+  'pages.config.namespace.column.updateTime': '修改时间',
+  'pages.config.namespace.column.isDisabled': '状态',
+  'pages.config.namespace.column.action': '操作',
 };

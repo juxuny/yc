@@ -30,6 +30,7 @@ var Error = struct {
 	NoPermissionUpdateUserInfo  errors.Error `code:"10040" msg:"not permission to update user info"`
 	IllegalUserData             errors.Error `code:"10041" msg:"illegal user data"`
 	NotAllowedCreateAccount     errors.Error `code:"10042" msg:"not allowed create account"`
+	NoPermissionAccessNamespace errors.Error `code:"10043" msg:"no permission access namespace"`
 }{}
 
 func init() {

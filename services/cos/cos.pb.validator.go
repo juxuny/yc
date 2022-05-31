@@ -18,6 +18,7 @@ const (
 	ValidatorTemplateDeleteValueRequestKey = "missing config key name"
 	ValidatorTemplateUserUpdateStatusRequestUserId = ""
 	ValidatorTemplateUserDeleteRequestUserId = ""
+	ValidatorTemplateUpdateStatusNamespaceRequestId = ""
 )
 
 var templateList = []string{
@@ -33,6 +34,7 @@ var templateList = []string{
 	ValidatorTemplateDeleteValueRequestKey,
 	ValidatorTemplateUserUpdateStatusRequestUserId,
 	ValidatorTemplateUserDeleteRequestUserId,
+	ValidatorTemplateUpdateStatusNamespaceRequestId,
 }
 
 func init() {
@@ -151,6 +153,12 @@ func (m *UserUpdateStatusRequest) Validate() error {
 }
 func (m *UserDeleteRequest) Validate() error {
 	if err := validator.Run(m.UserId, validator.CreateAction("required", ``, ValidatorTemplateUserDeleteRequestUserId), m, "userId"); err != nil {
+		return err
+	}
+	return nil
+}
+func (m *UpdateStatusNamespaceRequest) Validate() error {
+	if err := validator.Run(m.Id, validator.CreateAction("required", ``, ValidatorTemplateUpdateStatusNamespaceRequestId), m, "id"); err != nil {
 		return err
 	}
 	return nil

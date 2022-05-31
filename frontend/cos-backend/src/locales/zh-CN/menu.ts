@@ -50,9 +50,15 @@ export default {
   'menu.editor.mind': '脑图编辑器',
   'menu.editor.koni': '拓扑编辑器',
 
+  // system
   'menu.system': '系统管理',
   'menu.system.user-management': '用户管理',
   'menu.system.role-management': '角色管理',
   'menu.system.permission-management': '权限管理',
   'menu.system.menu-management': '菜单管理',
+
+  // config
+  'menu.config.namespace': '命名空间',
+  'menu.config': '配置管理',
+  'menu.config.config-management': '配置',
 };

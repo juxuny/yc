@@ -35,6 +35,8 @@ service Cos {
   rpc ListNamespace(ListNamespaceRequest) returns(ListNamespaceResponse) {}
   // @group: namespace
   rpc DeleteNamespace(DeleteNamespaceRequest) returns(DeleteNamespaceResponse) {}
+  // @group: namespace
+  rpc UpdateStatusNamespace(UpdateStatusNamespaceRequest) returns (UpdateStatusNamespaceResponse) {}
 
   // @group: config
   rpc SaveConfig(SaveConfigRequest) returns (SaveConfigResponse) {}
@@ -451,3 +453,12 @@ message UserDeleteRequest {
 }
 
 message UserDeleteResponse {}
+
+
+message UpdateStatusNamespaceRequest {
+  // @v: required
+  dt.ID id = 1;
+  bool isDisabled = 2;
+}
+
+message UpdateStatusNamespaceResponse {}

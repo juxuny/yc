@@ -44,6 +44,8 @@ type CosClient interface {
 	ListNamespace(ctx context.Context, in *ListNamespaceRequest, opts ...grpc.CallOption) (*ListNamespaceResponse, error)
 	// @group: namespace
 	DeleteNamespace(ctx context.Context, in *DeleteNamespaceRequest, opts ...grpc.CallOption) (*DeleteNamespaceResponse, error)
+	// @group: namespace
+	UpdateStatusNamespace(ctx context.Context, in *UpdateStatusNamespaceRequest, opts ...grpc.CallOption) (*UpdateStatusNamespaceResponse, error)
 	// @group: config
 	SaveConfig(ctx context.Context, in *SaveConfigRequest, opts ...grpc.CallOption) (*SaveConfigResponse, error)
 	// @group: config
@@ -180,6 +182,15 @@ func (c *cosClient) DeleteNamespace(ctx context.Context, in *DeleteNamespaceRequ
 	return out, nil
 }
 
+func (c *cosClient) UpdateStatusNamespace(ctx context.Context, in *UpdateStatusNamespaceRequest, opts ...grpc.CallOption) (*UpdateStatusNamespaceResponse, error) {
+	out := new(UpdateStatusNamespaceResponse)
+	err := c.cc.Invoke(ctx, "/cos.Cos/UpdateStatusNamespace", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *cosClient) SaveConfig(ctx context.Context, in *SaveConfigRequest, opts ...grpc.CallOption) (*SaveConfigResponse, error) {
 	out := new(SaveConfigResponse)
 	err := c.cc.Invoke(ctx, "/cos.Cos/SaveConfig", in, out, opts...)
@@ -291,6 +302,8 @@ type CosServer interface {
 	ListNamespace(context.Context, *ListNamespaceRequest) (*ListNamespaceResponse, error)
 	// @group: namespace
 	DeleteNamespace(context.Context, *DeleteNamespaceRequest) (*DeleteNamespaceResponse, error)
+	// @group: namespace
+	UpdateStatusNamespace(context.Context, *UpdateStatusNamespaceRequest) (*UpdateStatusNamespaceResponse, error)
 	// @group: config
 	SaveConfig(context.Context, *SaveConfigRequest) (*SaveConfigResponse, error)
 	// @group: config
@@ -351,6 +364,9 @@ func (UnimplementedCosServer) ListNamespace(context.Context, *ListNamespaceReque
 }
 func (UnimplementedCosServer) DeleteNamespace(context.Context, *DeleteNamespaceRequest) (*DeleteNamespaceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteNamespace not implemented")
+}
+func (UnimplementedCosServer) UpdateStatusNamespace(context.Context, *UpdateStatusNamespaceRequest) (*UpdateStatusNamespaceResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateStatusNamespace not implemented")
 }
 func (UnimplementedCosServer) SaveConfig(context.Context, *SaveConfigRequest) (*SaveConfigResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SaveConfig not implemented")
@@ -608,6 +624,24 @@ func _Cos_DeleteNamespace_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Cos_UpdateStatusNamespace_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateStatusNamespaceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CosServer).UpdateStatusNamespace(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/cos.Cos/UpdateStatusNamespace",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CosServer).UpdateStatusNamespace(ctx, req.(*UpdateStatusNamespaceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Cos_SaveConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SaveConfigRequest)
 	if err := dec(in); err != nil {
@@ -824,6 +858,10 @@ var Cos_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteNamespace",
 			Handler:    _Cos_DeleteNamespace_Handler,
+		},
+		{
+			MethodName: "UpdateStatusNamespace",
+			Handler:    _Cos_UpdateStatusNamespace_Handler,
 		},
 		{
 			MethodName: "SaveConfig",

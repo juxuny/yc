@@ -62,6 +62,25 @@
     ]
   },
   {
+    path: '/config',
+    name: 'Config',
+    icon: 'user',
+    routes: [
+      {
+        path: '/config/namespace',
+        name: 'Namespace',
+        icon: 'settings',
+        component: './config/Namespace'
+      },
+      {
+        path: '/config/config-management',
+        name: 'ConfigManagement',
+        icon: 'settings',
+        component: './config/ConfigManagement'
+      }
+    ]
+  },
+  {
     path: '/system',
     name: 'system',
     icon: 'setting',

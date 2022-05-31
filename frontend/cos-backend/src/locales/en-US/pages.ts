@@ -85,6 +85,7 @@ export default {
   'pages.action.cancel': 'Cancel',
   'pages.action.reset': 'Reset',
   'pages.action.save': 'Save',
+  'pages.action.search': 'Search',
 
   'pages.confirm.ok': 'OK',
   'pages.confirm.cancel': 'Cancel',
@@ -122,4 +123,12 @@ export default {
   'pages.account.modifyPassword.placeholder': 'Please input',
   'pages.account.modifyPassword.missing.old': 'missing old password',
   'pages.account.modifyPassword.missing.new': 'missing new password',
+
+  // config
+  'pages.config.namespace.column.id': 'ID',
+  'pages.config.namespace.column.namespace': 'Namespace',
+  'pages.config.namespace.column.createTime': 'CreateTime',
+  'pages.config.namespace.column.updateTime': 'UpdateTime',
+  'pages.config.namespace.column.isDisabled': 'Status',
+  'pages.config.namespace.column.action': 'Action',
 };
