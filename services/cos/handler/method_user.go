@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"fmt"
+
 	"github.com/juxuny/yc"
 	"github.com/juxuny/yc/log"
 	"github.com/juxuny/yc/orm"
@@ -207,4 +208,25 @@ func (t *handler) UserUpdateStatus(ctx context.Context, req *cos.UserUpdateStatu
 		return nil, err
 	}
 	return &cos.UserUpdateStatusResponse{}, nil
+}
+
+func (t *handler) UserDelete(ctx context.Context, req *cos.UserDeleteRequest) (resp *cos.UserDeleteResponse, err error) {
+	userId, _ := yc.GetUserId(ctx)
+	modelAccount, found, err := db.TableAccount.FindOneById(ctx, *req.UserId)
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+	if !found {
+		return nil, cos.Error.AccountNotFound
+	}
+	if !modelAccount.CreatorId.Equal(userId) {
+		return nil, cos.Error.NoPermissionAccessUserInfo
+	}
+	_, err = db.TableAccount.SoftDeleteById(ctx, *req.UserId)
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+	return &cos.UserDeleteResponse{}, nil
 }

@@ -35,4 +35,12 @@ export class User {
       ...(options || {}),
     });
   }
+
+  static async delete(body?: API.UserDeleteReq, options?: { [key: string]: any }) {
+    return doRequest<API.UserDeleteResp>('/cos/user-delete', {
+      method: 'POST',
+      data: body,
+      ...(options || {}),
+    });
+  }
 }

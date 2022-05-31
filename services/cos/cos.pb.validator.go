@@ -6,17 +6,18 @@ import (
 )
 
 const (
-	ValidatorTemplateLoginRequestAccountType            = "无效登录类型: {{.AccountType|num}}"
-	ValidatorTemplateUpdateInfoRequestNick              = "missing nick name"
-	ValidatorTemplateModifyPasswordRequestOldPassword   = "invalid old password: {{.OldPassword}}"
-	ValidatorTemplateModifyPasswordRequestNewPassword   = "invalid new password: {{.NewPassword}}"
+	ValidatorTemplateLoginRequestAccountType = "无效登录类型: {{.AccountType|num}}"
+	ValidatorTemplateUpdateInfoRequestNick = "missing nick name"
+	ValidatorTemplateModifyPasswordRequestOldPassword = "invalid old password: {{.OldPassword}}"
+	ValidatorTemplateModifyPasswordRequestNewPassword = "invalid new password: {{.NewPassword}}"
 	ValidatorTemplateSaveOrCreateUserRequestAccountType = "invalid accountType: {{.AccountType|num}}"
-	ValidatorTemplateSaveOrCreateUserRequestNick        = ""
-	ValidatorTemplateUserListRequestPagination          = ""
-	ValidatorTemplateSaveNamespaceRequestNamespace      = "invalid namespace: {{.Namespace}}"
-	ValidatorTemplateDeleteNamespaceRequestId           = "invalid id"
-	ValidatorTemplateDeleteValueRequestKey              = "missing config key name"
-	ValidatorTemplateUserUpdateStatusRequestUserId      = ""
+	ValidatorTemplateSaveOrCreateUserRequestNick = ""
+	ValidatorTemplateUserListRequestPagination = ""
+	ValidatorTemplateSaveNamespaceRequestNamespace = "invalid namespace: {{.Namespace}}"
+	ValidatorTemplateDeleteNamespaceRequestId = "invalid id"
+	ValidatorTemplateDeleteValueRequestKey = "missing config key name"
+	ValidatorTemplateUserUpdateStatusRequestUserId = ""
+	ValidatorTemplateUserDeleteRequestUserId = ""
 )
 
 var templateList = []string{
@@ -31,6 +32,7 @@ var templateList = []string{
 	ValidatorTemplateDeleteNamespaceRequestId,
 	ValidatorTemplateDeleteValueRequestKey,
 	ValidatorTemplateUserUpdateStatusRequestUserId,
+	ValidatorTemplateUserDeleteRequestUserId,
 }
 
 func init() {
@@ -143,6 +145,12 @@ func (m *ListAllValueRequest) Validate() error {
 }
 func (m *UserUpdateStatusRequest) Validate() error {
 	if err := validator.Run(m.UserId, validator.CreateAction("required", ``, ValidatorTemplateUserUpdateStatusRequestUserId), m, "userId"); err != nil {
+		return err
+	}
+	return nil
+}
+func (m *UserDeleteRequest) Validate() error {
+	if err := validator.Run(m.UserId, validator.CreateAction("required", ``, ValidatorTemplateUserDeleteRequestUserId), m, "userId"); err != nil {
 		return err
 	}
 	return nil

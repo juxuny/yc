@@ -103,9 +103,10 @@ export default {
   'pages.system.userManagement.column.createTime': 'CreateTime',
   'pages.system.userManagement.column.updateTime': 'UpdateTime',
   'pages.system.userManagement.column.accountType': 'AccountType',
-  'pages.system.userManagement.column.isDisabled': 'IsDisabled',
+  'pages.system.userManagement.column.isDisabled': 'User Status',
   'pages.system.userManagement.column.action': 'Action',
   'pages.system.userManagement.query.search': 'Search',
   'pages.system.userManagement.confirm.disable': 'Are you want to disable the user ?',
   'pages.system.userManagement.confirm.enable': 'Are you want to enable the user ?',
+  'pages.system.userManagement.confirm.delete': 'Are you want to delete th user ?',
 };

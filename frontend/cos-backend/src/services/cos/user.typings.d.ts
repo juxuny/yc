@@ -44,7 +44,13 @@ declare namespace API {
   type UserUpdateStatusReq = {
     userId: string;
     isDisabled: boolean;
+  };
+
+  type UserUpdateStatusResp = {};
+
+  type UserDeleteReq = {
+    userId: string;
   }
 
-  type UserUpdateStatusResp = {}
+  type UserDeleteResp = {};
 }

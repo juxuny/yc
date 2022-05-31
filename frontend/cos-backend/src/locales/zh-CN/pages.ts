@@ -106,4 +106,5 @@ export default {
   'pages.system.userManagement.query.search': '搜索',
   'pages.system.userManagement.confirm.disable': '确定要禁用当前用户吗？',
   'pages.system.userManagement.confirm.enable': '确定要启用当前用户吗？',
+  'pages.system.userManagement.confirm.delete': '确定要删除当前用户吗？',
 };

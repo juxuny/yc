@@ -53,6 +53,20 @@ export default (): React.ReactNode => {
     }
   };
 
+  const userDelete = async (userData: API.UserListItem) => {
+    const req = {
+      userId: userData.id || ''
+    }
+    try {
+      const resp = await User.delete(req);
+      if (resp && resp.code === 0) {
+        actionRef.current?.reload();
+      }
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
   const columns: ProColumns<API.UserListItem>[] = [
     {
       title: intl.formatMessage({ id: 'pages.system.userManagement.column.id' }),
@@ -149,6 +163,14 @@ export default (): React.ReactNode => {
               <a style={{color: 'red'}}><FormattedMessage id={'pages.action.disable'}/></a>
             </Popconfirm>
         }
+        <Popconfirm key={'delete'}
+                    title={intl.formatMessage({id: 'pages.system.userManagement.confirm.delete'})}
+                    cancelText={intl.formatMessage({id: 'pages.confirm.cancel'})}
+                    okButtonProps={{type: 'primary'}}
+                    okType={'danger'}
+                    okText={intl.formatMessage({id: 'pages.confirm.ok'})} onConfirm={async () => await userDelete(record)}>
+          <a style={{color: 'red'}}><FormattedMessage id={'pages.action.delete'}/></a>
+        </Popconfirm>
       </Space>,
     },
   ];

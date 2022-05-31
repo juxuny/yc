@@ -26,6 +26,8 @@ service Cos {
   rpc UserList(UserListRequest) returns (UserListResponse) {}
   // @group: user
   rpc UserUpdateStatus(UserUpdateStatusRequest) returns (UserUpdateStatusResponse) {}
+  // @group: user
+  rpc UserDelete(UserDeleteRequest) returns (UserDeleteResponse) {}
 
   // @group: namespace
   rpc SaveNamespace(SaveNamespaceRequest) returns (SaveNamespaceResponse) {}
@@ -442,3 +444,10 @@ message UserUpdateStatusRequest {
 }
 
 message UserUpdateStatusResponse {}
+
+message UserDeleteRequest {
+  // @v: required
+  dt.ID userId = 1;
+}
+
+message UserDeleteResponse {}
