@@ -2,11 +2,13 @@ package handler
 
 import (
 	"context"
+	"fmt"
 	"github.com/juxuny/yc"
 	"github.com/juxuny/yc/log"
 	"github.com/juxuny/yc/orm"
 	cos "github.com/juxuny/yc/services/cos"
 	"github.com/juxuny/yc/services/cos/db"
+	"strings"
 )
 
 func (t *handler) SaveNamespace(ctx context.Context, req *cos.SaveNamespaceRequest) (resp *cos.SaveNamespaceResponse, err error) {
@@ -62,6 +64,9 @@ func (t *handler) ListNamespace(ctx context.Context, req *cos.ListNamespaceReque
 	where := orm.NewAndWhereWrapper().Eq(db.TableNamespace.CreatorId, currentId)
 	if req.IsDisabled != nil && req.IsDisabled.Valid {
 		where.Eq(db.TableNamespace.IsDisabled, req.IsDisabled)
+	}
+	if strings.TrimSpace(req.SearchKey) != "" {
+		where.Like(db.TableNamespace.Namespace, fmt.Sprintf("%%%s%%", strings.TrimSpace(req.SearchKey)))
 	}
 	total, err := db.TableNamespace.Count(ctx, where)
 	if err != nil {
