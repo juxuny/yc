@@ -9,7 +9,7 @@ import { User } from '@/services/cos/user';
 export type CreateOrEditUserProps = {
   visible?: boolean;
   onChangeVisible: (v: boolean) => void;
-  oldData?: API.SaveUserInfoReq;
+  oldData?: API.User.SaveReq;
   trigger?: JSX.Element | undefined;
   onSuccess?: () => void;
 };
@@ -22,9 +22,9 @@ const layout = {
 const CreateOrEditUserModal: React.FC<CreateOrEditUserProps> = (props) => {
   const intl = useIntl();
   const { visible, onChangeVisible, onSuccess } = props;
-  const formRef = useRef<ProFormInstance<API.SaveUserInfoReq> | null>();
+  const formRef = useRef<ProFormInstance<API.User.SaveReq> | null>();
 
-  const [userInfo, setUserInfo] = useMergedState<API.SaveUserInfoReq>(
+  const [userInfo, setUserInfo] = useMergedState<API.User.SaveReq>(
     { userId: '', identifier: '', nick: '', credential: '' },
     {
       value: props.oldData,
@@ -40,7 +40,7 @@ const CreateOrEditUserModal: React.FC<CreateOrEditUserProps> = (props) => {
   const onSubmit = async () => {
     try {
       setLoading(true);
-      const params = formRef.current?.getFieldsValue() || ({} as API.SaveUserInfoReq);
+      const params = formRef.current?.getFieldsValue() || ({} as API.User.SaveReq);
       params.accountType = props.oldData?.accountType || 1;
       params.userId = props.oldData?.userId;
       const resp = await User.saveOrCreateUser(params);
@@ -73,7 +73,7 @@ const CreateOrEditUserModal: React.FC<CreateOrEditUserProps> = (props) => {
         </Button>,
       ]}
     >
-      <ProForm<API.SaveUserInfoReq>
+      <ProForm<API.User.SaveReq>
         {...layout}
         requiredMark={true}
         formRef={formRef}

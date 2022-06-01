@@ -9,7 +9,7 @@ import { Namespace } from '@/services/cos/namespace';
 export type NamespaceEditorProp = {
   visible?: boolean;
   onChangeVisible: (v: boolean) => void;
-  oldData?: API.Namespace.NamespaceSaveReq;
+  oldData?: API.Namespace.SaveReq;
   trigger?: JSX.Element | undefined;
   onSuccess?: () => void;
 };
@@ -22,10 +22,10 @@ const layout = {
 const NamespaceEditorModal: React.FC<NamespaceEditorProp> = (props) => {
   const intl = useIntl();
   const { visible, onChangeVisible, onSuccess } = props;
-  const formRef = useRef<ProFormInstance<API.Namespace.NamespaceSaveReq>|undefined>();
+  const formRef = useRef<ProFormInstance<API.Namespace.SaveReq>|undefined>();
 
-  const [namespaceData, setNamespaceData] = useMergedState<API.Namespace.NamespaceSaveReq>(
-    { } as API.Namespace.NamespaceSaveReq,
+  const [namespaceData, setNamespaceData] = useMergedState<API.Namespace.SaveReq>(
+    { } as API.Namespace.SaveReq,
     {
       value: props.oldData,
     },
@@ -40,7 +40,7 @@ const NamespaceEditorModal: React.FC<NamespaceEditorProp> = (props) => {
   const onSubmit = async () => {
     try {
       setLoading(true);
-      const params = formRef.current?.getFieldsValue() || ({} as API.Namespace.NamespaceSaveReq);
+      const params = formRef.current?.getFieldsValue() || ({} as API.Namespace.SaveReq);
       const resp = await Namespace.save({
         ...params,
         id: props.oldData?.id || undefined
@@ -75,7 +75,7 @@ const NamespaceEditorModal: React.FC<NamespaceEditorProp> = (props) => {
         </Button>,
       ]}
     >
-      <ProForm<API.Namespace.NamespaceSaveReq>
+      <ProForm<API.Namespace.SaveReq>
         {...layout}
         requiredMark={true}
         formRef={formRef}

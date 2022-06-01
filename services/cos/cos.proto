@@ -46,6 +46,8 @@ service Cos {
   rpc ListConfig(ListConfigRequest) returns (ListConfigResponse) {}
   // @group: config
   rpc CloneConfig(CloneConfigRequest) returns (CloneConfigResponse) {}
+  // @group: config
+  rpc UpdateStatusConfig(UpdateStatusConfigRequest) returns (UpdateStatusConfigResponse) {}
 
   // @group: key_value
   rpc SaveValue(SaveValueRequest) returns (SaveValueResponse) {}
@@ -466,3 +468,11 @@ message UpdateStatusNamespaceRequest {
 }
 
 message UpdateStatusNamespaceResponse {}
+
+message UpdateStatusConfigRequest {
+  // @v: required
+  dt.ID id = 1;
+  bool isDisabled = 2;
+}
+
+message UpdateStatusConfigResponse {}

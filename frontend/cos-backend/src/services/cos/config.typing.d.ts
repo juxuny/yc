@@ -2,7 +2,7 @@
 /* eslint-disable */
 
 declare namespace API {
-  declare namespace Namespace {
+  declare namespace Config {
     type SaveReq = {
       id?: string;
       namespace: string;

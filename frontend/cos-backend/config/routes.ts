@@ -25,30 +25,6 @@
     component: './Welcome',
   },
   {
-    path: '/admin',
-    name: 'admin',
-    icon: 'crown',
-    access: 'canAdmin',
-    component: './Admin',
-    routes: [
-      {
-        path: '/admin/sub-page',
-        name: 'sub-page',
-        icon: 'smile',
-        component: './Welcome',
-      },
-      {
-        component: './404',
-      },
-    ],
-  },
-  {
-    name: 'list.table-list',
-    icon: 'table',
-    path: '/list',
-    component: './TableList',
-  },
-  {
     path: '/account',
     name: 'account',
     icon: 'user',
@@ -63,18 +39,18 @@
   },
   {
     path: '/config',
-    name: 'Config',
+    name: 'config',
     icon: 'user',
     routes: [
       {
         path: '/config/namespace',
-        name: 'Namespace',
+        name: 'namespace',
         icon: 'settings',
         component: './config/Namespace'
       },
       {
         path: '/config/config-management',
-        name: 'ConfigManagement',
+        name: 'config-management',
         icon: 'settings',
         component: './config/ConfigManagement'
       }

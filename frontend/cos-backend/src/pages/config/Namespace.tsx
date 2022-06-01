@@ -14,10 +14,10 @@ export default (): React.ReactNode => {
   const intl = useIntl();
   const actionRef = useRef<ActionType>();
   const [visible, setVisible] = useState<boolean>(false);
-  const [selectedData, setSelectedData] = useState<API.Namespace.NamespaceSaveReq>();
+  const [selectedData, setSelectedData] = useState<API.Namespace.SaveReq>();
   const loadData = async (
-    params: API.QueryParams<API.Namespace.NamespaceListReq>,
-  ): Promise<{ data: API.Namespace.NamespaceListItem[]; success: boolean; total: number }> => {
+    params: API.QueryParams<API.Namespace.ListReq>,
+  ): Promise<{ data: API.Namespace.ListItem[]; success: boolean; total: number }> => {
     const { current, pageSize, ...args } = params;
     try {
       const resp = await Namespace.list({
@@ -35,12 +35,12 @@ export default (): React.ReactNode => {
     return {data: [], success: false, total: 0}
   };
 
-  const showEditor = (record: API.Namespace.NamespaceListItem) => {
+  const showEditor = (record: API.Namespace.ListItem) => {
     setSelectedData(record)
     setVisible(true);
   }
 
-  const updateStatus = async (record: API.Namespace.NamespaceListItem, isDisabled: boolean) => {
+  const updateStatus = async (record: API.Namespace.ListItem, isDisabled: boolean) => {
     try {
       const resp = await Namespace.updateStatus({
         id: record.id,
@@ -54,7 +54,7 @@ export default (): React.ReactNode => {
     }
   }
 
-  const deleteNamespace = async (record: API.Namespace.NamespaceListItem) => {
+  const deleteNamespace = async (record: API.Namespace.ListItem) => {
     try {
       const resp = await Namespace.deleteNamespace({
         id: record.id,
@@ -67,7 +67,7 @@ export default (): React.ReactNode => {
     }
   }
 
-  const columns: ProColumns<API.Namespace.NamespaceListItem>[] = [
+  const columns: ProColumns<API.Namespace.ListItem>[] = [
     {
       title: intl.formatMessage({ id: 'pages.config.namespace.column.id' }),
       dataIndex: 'id',
@@ -178,7 +178,7 @@ export default (): React.ReactNode => {
 
   return (
     <PageContainer>
-      <ProTable<API.Namespace.NamespaceListItem, API.Namespace.NamespaceListReq>
+      <ProTable<API.Namespace.ListItem, API.Namespace.ListReq>
         request={loadData}
         actionRef={actionRef}
         columns={columns}
@@ -195,7 +195,7 @@ export default (): React.ReactNode => {
             type="primary"
             onClick={() => {
               showEditor(
-                {} as API.Namespace.NamespaceListItem,
+                {} as API.Namespace.ListItem,
               );
             }}
           >

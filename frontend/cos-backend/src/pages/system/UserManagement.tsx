@@ -13,8 +13,8 @@ export default (): React.ReactNode => {
   const intl = useIntl();
   const actionRef = useRef<ActionType>();
   const loadData = async (
-    params: API.QueryParams<API.UserListReq>,
-  ): Promise<{ data: API.UserListItem[]; success: boolean; total: number }> => {
+    params: API.QueryParams<API.User.ListReq>,
+  ): Promise<{ data: API.User.ListItem[]; success: boolean; total: number }> => {
     const { current, pageSize, ...args } = params;
     const resp = await User.userList({
       ...args,
@@ -28,17 +28,17 @@ export default (): React.ReactNode => {
   };
 
   const [editVisible, setEditVisible] = useState(false);
-  const [selectedUserData, setSelectedUserData] = useState<API.SaveUserInfoReq | undefined>(
+  const [selectedUserData, setSelectedUserData] = useState<API.User.SaveReq | undefined>(
     undefined,
   );
 
-  const showEditor = (userData: API.SaveUserInfoReq, visible: boolean) => {
+  const showEditor = (userData: API.User.SaveReq, visible: boolean) => {
     setEditVisible(visible);
     console.log(userData);
     setSelectedUserData(userData);
   };
 
-  const updateStatus = async (userData: API.UserListItem, isDisabled: boolean) => {
+  const updateStatus = async (userData: API.User.ListItem, isDisabled: boolean) => {
     const req = {
       userId: userData.id || '',
       isDisabled: isDisabled || false,
@@ -53,7 +53,7 @@ export default (): React.ReactNode => {
     }
   };
 
-  const userDelete = async (userData: API.UserListItem) => {
+  const userDelete = async (userData: API.User.ListItem) => {
     const req = {
       userId: userData.id || ''
     }
@@ -67,7 +67,7 @@ export default (): React.ReactNode => {
     }
   }
 
-  const columns: ProColumns<API.UserListItem>[] = [
+  const columns: ProColumns<API.User.ListItem>[] = [
     {
       title: intl.formatMessage({ id: 'pages.system.user-management.column.id' }),
       dataIndex: 'id',
@@ -177,7 +177,7 @@ export default (): React.ReactNode => {
 
   return (
     <PageContainer>
-      <ProTable<API.UserListItem, API.UserListReq>
+      <ProTable<API.User.ListItem, API.User.ListReq>
         request={loadData}
         actionRef={actionRef}
         columns={columns}

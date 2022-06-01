@@ -10,9 +10,9 @@ import type { ProFormInstance } from '@ant-design/pro-components';
 export default (): React.ReactNode => {
   const intl = useIntl();
   const [loading, setLoading] = useState<number>(0);
-  const formRef = useRef<ProFormInstance<API.UserModifyPasswordReq>|undefined>(undefined);
+  const formRef = useRef<ProFormInstance<API.User.ModifyPasswordReq>|undefined>(undefined);
 
-  const savePassword = async (update: API.UserModifyPasswordReq) => {
+  const savePassword = async (update: API.User.ModifyPasswordReq) => {
     try {
       setLoading(v => v + 1);
       await formRef.current?.validateFields();
@@ -31,10 +31,10 @@ export default (): React.ReactNode => {
   return (
     <PageContainer>
       <ProCard>
-        <ProForm<API.UserModifyPasswordReq> formRef={formRef} submitter={{
+        <ProForm<API.User.ModifyPasswordReq> formRef={formRef} submitter={{
           render: () => {
             return [
-              <Button key={'ok'} type={'primary'} loading={loading > 0} onClick={async () => await savePassword(formRef.current?.getFieldsValue() || ({} as API.UserModifyPasswordReq))}>
+              <Button key={'ok'} type={'primary'} loading={loading > 0} onClick={async () => await savePassword(formRef.current?.getFieldsValue() || ({} as API.User.ModifyPasswordReq))}>
                 <FormattedMessage id={'pages.action.ok'}/>
               </Button>,
               <Button key={'reset'} onClick={() => formRef.current?.resetFields()}>
