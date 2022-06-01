@@ -45,20 +45,20 @@ export default (): React.ReactNode => {
         }}>
           <ProForm.Group>
             <ProFormText.Password
-              rules={[{ required: true}, {pattern: /^([a-zA-Z0-9]{6,22})$/, message: intl.formatMessage({id: 'pages.account.modifyPassword.tips'})}]}
+              rules={[{ required: true}, {pattern: /^([a-zA-Z0-9]{6,22})$/, message: intl.formatMessage({id: 'pages.account.modify-password.tips'})}]}
               name="oldPassword"
-              label={intl.formatMessage({id: 'pages.account.modifyPassword.label.old'})}
-              tooltip={intl.formatMessage({id: 'pages.account.modifyPassword.tips'})}
-              placeholder={intl.formatMessage({id: 'pages.account.modifyPassword.placeholder'})}
+              label={intl.formatMessage({id: 'pages.account.modify-password.label.old'})}
+              tooltip={intl.formatMessage({id: 'pages.account.modify-password.tips'})}
+              placeholder={intl.formatMessage({id: 'pages.account.modify-password.placeholder'})}
             />
           </ProForm.Group>
           <ProForm.Group>
             <ProFormText.Password
-              rules={[{ required: true}, {pattern: /^([a-zA-Z0-9]{6,22})$/, message: intl.formatMessage({id: 'pages.account.modifyPassword.tips'})}]}
+              rules={[{ required: true}, {pattern: /^([a-zA-Z0-9]{6,22})$/, message: intl.formatMessage({id: 'pages.account.modify-password.tips'})}]}
               name="newPassword"
-              label={intl.formatMessage({id: 'pages.account.modifyPassword.label.new'})}
-              tooltip={intl.formatMessage({id: 'pages.account.modifyPassword.tips'})}
-              placeholder={intl.formatMessage({id: 'pages.account.modifyPassword.placeholder'})}
+              label={intl.formatMessage({id: 'pages.account.modify-password.label.new'})}
+              tooltip={intl.formatMessage({id: 'pages.account.modify-password.tips'})}
+              placeholder={intl.formatMessage({id: 'pages.account.modify-password.placeholder'})}
             />
           </ProForm.Group>
         </ProForm>

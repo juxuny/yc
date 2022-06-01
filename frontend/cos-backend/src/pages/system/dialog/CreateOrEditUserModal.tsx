@@ -81,7 +81,7 @@ const CreateOrEditUserModal: React.FC<CreateOrEditUserProps> = (props) => {
       >
         <Form.Item
           required
-          label={intl.formatMessage({ id: 'pages.system.userManagement.column.identifier' })}
+          label={intl.formatMessage({ id: 'pages.system.user-management.column.identifier' })}
           name="identifier"
         >
           <Input
@@ -95,7 +95,7 @@ const CreateOrEditUserModal: React.FC<CreateOrEditUserProps> = (props) => {
 
         <Form.Item
           required
-          label={intl.formatMessage({ id: 'pages.system.userManagement.column.nick' })}
+          label={intl.formatMessage({ id: 'pages.system.user-management.column.nick' })}
           name="nick"
         >
           <Input

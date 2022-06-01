@@ -69,33 +69,33 @@ export default (): React.ReactNode => {
 
   const columns: ProColumns<API.UserListItem>[] = [
     {
-      title: intl.formatMessage({ id: 'pages.system.userManagement.column.id' }),
+      title: intl.formatMessage({ id: 'pages.system.user-management.column.id' }),
       dataIndex: 'id',
       hideInSearch: true,
     },
     {
-      title: intl.formatMessage({ id: 'pages.system.userManagement.column.identifier' }),
+      title: intl.formatMessage({ id: 'pages.system.user-management.column.identifier' }),
       dataIndex: 'identifier',
       hideInSearch: true,
     },
     {
-      title: intl.formatMessage({ id: 'pages.system.userManagement.column.nick' }),
+      title: intl.formatMessage({ id: 'pages.system.user-management.column.nick' }),
       dataIndex: 'nick',
       hideInSearch: true,
     },
     {
-      title: intl.formatMessage({ id: 'pages.system.userManagement.query.search' }),
+      title: intl.formatMessage({ id: 'pages.system.user-management.query.search' }),
       dataIndex: 'searchKey',
       hideInTable: true,
     },
     {
-      title: intl.formatMessage({ id: 'pages.system.userManagement.column.accountType' }),
+      title: intl.formatMessage({ id: 'pages.system.user-management.column.accountType' }),
       dataIndex: 'accountType',
       hideInTable: true,
       hideInSearch: true,
     },
     {
-      title: intl.formatMessage({ id: 'pages.system.userManagement.column.isDisabled' }),
+      title: intl.formatMessage({ id: 'pages.system.user-management.column.isDisabled' }),
       dataIndex: 'isDisabled',
       valueType: 'select',
       valueEnum: {
@@ -143,7 +143,7 @@ export default (): React.ReactNode => {
         {
           record.isDisabled ?
             <Popconfirm key={'enable'}
-                        title={intl.formatMessage({id: 'pages.system.userManagement.confirm.enable'})}
+                        title={intl.formatMessage({id: 'pages.system.user-management.confirm.enable'})}
                         cancelText={intl.formatMessage({id: 'pages.confirm.cancel'})}
                         okText={intl.formatMessage({id: 'pages.confirm.ok'})}
                         onConfirm={async () => {
@@ -153,7 +153,7 @@ export default (): React.ReactNode => {
             </Popconfirm>
              :
             <Popconfirm key={'disable'}
-                        title={intl.formatMessage({id: 'pages.system.userManagement.confirm.disable'})}
+                        title={intl.formatMessage({id: 'pages.system.user-management.confirm.disable'})}
                         cancelText={intl.formatMessage({id: 'pages.confirm.cancel'})}
                         okButtonProps={{type: 'primary'}}
                         okType={'danger'}
@@ -164,7 +164,7 @@ export default (): React.ReactNode => {
             </Popconfirm>
         }
         <Popconfirm key={'delete'}
-                    title={intl.formatMessage({id: 'pages.system.userManagement.confirm.delete'})}
+                    title={intl.formatMessage({id: 'pages.system.user-management.confirm.delete'})}
                     cancelText={intl.formatMessage({id: 'pages.confirm.cancel'})}
                     okButtonProps={{type: 'primary'}}
                     okType={'danger'}
