@@ -22,10 +22,10 @@ const layout = {
 const NamespaceEditorModal: React.FC<NamespaceEditorProp> = (props) => {
   const intl = useIntl();
   const { visible, onChangeVisible, onSuccess } = props;
-  const formRef = useRef<ProFormInstance<API.Namespace.SaveReq>|undefined>();
+  const formRef = useRef<ProFormInstance<API.Namespace.SaveReq> | undefined>();
 
   const [namespaceData, setNamespaceData] = useMergedState<API.Namespace.SaveReq>(
-    { } as API.Namespace.SaveReq,
+    {} as API.Namespace.SaveReq,
     {
       value: props.oldData,
     },
@@ -43,7 +43,7 @@ const NamespaceEditorModal: React.FC<NamespaceEditorProp> = (props) => {
       const params = formRef.current?.getFieldsValue() || ({} as API.Namespace.SaveReq);
       const resp = await Namespace.save({
         ...params,
-        id: props.oldData?.id || undefined
+        id: props.oldData?.id || undefined,
       });
       if (resp.code !== 0) {
         message.error(resp.msg);

@@ -133,3 +133,27 @@ func (t *handler) UpdateStatusNamespace(ctx context.Context, req *cos.UpdateStat
 	}
 	return &cos.UpdateStatusNamespaceResponse{}, nil
 }
+
+func (t *handler) SelectorNamespace(ctx context.Context, req *cos.SelectorRequest) (resp *cos.SelectorResponse, err error) {
+	userId, _ := yc.GetUserId(ctx)
+	where := orm.NewAndWhereWrapper().Eq(db.TableNamespace.CreatorId, userId)
+	if req.IsDisabled != nil && req.IsDisabled.Valid {
+		where.Eq(db.TableNamespace.IsDisabled, req.IsDisabled)
+	}
+	modelNamespaceList, err := db.TableNamespace.Find(ctx, where, orm.DESC(db.TableNamespace.CreateTime))
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+	list := make([]*cos.SelectorItem, 0)
+	for _, item := range modelNamespaceList {
+		list = append(list, &cos.SelectorItem{
+			Label: item.Namespace,
+			Value: item.Id.NumberInString(),
+		})
+	}
+	resp = &cos.SelectorResponse{
+		List: list,
+	}
+	return resp, nil
+}

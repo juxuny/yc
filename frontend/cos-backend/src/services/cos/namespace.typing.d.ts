@@ -6,15 +6,15 @@ declare namespace API {
     type SaveReq = {
       id?: string;
       namespace: string;
-    }
+    };
 
-    type SaveResp = {}
+    type SaveResp = {};
 
     type ListReq = {
       pagination: PaginationReq;
       searchKey?: string;
       isDisabled?: boolean;
-    }
+    };
 
     type ListItem = {
       id: string;
@@ -22,20 +22,19 @@ declare namespace API {
       isDisabled: boolean;
       createTime: number;
       updateTime: number;
-    }
+    };
 
     type DeleteReq = {
       id: string;
-    }
+    };
 
-    type DeleteResp = {}
+    type DeleteResp = {};
 
     type UpdateStatusReq = {
       id: string;
       isDisabled: boolean;
-    }
+    };
 
-    type UpdateStatusResp = {}
-
+    type UpdateStatusResp = {};
   }
 }

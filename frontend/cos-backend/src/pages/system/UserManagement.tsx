@@ -28,9 +28,7 @@ export default (): React.ReactNode => {
   };
 
   const [editVisible, setEditVisible] = useState(false);
-  const [selectedUserData, setSelectedUserData] = useState<API.User.SaveReq | undefined>(
-    undefined,
-  );
+  const [selectedUserData, setSelectedUserData] = useState<API.User.SaveReq | undefined>(undefined);
 
   const showEditor = (userData: API.User.SaveReq, visible: boolean) => {
     setEditVisible(visible);
@@ -42,7 +40,7 @@ export default (): React.ReactNode => {
     const req = {
       userId: userData.id || '',
       isDisabled: isDisabled || false,
-    }
+    };
     try {
       const resp = await User.updateStatus(req);
       if (resp && resp.code === 0) {
@@ -55,17 +53,17 @@ export default (): React.ReactNode => {
 
   const userDelete = async (userData: API.User.ListItem) => {
     const req = {
-      userId: userData.id || ''
-    }
+      userId: userData.id || '',
+    };
     try {
       const resp = await User.delete(req);
       if (resp && resp.code === 0) {
         actionRef.current?.reload();
       }
     } catch (err) {
-      console.error(err)
+      console.error(err);
     }
-  }
+  };
 
   const columns: ProColumns<API.User.ListItem>[] = [
     {
@@ -99,79 +97,98 @@ export default (): React.ReactNode => {
       dataIndex: 'isDisabled',
       valueType: 'select',
       valueEnum: {
-        all: { text: intl.formatMessage({ id: 'pages.status.all' }), status: 'All'},
-        enabled: { text: intl.formatMessage({ id: 'pages.status.enable' }), status: 'Enabled'},
-        disabled: { text: intl.formatMessage({ id: 'pages.status.disable' }), status: 'Disabled'},
+        all: { text: intl.formatMessage({ id: 'pages.status.all' }), status: 'All' },
+        enabled: { text: intl.formatMessage({ id: 'pages.status.enable' }), status: 'Enabled' },
+        disabled: { text: intl.formatMessage({ id: 'pages.status.disable' }), status: 'Disabled' },
       },
       search: {
         transform: (value) => {
-          if (value === "all") {
-            return { isDisabled: undefined }
-          } else if (value === "enabled") {
-            return { isDisabled: 0 }
-          } else if (value == "disabled") {
-            return { isDisabled: 1 }
+          if (value === 'all') {
+            return { isDisabled: undefined };
+          } else if (value === 'enabled') {
+            return { isDisabled: 0 };
+          } else if (value == 'disabled') {
+            return { isDisabled: 1 };
           } else {
-            return {}
+            return {};
           }
-        }
+        },
       },
       hideInSearch: false,
       render: (node, record) => {
-        return <Tag color={record.isDisabled ? 'error' : 'success'}>{record.isDisabled ? '禁用' : '启用'}</Tag>
+        return (
+          <Tag color={record.isDisabled ? 'error' : 'success'}>
+            {record.isDisabled ? '禁用' : '启用'}
+          </Tag>
+        );
       },
     },
     {
       title: intl.formatMessage({ id: 'pages.action' }),
       key: 'action',
       hideInSearch: true,
-      render: (node, record) => <Space>
-        <a
-          key={'edit'}
-          onClick={() => {
-            showEditor(
-              {
-                ...record,
-                userId: record.id,
-              },
-              true,
-            );
-          }}
-        >
-          <FormattedMessage id={'pages.action.edit'} />
-        </a>
-        {
-          record.isDisabled ?
-            <Popconfirm key={'enable'}
-                        title={intl.formatMessage({id: 'pages.system.user-management.confirm.enable'})}
-                        cancelText={intl.formatMessage({id: 'pages.confirm.cancel'})}
-                        okText={intl.formatMessage({id: 'pages.confirm.ok'})}
-                        onConfirm={async () => {
-                          await updateStatus(record, false);
-            }}>
-              <a><FormattedMessage id={'pages.action.enable'}/></a>
+      render: (node, record) => (
+        <Space>
+          <a
+            key={'edit'}
+            onClick={() => {
+              showEditor(
+                {
+                  ...record,
+                  userId: record.id,
+                },
+                true,
+              );
+            }}
+          >
+            <FormattedMessage id={'pages.action.edit'} />
+          </a>
+          {record.isDisabled ? (
+            <Popconfirm
+              key={'enable'}
+              title={intl.formatMessage({ id: 'pages.system.user-management.confirm.enable' })}
+              cancelText={intl.formatMessage({ id: 'pages.confirm.cancel' })}
+              okText={intl.formatMessage({ id: 'pages.confirm.ok' })}
+              onConfirm={async () => {
+                await updateStatus(record, false);
+              }}
+            >
+              <a>
+                <FormattedMessage id={'pages.action.enable'} />
+              </a>
             </Popconfirm>
-             :
-            <Popconfirm key={'disable'}
-                        title={intl.formatMessage({id: 'pages.system.user-management.confirm.disable'})}
-                        cancelText={intl.formatMessage({id: 'pages.confirm.cancel'})}
-                        okButtonProps={{type: 'primary'}}
-                        okType={'danger'}
-                        okText={intl.formatMessage({id: 'pages.confirm.ok'})} onConfirm={async () => {
-                          await updateStatus(record, true);
-            }}>
-              <a style={{color: 'red'}}><FormattedMessage id={'pages.action.disable'}/></a>
+          ) : (
+            <Popconfirm
+              key={'disable'}
+              title={intl.formatMessage({ id: 'pages.system.user-management.confirm.disable' })}
+              cancelText={intl.formatMessage({ id: 'pages.confirm.cancel' })}
+              okButtonProps={{ type: 'primary' }}
+              okType={'danger'}
+              okText={intl.formatMessage({ id: 'pages.confirm.ok' })}
+              onConfirm={async () => {
+                await updateStatus(record, true);
+              }}
+            >
+              <a style={{ color: 'red' }}>
+                <FormattedMessage id={'pages.action.disable'} />
+              </a>
             </Popconfirm>
-        }
-        <Popconfirm key={'delete'}
-                    title={intl.formatMessage({id: 'pages.system.user-management.confirm.delete'})}
-                    cancelText={intl.formatMessage({id: 'pages.confirm.cancel'})}
-                    okButtonProps={{type: 'primary'}}
-                    okType={'danger'}
-                    okText={intl.formatMessage({id: 'pages.confirm.ok'})} onConfirm={async () => await userDelete(record)}>
-          <a style={{color: 'red'}}><FormattedMessage id={'pages.action.delete'}/></a>
-        </Popconfirm>
-      </Space>,
+          )}
+          <Popconfirm
+            key={'delete'}
+            title={intl.formatMessage({ id: 'pages.system.user-management.confirm.delete' })}
+            cancelText={intl.formatMessage({ id: 'pages.confirm.cancel' })}
+            okButtonProps={{ type: 'primary' }}
+            okType={'danger'}
+            okText={intl.formatMessage({ id: 'pages.confirm.ok' })}
+            onConfirm={async () => await userDelete(record)}
+          >
+            <a style={{ color: 'red' }}>
+              <FormattedMessage id={'pages.action.delete'} />
+            </a>
+          </Popconfirm>
+        </Space>
+      ),
     },
   ];
 

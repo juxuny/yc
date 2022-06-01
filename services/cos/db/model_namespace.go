@@ -277,7 +277,8 @@ func (tableNamespace) SoftDelete(ctx context.Context, where orm.WhereWrapper) (r
 func (tableNamespace) Find(ctx context.Context, where orm.WhereWrapper, orderBy ...orm.Order) (list ModelNamespaceList, err error) {
 	w := orm.NewQueryWrapper(ModelNamespace{})
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableNamespace.DeletedAt, 0).IsNull(TableNamespace.DeletedAt))
-	w.SetWhere(where).Order(orderBy...)
+	w.Nested(where)
+	w.Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &list)
 	if err != nil {
 		log.Error(err)

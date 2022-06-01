@@ -433,7 +433,8 @@ func (tableKeyValue) SoftDelete(ctx context.Context, where orm.WhereWrapper) (ro
 func (tableKeyValue) Find(ctx context.Context, where orm.WhereWrapper, orderBy ...orm.Order) (list ModelKeyValueList, err error) {
 	w := orm.NewQueryWrapper(ModelKeyValue{})
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableKeyValue.DeletedAt, 0).IsNull(TableKeyValue.DeletedAt))
-	w.SetWhere(where).Order(orderBy...)
+	w.Nested(where)
+	w.Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &list)
 	if err != nil {
 		log.Error(err)

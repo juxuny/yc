@@ -6,7 +6,7 @@ import RightContent from '@/components/RightContent';
 import Footer from '@/components/Footer';
 import { BookOutlined, LinkOutlined } from '@ant-design/icons';
 import { User } from '@/services/cos/user';
-import {timestampInMinute} from "@/utils/func";
+import { timestampInMinute } from '@/utils/func';
 
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';

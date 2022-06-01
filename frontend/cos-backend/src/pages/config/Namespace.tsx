@@ -2,13 +2,13 @@ import React, { useRef, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import { Namespace } from '@/services/cos/namespace';
 import { useIntl } from 'umi';
-import {Button, Popconfirm, Space, Tag} from 'antd';
+import { Button, Popconfirm, Space, Tag } from 'antd';
 import { FormattedMessage } from '@@/plugin-locale/localeExports';
-import {PlusOutlined} from "@ant-design/icons";
-import ProTable from "@ant-design/pro-table";
-import type {ActionType, ProColumns} from '@ant-design/pro-table';
-import NamespaceEditorModal from "@/pages/config/dialog/NamespaceEditorModal";
-import {Formatter} from '@/utils/formatter'
+import { PlusOutlined } from '@ant-design/icons';
+import ProTable from '@ant-design/pro-table';
+import type { ActionType, ProColumns } from '@ant-design/pro-table';
+import NamespaceEditorModal from '@/pages/config/component/NamespaceEditorModal';
+import { Formatter } from '@/utils/formatter';
 
 export default (): React.ReactNode => {
   const intl = useIntl();
@@ -32,40 +32,40 @@ export default (): React.ReactNode => {
     } catch (err) {
       console.error(err);
     }
-    return {data: [], success: false, total: 0}
+    return { data: [], success: false, total: 0 };
   };
 
   const showEditor = (record: API.Namespace.ListItem) => {
-    setSelectedData(record)
+    setSelectedData(record);
     setVisible(true);
-  }
+  };
 
   const updateStatus = async (record: API.Namespace.ListItem, isDisabled: boolean) => {
     try {
       const resp = await Namespace.updateStatus({
         id: record.id,
         isDisabled: isDisabled,
-      })
+      });
       if (resp && resp.code === 0) {
         actionRef.current?.reload();
       }
     } catch (err) {
-      console.error(err)
+      console.error(err);
     }
-  }
+  };
 
   const deleteNamespace = async (record: API.Namespace.ListItem) => {
     try {
       const resp = await Namespace.deleteNamespace({
         id: record.id,
-      })
+      });
       if (resp && resp.code === 0) {
         actionRef.current?.reload();
       }
     } catch (err) {
-      console.error(err)
+      console.error(err);
     }
-  }
+  };
 
   const columns: ProColumns<API.Namespace.ListItem>[] = [
     {
@@ -88,26 +88,30 @@ export default (): React.ReactNode => {
       dataIndex: 'isDisabled',
       valueType: 'select',
       valueEnum: {
-        all: { text: intl.formatMessage({ id: 'pages.status.all' }), status: 'All'},
-        enabled: { text: intl.formatMessage({ id: 'pages.status.enable' }), status: 'Enabled'},
-        disabled: { text: intl.formatMessage({ id: 'pages.status.disable' }), status: 'Disabled'},
+        all: { text: intl.formatMessage({ id: 'pages.status.all' }), status: 'All' },
+        enabled: { text: intl.formatMessage({ id: 'pages.status.enable' }), status: 'Enabled' },
+        disabled: { text: intl.formatMessage({ id: 'pages.status.disable' }), status: 'Disabled' },
       },
       search: {
         transform: (value) => {
-          if (value === "all") {
-            return { isDisabled: undefined }
-          } else if (value === "enabled") {
-            return { isDisabled: 0 }
-          } else if (value == "disabled") {
-            return { isDisabled: 1 }
+          if (value === 'all') {
+            return { isDisabled: undefined };
+          } else if (value === 'enabled') {
+            return { isDisabled: 0 };
+          } else if (value == 'disabled') {
+            return { isDisabled: 1 };
           } else {
-            return {}
+            return {};
           }
-        }
+        },
       },
       hideInSearch: false,
       render: (node, record) => {
-        return <Tag color={record.isDisabled ? 'error' : 'success'}>{record.isDisabled ? '禁用' : '启用'}</Tag>
+        return (
+          <Tag color={record.isDisabled ? 'error' : 'success'}>
+            {record.isDisabled ? '禁用' : '启用'}
+          </Tag>
+        );
       },
     },
     {
@@ -128,51 +132,64 @@ export default (): React.ReactNode => {
       title: intl.formatMessage({ id: 'pages.action' }),
       key: 'action',
       hideInSearch: true,
-      render: (node, record) => <Space>
-        <a
-          key={'edit'}
-          onClick={() => {
-            showEditor(
-              {
-                ...record
-              },
-            );
-          }}
-        >
-          <FormattedMessage id={'pages.action.edit'} />
-        </a>
-        {
-          record.isDisabled ?
-            <Popconfirm key={'enable'}
-                        title={intl.formatMessage({id: 'pages.config.namespace.confirm.enable'})}
-                        cancelText={intl.formatMessage({id: 'pages.confirm.cancel'})}
-                        okText={intl.formatMessage({id: 'pages.confirm.ok'})}
-                        onConfirm={async () => {
-                          await updateStatus(record, false);
-                        }}>
-              <a><FormattedMessage id={'pages.action.enable'}/></a>
+      render: (node, record) => (
+        <Space>
+          <a
+            key={'edit'}
+            onClick={() => {
+              showEditor({
+                ...record,
+              });
+            }}
+          >
+            <FormattedMessage id={'pages.action.edit'} />
+          </a>
+          {record.isDisabled ? (
+            <Popconfirm
+              key={'enable'}
+              title={intl.formatMessage({ id: 'pages.config.namespace.confirm.enable' })}
+              cancelText={intl.formatMessage({ id: 'pages.confirm.cancel' })}
+              okText={intl.formatMessage({ id: 'pages.confirm.ok' })}
+              onConfirm={async () => {
+                await updateStatus(record, false);
+              }}
+            >
+              <a>
+                <FormattedMessage id={'pages.action.enable'} />
+              </a>
             </Popconfirm>
-            :
-            <Popconfirm key={'disable'}
-                        title={intl.formatMessage({id: 'pages.config.namespace.confirm.disable'})}
-                        cancelText={intl.formatMessage({id: 'pages.confirm.cancel'})}
-                        okButtonProps={{type: 'primary'}}
-                        okType={'danger'}
-                        okText={intl.formatMessage({id: 'pages.confirm.ok'})} onConfirm={async () => {
-              await updateStatus(record, true);
-            }}>
-              <a style={{color: 'red'}}><FormattedMessage id={'pages.action.disable'}/></a>
+          ) : (
+            <Popconfirm
+              key={'disable'}
+              title={intl.formatMessage({ id: 'pages.config.namespace.confirm.disable' })}
+              cancelText={intl.formatMessage({ id: 'pages.confirm.cancel' })}
+              okButtonProps={{ type: 'primary' }}
+              okType={'danger'}
+              okText={intl.formatMessage({ id: 'pages.confirm.ok' })}
+              onConfirm={async () => {
+                await updateStatus(record, true);
+              }}
+            >
+              <a style={{ color: 'red' }}>
+                <FormattedMessage id={'pages.action.disable'} />
+              </a>
             </Popconfirm>
-        }
-        <Popconfirm key={'delete'}
-                    title={intl.formatMessage({id: 'pages.config.namespace.confirm.delete'})}
-                    cancelText={intl.formatMessage({id: 'pages.confirm.cancel'})}
-                    okButtonProps={{type: 'primary'}}
-                    okType={'danger'}
-                    okText={intl.formatMessage({id: 'pages.confirm.ok'})} onConfirm={async () => await deleteNamespace(record)}>
-          <a style={{color: 'red'}}><FormattedMessage id={'pages.action.delete'}/></a>
-        </Popconfirm>
-      </Space>,
+          )}
+          <Popconfirm
+            key={'delete'}
+            title={intl.formatMessage({ id: 'pages.config.namespace.confirm.delete' })}
+            cancelText={intl.formatMessage({ id: 'pages.confirm.cancel' })}
+            okButtonProps={{ type: 'primary' }}
+            okType={'danger'}
+            okText={intl.formatMessage({ id: 'pages.confirm.ok' })}
+            onConfirm={async () => await deleteNamespace(record)}
+          >
+            <a style={{ color: 'red' }}>
+              <FormattedMessage id={'pages.action.delete'} />
+            </a>
+          </Popconfirm>
+        </Space>
+      ),
     },
   ];
 
@@ -194,18 +211,21 @@ export default (): React.ReactNode => {
             icon={<PlusOutlined />}
             type="primary"
             onClick={() => {
-              showEditor(
-                {} as API.Namespace.ListItem,
-              );
+              showEditor({} as API.Namespace.ListItem);
             }}
           >
             <FormattedMessage id="pages.action.create" />
           </Button>,
         ]}
       />
-      <NamespaceEditorModal visible={visible} onChangeVisible={setVisible} oldData={selectedData} onSuccess={() => {
-        actionRef.current?.reload();
-      }}/>
+      <NamespaceEditorModal
+        visible={visible}
+        onChangeVisible={setVisible}
+        oldData={selectedData}
+        onSuccess={() => {
+          actionRef.current?.reload();
+        }}
+      />
     </PageContainer>
   );
 };

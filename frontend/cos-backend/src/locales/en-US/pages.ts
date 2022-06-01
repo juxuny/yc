@@ -68,8 +68,11 @@ export default {
   'pages.searchTable.batchDeletion': 'batch deletion',
   'pages.searchTable.batchApproval': 'batch approval',
 
+  'pages.label.all': 'All',
+
   'pages.result.saveSuccess': 'Save Success',
   'pages.result.modifySuccess': 'Modify Success',
+
   'pages.status.enable.confirm': 'Are you sure to enable it ?',
   'pages.status.disable.confirm': 'Are you sure to disable it ?',
   'pages.status.enable': 'Enable',
@@ -92,8 +95,11 @@ export default {
 
   'pages.field.password': 'Password',
 
-  'pages.column.createTime': '创建时间',
-  'pages.column.updateTime': '修改时间',
+  'pages.column.id': 'ID',
+  'pages.column.createTime': 'CreateTime',
+  'pages.column.updateTime': 'UpdateTime',
+  'pages.column.isDisabled': 'Status',
+  'pages.column.action': 'Action',
 
   // role
   'pages.system.role-management.column.id': 'ID',
@@ -138,5 +144,10 @@ export default {
   'pages.config.namespace.confirm.disable': 'Do you want to disable the namespace ?',
   'pages.config.namespace.confirm.enable': 'Do you want to enable the namespace ?',
   'pages.config.namespace.confirm.delete': 'Do you want to delete th namespace ?',
+  'pages.config.config-management.column.id': 'ID',
+  'pages.config.config-management.column.configId': 'ConfigId',
+  'pages.config.config-management.confirm.disable': 'Do you want to disable the config ?',
+  'pages.config.config-management.confirm.enable': 'Do you want to enable the config ?',
+  'pages.config.config-management.confirm.delete': 'Do you want to delete th config ?',
 
 };

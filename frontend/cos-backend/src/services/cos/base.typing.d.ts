@@ -48,8 +48,16 @@ declare namespace API {
 
   type SelectorItem = {
     label: string;
-    value: string | number;
+    value: string | number | undefined;
   };
 
   type ValueEnum = { [key: string]: {} };
+
+  type SelectorReq = {
+    isDisabled?: boolean;
+  };
+
+  type SelectorResp = {
+    list: SelectorItem[];
+  };
 }

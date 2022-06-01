@@ -20,7 +20,6 @@ export class Config {
     });
   }
 
-
   static async deleteOne(body?: API.Config.SaveResp, options?: { [key: string]: any }) {
     return doRequest<API.Config.DeleteResp>('/cos/delete-config', {
       method: 'POST',
@@ -36,5 +35,4 @@ export class Config {
       ...(options || {}),
     });
   }
-
 }

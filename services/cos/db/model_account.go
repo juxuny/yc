@@ -337,7 +337,8 @@ func (tableAccount) SoftDelete(ctx context.Context, where orm.WhereWrapper) (row
 func (tableAccount) Find(ctx context.Context, where orm.WhereWrapper, orderBy ...orm.Order) (list ModelAccountList, err error) {
 	w := orm.NewQueryWrapper(ModelAccount{})
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableAccount.DeletedAt, 0).IsNull(TableAccount.DeletedAt))
-	w.SetWhere(where).Order(orderBy...)
+	w.Nested(where)
+	w.Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &list)
 	if err != nil {
 		log.Error(err)

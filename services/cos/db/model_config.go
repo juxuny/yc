@@ -377,7 +377,8 @@ func (tableConfig) SoftDelete(ctx context.Context, where orm.WhereWrapper) (rows
 func (tableConfig) Find(ctx context.Context, where orm.WhereWrapper, orderBy ...orm.Order) (list ModelConfigList, err error) {
 	w := orm.NewQueryWrapper(ModelConfig{})
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableConfig.DeletedAt, 0).IsNull(TableConfig.DeletedAt))
-	w.SetWhere(where).Order(orderBy...)
+	w.Nested(where)
+	w.Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &list)
 	if err != nil {
 		log.Error(err)

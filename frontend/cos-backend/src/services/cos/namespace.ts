@@ -20,7 +20,6 @@ export class Namespace {
     });
   }
 
-
   static async deleteNamespace(body?: API.Namespace.DeleteReq, options?: { [key: string]: any }) {
     return doRequest<API.Namespace.DeleteResp>('/cos/delete-namespace', {
       method: 'POST',
@@ -29,7 +28,10 @@ export class Namespace {
     });
   }
 
-  static async updateStatus(body?: API.Namespace.UpdateStatusReq, options?: { [key: string]: any }) {
+  static async updateStatus(
+    body?: API.Namespace.UpdateStatusReq,
+    options?: { [key: string]: any },
+  ) {
     return doRequest<API.Namespace.UpdateStatusResp>('/cos/update-status-namespace', {
       method: 'POST',
       data: body,
@@ -37,4 +39,11 @@ export class Namespace {
     });
   }
 
+  static async selector(body?: API.SelectorReq, options?: { [key: string]: any }) {
+    return doRequest<API.SelectorResp>('/cos/selector-namespace', {
+      method: 'POST',
+      data: body,
+      ...(options || {}),
+    });
+  }
 }

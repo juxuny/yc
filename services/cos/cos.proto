@@ -37,6 +37,8 @@ service Cos {
   rpc DeleteNamespace(DeleteNamespaceRequest) returns(DeleteNamespaceResponse) {}
   // @group: namespace
   rpc UpdateStatusNamespace(UpdateStatusNamespaceRequest) returns (UpdateStatusNamespaceResponse) {}
+  // @group: namespace
+  rpc SelectorNamespace(SelectorRequest) returns (SelectorResponse) {}
 
   // @group: config
   rpc SaveConfig(SaveConfigRequest) returns (SaveConfigResponse) {}
@@ -358,6 +360,7 @@ message DeleteNamespaceResponse {}
 message SaveConfigRequest {
   dt.ID id = 1;
   dt.ID namespaceId = 2;
+  // @v: required
   string configId = 3;
   dt.ID baseId = 4;
 }
@@ -371,6 +374,7 @@ message DeleteConfigResponse {}
 
 message ListConfigRequest {
   dt.Pagination pagination = 1;
+  // @v: required
   dt.ID namespaceId = 2;
   string searchKey = 3;
   dt.NullBool isDisabled = 4;
@@ -476,3 +480,16 @@ message UpdateStatusConfigRequest {
 }
 
 message UpdateStatusConfigResponse {}
+
+message SelectorRequest {
+  dt.NullBool isDisabled = 1;
+}
+
+message SelectorItem {
+  string label = 1;
+  string value = 2;
+}
+
+message SelectorResponse {
+  repeated SelectorItem list = 1;
+}

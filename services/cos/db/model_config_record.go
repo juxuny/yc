@@ -171,7 +171,8 @@ func (tableConfigRecord) DeleteByRecordType(ctx context.Context, recordType cos.
 
 func (tableConfigRecord) Find(ctx context.Context, where orm.WhereWrapper, orderBy ...orm.Order) (list ModelConfigRecordList, err error) {
 	w := orm.NewQueryWrapper(ModelConfigRecord{})
-	w.SetWhere(where).Order(orderBy...)
+	w.Nested(where)
+	w.Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &list)
 	if err != nil {
 		log.Error(err)

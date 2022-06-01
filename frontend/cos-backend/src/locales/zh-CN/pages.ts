@@ -65,8 +65,11 @@ export default {
   'pages.searchTable.batchDeletion': '批量删除',
   'pages.searchTable.batchApproval': '批量审批',
 
+  'pages.label.all': '全部',
+
   'pages.result.saveSuccess': '保存成功',
   'pages.result.modifySuccess': '修改成功',
+
   'pages.status.enable.confirm': '确定要启用吗？',
   'pages.status.disable.confirm': '确定要禁用吗？',
   'pages.status.enable': '启用',
@@ -84,14 +87,16 @@ export default {
   'pages.action.save': '保存',
   'pages.action.search': '搜索',
 
-
   'pages.confirm.ok': '确定',
   'pages.confirm.cancel': '取消',
 
   'pages.field.password': '密码',
 
+  'pages.column.id': 'ID',
   'pages.column.createTime': '创建时间',
   'pages.column.updateTime': '修改时间',
+  'pages.column.isDisabled': '状态',
+  'pages.column.action': '操作',
 
   // 角色管理
   'pages.system.role-management.column.id': 'ID',
@@ -131,4 +136,13 @@ export default {
   'pages.config.namespace.column.updateTime': '修改时间',
   'pages.config.namespace.column.isDisabled': '状态',
   'pages.config.namespace.column.action': '操作',
+  'pages.config.namespace.confirm.disable': '确定禁用当前命名空间吗 ?',
+  'pages.config.namespace.confirm.enable': '确定启用当前命名空间吗 ?',
+  'pages.config.namespace.confirm.delete': '确定删除当前命名空间吗 ?',
+  'pages.config.config-management.column.id': 'ID',
+  'pages.config.config-management.column.configId': '配置资源标识',
+  'pages.config.config-management.confirm.disable': '确定要禁用当前配置吗 ?',
+  'pages.config.config-management.confirm.enable': '确定要启用当前配置吗 ?',
+  'pages.config.config-management.confirm.delete': '确定要删除当前配置吗 ?',
+
 };

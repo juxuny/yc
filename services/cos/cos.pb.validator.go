@@ -6,19 +6,22 @@ import (
 )
 
 const (
-	ValidatorTemplateLoginRequestAccountType = "无效登录类型: {{.AccountType|num}}"
-	ValidatorTemplateUpdateInfoRequestNick = "missing nick name"
-	ValidatorTemplateModifyPasswordRequestOldPassword = "invalid old password: {{.OldPassword}}"
-	ValidatorTemplateModifyPasswordRequestNewPassword = "invalid new password: {{.NewPassword}}"
+	ValidatorTemplateLoginRequestAccountType            = "无效登录类型: {{.AccountType|num}}"
+	ValidatorTemplateUpdateInfoRequestNick              = "missing nick name"
+	ValidatorTemplateModifyPasswordRequestOldPassword   = "invalid old password: {{.OldPassword}}"
+	ValidatorTemplateModifyPasswordRequestNewPassword   = "invalid new password: {{.NewPassword}}"
 	ValidatorTemplateSaveOrCreateUserRequestAccountType = "invalid accountType: {{.AccountType|num}}"
-	ValidatorTemplateSaveOrCreateUserRequestNick = ""
-	ValidatorTemplateUserListRequestPagination = ""
-	ValidatorTemplateSaveNamespaceRequestNamespace = "invalid namespace: {{.Namespace}}"
-	ValidatorTemplateDeleteNamespaceRequestId = "invalid id"
-	ValidatorTemplateDeleteValueRequestKey = "missing config key name"
-	ValidatorTemplateUserUpdateStatusRequestUserId = ""
-	ValidatorTemplateUserDeleteRequestUserId = ""
-	ValidatorTemplateUpdateStatusNamespaceRequestId = ""
+	ValidatorTemplateSaveOrCreateUserRequestNick        = ""
+	ValidatorTemplateUserListRequestPagination          = ""
+	ValidatorTemplateSaveNamespaceRequestNamespace      = "invalid namespace: {{.Namespace}}"
+	ValidatorTemplateDeleteNamespaceRequestId           = "invalid id"
+	ValidatorTemplateSaveConfigRequestConfigId          = ""
+	ValidatorTemplateListConfigRequestNamespaceId       = ""
+	ValidatorTemplateDeleteValueRequestKey              = "missing config key name"
+	ValidatorTemplateUserUpdateStatusRequestUserId      = ""
+	ValidatorTemplateUserDeleteRequestUserId            = ""
+	ValidatorTemplateUpdateStatusNamespaceRequestId     = ""
+	ValidatorTemplateUpdateStatusConfigRequestId        = ""
 )
 
 var templateList = []string{
@@ -31,10 +34,13 @@ var templateList = []string{
 	ValidatorTemplateUserListRequestPagination,
 	ValidatorTemplateSaveNamespaceRequestNamespace,
 	ValidatorTemplateDeleteNamespaceRequestId,
+	ValidatorTemplateSaveConfigRequestConfigId,
+	ValidatorTemplateListConfigRequestNamespaceId,
 	ValidatorTemplateDeleteValueRequestKey,
 	ValidatorTemplateUserUpdateStatusRequestUserId,
 	ValidatorTemplateUserDeleteRequestUserId,
 	ValidatorTemplateUpdateStatusNamespaceRequestId,
+	ValidatorTemplateUpdateStatusConfigRequestId,
 }
 
 func init() {
@@ -116,12 +122,18 @@ func (m *DeleteNamespaceRequest) Validate() error {
 	return nil
 }
 func (m *SaveConfigRequest) Validate() error {
+	if err := validator.Run(m.ConfigId, validator.CreateAction("required", ``, ValidatorTemplateSaveConfigRequestConfigId), m, "configId"); err != nil {
+		return err
+	}
 	return nil
 }
 func (m *DeleteConfigRequest) Validate() error {
 	return nil
 }
 func (m *ListConfigRequest) Validate() error {
+	if err := validator.Run(m.NamespaceId, validator.CreateAction("required", ``, ValidatorTemplateListConfigRequestNamespaceId), m, "namespaceId"); err != nil {
+		return err
+	}
 	return nil
 }
 func (m *CloneConfigRequest) Validate() error {
@@ -161,5 +173,14 @@ func (m *UpdateStatusNamespaceRequest) Validate() error {
 	if err := validator.Run(m.Id, validator.CreateAction("required", ``, ValidatorTemplateUpdateStatusNamespaceRequestId), m, "id"); err != nil {
 		return err
 	}
+	return nil
+}
+func (m *UpdateStatusConfigRequest) Validate() error {
+	if err := validator.Run(m.Id, validator.CreateAction("required", ``, ValidatorTemplateUpdateStatusConfigRequestId), m, "id"); err != nil {
+		return err
+	}
+	return nil
+}
+func (m *SelectorRequest) Validate() error {
 	return nil
 }

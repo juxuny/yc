@@ -10,6 +10,10 @@ func (m *ID) NewPointer() *ID {
 	return NewIDPointer(m.Uint64)
 }
 
+func (m *ID) NumberInString() string {
+	return fmt.Sprintf("%d", m.Uint64)
+}
+
 func (m *ID) UnmarshalJSON(data []byte) error {
 	input := strings.Trim(string(data), "\" ")
 	if input == "" || strings.Contains(input, "null") {

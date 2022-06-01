@@ -57,7 +57,6 @@ export default {
   'menu.system.permission-management': 'Permission',
   'menu.system.menu-management': 'Menus',
 
-
   // config
   'menu.config.namespace': 'Namespace',
   'menu.config': 'Configuration',

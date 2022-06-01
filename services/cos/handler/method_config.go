@@ -145,3 +145,6 @@ func (t *handler) ListConfig(ctx context.Context, req *cos.ListConfigRequest) (r
 func (t *handler) CloneConfig(ctx context.Context, req *cos.CloneConfigRequest) (resp *cos.CloneConfigResponse, err error) {
 	return &cos.CloneConfigResponse{}, nil
 }
+func (t *handler) UpdateStatusConfig(ctx context.Context, req *cos.UpdateStatusConfigRequest) (resp *cos.UpdateStatusConfigResponse, err error) {
+	return &cos.UpdateStatusConfigResponse{}, nil
+}
