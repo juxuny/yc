@@ -328,12 +328,16 @@ message SaveNamespaceResponse {}
 message ListNamespaceRequest {
   dt.Pagination pagination = 1;
   string searchKey = 2;
+  dt.NullBool isDisabled = 3;
 }
 
 // @ref: ModelNamespace
 message ListNamespaceItem {
   dt.ID id = 1;
   string namespace = 2;
+  int64 createTime = 3;
+  int64 updateTime = 4;
+  bool isDisabled = 5;
 }
 
 message ListNamespaceResponse {

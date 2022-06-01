@@ -50,6 +50,7 @@ const NamespaceEditorModal: React.FC<NamespaceEditorProp> = (props) => {
       } else {
         if (onChangeVisible) onChangeVisible(false);
         if (onSuccess) onSuccess();
+        formRef.current?.resetFields();
       }
     } catch (err) {
       console.error(err);

@@ -147,8 +147,8 @@ func (t *wrapper) UpdateStatusNamespace(ctx context.Context, req *cos.UpdateStat
 	defer func() {
 		if recoverError := recover(); recoverError != nil {
 			err = errors.SystemError.InternalError
-				debug.PrintStack()
-				handleRecover(ctx, recoverError)
+			debug.PrintStack()
+			handleRecover(ctx, recoverError)
 			return
 		}
 	}()
@@ -166,21 +166,20 @@ func (t *wrapper) UpdateStatusNamespace(ctx context.Context, req *cos.UpdateStat
 	if isEnd {
 		return nil, nil
 	}
-	defer func () {
+	defer func() {
 		_, err := t.afterHandler.Run(ctx)
 		if err != nil {
 			log.Error(err)
 		}
-	} ()
+	}()
 	if err := req.Validate(); err != nil {
 		log.Error(err)
 		return nil, err
 	}
-	defer func () {
+	defer func() {
 		if err != nil {
 			log.Error(err)
 		}
-	} ()
+	}()
 	return t.handler.UpdateStatusNamespace(ctx, req)
 }
-

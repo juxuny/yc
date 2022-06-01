@@ -89,7 +89,11 @@ export default {
 
   'pages.confirm.ok': 'OK',
   'pages.confirm.cancel': 'Cancel',
+
   'pages.field.password': 'Password',
+
+  'pages.column.createTime': '创建时间',
+  'pages.column.updateTime': '修改时间',
 
   // role
   'pages.system.roleManagement.column.id': 'ID',

@@ -8,6 +8,7 @@ import {PlusOutlined} from "@ant-design/icons";
 import ProTable from "@ant-design/pro-table";
 import type {ActionType, ProColumns} from '@ant-design/pro-table';
 import NamespaceEditorModal from "@/pages/config/dialog/NamespaceEditorModal";
+import {Formatter} from '@/utils/formatter'
 
 export default (): React.ReactNode => {
   const intl = useIntl();
@@ -108,6 +109,20 @@ export default (): React.ReactNode => {
       render: (node, record) => {
         return <Tag color={record.isDisabled ? 'error' : 'success'}>{record.isDisabled ? '禁用' : '启用'}</Tag>
       },
+    },
+    {
+      title: intl.formatMessage({ id: 'pages.config.namespace.column.createTime' }),
+      dataIndex: 'createTime',
+      hideInTable: false,
+      hideInSearch: true,
+      renderText: Formatter.convertTimestampFromMillionSeconds,
+    },
+    {
+      title: intl.formatMessage({ id: 'pages.config.namespace.column.updateTime' }),
+      dataIndex: 'updateTime',
+      hideInTable: false,
+      hideInSearch: true,
+      renderText: Formatter.convertTimestampFromMillionSeconds,
     },
     {
       title: intl.formatMessage({ id: 'pages.action' }),

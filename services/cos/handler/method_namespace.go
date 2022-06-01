@@ -59,12 +59,16 @@ func (t *handler) ListNamespace(ctx context.Context, req *cos.ListNamespaceReque
 		log.Error(err)
 		return nil, err
 	}
-	total, err := db.TableNamespace.CountByCreatorId(ctx, currentId)
+	where := orm.NewAndWhereWrapper().Eq(db.TableNamespace.CreatorId, currentId)
+	if req.IsDisabled != nil && req.IsDisabled.Valid {
+		where.Eq(db.TableNamespace.IsDisabled, req.IsDisabled)
+	}
+	total, err := db.TableNamespace.Count(ctx, where)
 	if err != nil {
 		log.Error(err)
 		return nil, err
 	}
-	modelNamespaceList, err := db.TableNamespace.PageByCreatorId(ctx, req.Pagination.PageNum, req.Pagination.PageSize, currentId, orm.DESC(db.TableNamespace.CreateTime))
+	modelNamespaceList, err := db.TableNamespace.Page(ctx, req.Pagination.PageNum, req.Pagination.PageSize, where, orm.DESC(db.TableNamespace.CreateTime))
 	if err != nil {
 		log.Error(err)
 		return nil, err
@@ -124,4 +128,3 @@ func (t *handler) UpdateStatusNamespace(ctx context.Context, req *cos.UpdateStat
 	}
 	return &cos.UpdateStatusNamespaceResponse{}, nil
 }
-

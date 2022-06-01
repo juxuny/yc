@@ -46,8 +46,11 @@ func (t ModelNamespace) ToNamespaceResp() cos.NamespaceResp {
 }
 func (t ModelNamespace) ToListNamespaceItem() cos.ListNamespaceItem {
 	return cos.ListNamespaceItem{
-		Id:        t.Id,
-		Namespace: t.Namespace,
+		Id:         t.Id,
+		Namespace:  t.Namespace,
+		CreateTime: t.CreateTime,
+		UpdateTime: t.UpdateTime,
+		IsDisabled: t.IsDisabled,
 	}
 }
 

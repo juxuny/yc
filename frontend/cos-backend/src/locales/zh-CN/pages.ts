@@ -90,6 +90,9 @@ export default {
 
   'pages.field.password': '密码',
 
+  'pages.column.createTime': '创建时间',
+  'pages.column.updateTime': '修改时间',
+
   // 角色管理
   'pages.system.roleManagement.column.id': 'ID',
   'pages.system.roleManagement.column.type': '类别',
