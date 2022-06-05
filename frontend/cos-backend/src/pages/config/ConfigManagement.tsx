@@ -190,37 +190,19 @@ export default (): React.ReactNode => {
           >
             <FormattedMessage id={'pages.action.edit'} />
           </a>
-          {record.isDisabled ? (
-            <Popconfirm
-              key={'enable'}
-              title={intl.formatMessage({ id: 'pages.config.namespace.confirm.enable' })}
-              cancelText={intl.formatMessage({ id: 'pages.confirm.cancel' })}
-              okText={intl.formatMessage({ id: 'pages.confirm.ok' })}
-              onConfirm={async () => {
-                await updateStatus(record, false);
-              }}
-            >
-              <a>
-                <FormattedMessage id={'pages.action.enable'} />
-              </a>
-            </Popconfirm>
-          ) : (
-            <Popconfirm
-              key={'disable'}
-              title={intl.formatMessage({ id: 'pages.config.namespace.confirm.disable' })}
-              cancelText={intl.formatMessage({ id: 'pages.confirm.cancel' })}
-              okButtonProps={{ type: 'primary' }}
-              okType={'danger'}
-              okText={intl.formatMessage({ id: 'pages.confirm.ok' })}
-              onConfirm={async () => {
-                await updateStatus(record, true);
-              }}
-            >
-              <a style={{ color: 'red' }}>
-                <FormattedMessage id={'pages.action.disable'} />
-              </a>
-            </Popconfirm>
-          )}
+          <Popconfirm
+            key={'enable'}
+            title={intl.formatMessage({ id: record.isDisabled ? 'pages.config.namespace.confirm.enable' : 'pages.config.namespace.confirm.disable' })}
+            cancelText={intl.formatMessage({ id: 'pages.confirm.cancel' })}
+            okText={intl.formatMessage({ id: 'pages.confirm.ok' })}
+            onConfirm={async () => {
+              await updateStatus(record, !record.isDisabled);
+            }}
+          >
+            <a>
+              <FormattedMessage id={record.isDisabled ? 'pages.action.enable' : 'pages.action.disable'} />
+            </a>
+          </Popconfirm>
           <Popconfirm
             key={'delete'}
             title={intl.formatMessage({ id: 'pages.config.namespace.confirm.delete' })}
