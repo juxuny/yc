@@ -149,5 +149,6 @@ export default {
   'pages.config.config-management.confirm.disable': 'Do you want to disable the config ?',
   'pages.config.config-management.confirm.enable': 'Do you want to enable the config ?',
   'pages.config.config-management.confirm.delete': 'Do you want to delete th config ?',
+  'pages.config.config-management.error.missingNamespaceId': 'Please select namespace',
 
 };

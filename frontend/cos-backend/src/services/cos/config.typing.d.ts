@@ -5,7 +5,7 @@ declare namespace API {
   declare namespace Config {
     type SaveReq = {
       id?: string;
-      namespaceId: string;
+      namespaceId: string | number;
       configId: string;
       baseId?: string;
     };
@@ -16,6 +16,7 @@ declare namespace API {
       pagination: PaginationReq;
       searchKey?: string;
       isDisabled?: boolean;
+      namespaceId: string | number;
     };
 
     type ListItem = {

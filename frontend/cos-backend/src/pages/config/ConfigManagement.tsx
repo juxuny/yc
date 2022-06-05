@@ -1,30 +1,38 @@
-import React, { useRef, useState } from 'react';
+import React, {useRef, useState, useEffect} from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import { Config } from '@/services/cos/config';
 import { useIntl } from 'umi';
-import { Button, Popconfirm, Space, Tag } from 'antd';
+import {Button, Popconfirm, Space, Tag, message} from 'antd';
+import type { FormInstance } from 'antd';
 import { FormattedMessage } from '@@/plugin-locale/localeExports';
 import { PlusOutlined } from '@ant-design/icons';
 import ProTable from '@ant-design/pro-table';
 import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import ConfigEditorModal from '@/pages/config/component/ConfigEditorModal';
 import { Formatter } from '@/utils/formatter';
-import AsyncSelector from '@/components/AsyncSelector';
 import { Namespace } from '@/services/cos/namespace';
+import { history } from 'umi';
 
 export default (): React.ReactNode => {
   const intl = useIntl();
   const actionRef = useRef<ActionType>();
+  const formRef = useRef<FormInstance<API.Config.ListReq> | undefined>();
   const [visible, setVisible] = useState<boolean>(false);
   const [selectedData, setSelectedData] = useState<API.Config.SaveReq>();
   const loadData = async (
     params: API.QueryParams<API.Config.ListReq>,
   ): Promise<{ data: API.Config.ListItem[]; success: boolean; total: number }> => {
     const { current, pageSize, ...args } = params;
+    const selectedNamespaceId = formRef.current?.getFieldsValue().namespaceId;
+    if (selectedNamespaceId === undefined || selectedNamespaceId === 'undefined') {
+      message.error(intl.formatMessage({ id: 'pages.config.config-management.error.missingNamespaceId' }));
+      return { data: [], success: false, total: 0 };
+    }
     try {
       const resp = await Config.list({
         ...args,
         pagination: { pageNum: current, pageSize: pageSize },
+        namespaceId: selectedNamespaceId,
       });
       return {
         data: resp.data?.list || [],
@@ -37,11 +45,24 @@ export default (): React.ReactNode => {
     return { data: [], success: false, total: 0 };
   };
 
+  useEffect(() => {
+    const { location } = history;
+    const namespaceId = location.query?.namespaceId;
+    if (namespaceId) {
+      if (Array.isArray(namespaceId)) {
+        formRef.current?.setFieldsValue({namespaceId: namespaceId[0]});
+      } else {
+        formRef.current?.setFieldsValue({namespaceId});
+      }
+    }
+  });
+
   const showEditor = (record: API.Config.ListItem) => {
+    const selectedNamespaceId = formRef.current?.getFieldsValue().namespaceId;
     setSelectedData({
       id: record.id,
       configId: record.configId,
-      namespaceId: '',
+      namespaceId: selectedNamespaceId || 0,
       baseId: undefined,
     });
     setVisible(true);
@@ -61,7 +82,7 @@ export default (): React.ReactNode => {
     }
   };
 
-  const deleteNamespace = async (record: API.Config.ListItem) => {
+  const deleteConfig = async (record: API.Config.ListItem) => {
     try {
       const resp = await Config.deleteOne({
         id: record.id,
@@ -89,6 +110,24 @@ export default (): React.ReactNode => {
       title: intl.formatMessage({ id: 'pages.action.search' }),
       dataIndex: 'searchKey',
       hideInTable: true,
+    },
+    {
+      title: intl.formatMessage({ id: 'pages.config.namespace.column.namespace' }),
+      dataIndex: 'namespaceId',
+      hideInTable: true,
+      valueType: 'select',
+      request: async () => {
+        try {
+          const resp = await Namespace.selector();
+          if (resp && resp.code === 0) {
+            return resp.data?.list || [];
+          }
+          return [];
+        } catch (e) {
+          console.error(e);
+        }
+        return [];
+      }
     },
     {
       title: intl.formatMessage({ id: 'pages.config.namespace.column.isDisabled' }),
@@ -189,7 +228,7 @@ export default (): React.ReactNode => {
             okButtonProps={{ type: 'primary' }}
             okType={'danger'}
             okText={intl.formatMessage({ id: 'pages.confirm.ok' })}
-            onConfirm={async () => await deleteNamespace(record)}
+            onConfirm={async () => await deleteConfig(record)}
           >
             <a style={{ color: 'red' }}>
               <FormattedMessage id={'pages.action.delete'} />
@@ -203,6 +242,7 @@ export default (): React.ReactNode => {
   return (
     <PageContainer>
       <ProTable<API.Config.ListItem, API.Config.ListReq>
+        formRef={formRef}
         request={loadData}
         actionRef={actionRef}
         columns={columns}
@@ -214,7 +254,7 @@ export default (): React.ReactNode => {
         headerTitle={false}
         toolBarRender={() => [
           <Button
-            key="button"
+            key={'edit'}
             icon={<PlusOutlined />}
             type="primary"
             onClick={() => {
@@ -222,21 +262,7 @@ export default (): React.ReactNode => {
             }}
           >
             <FormattedMessage id="pages.action.create" />
-          </Button>,
-          <AsyncSelector
-            all={true}
-            request={async () => {
-              try {
-                const resp = await Namespace.selector();
-                if (resp && resp.code === 0) {
-                  return Promise.resolve(resp.data || ({} as API.SelectorResp));
-                }
-              } catch (err) {
-                console.error(err);
-              }
-              return Promise.resolve({} as API.SelectorResp);
-            }}
-          />,
+          </Button>
         ]}
       />
       <ConfigEditorModal

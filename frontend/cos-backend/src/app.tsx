@@ -6,7 +6,7 @@ import RightContent from '@/components/RightContent';
 import Footer from '@/components/Footer';
 import { BookOutlined, LinkOutlined } from '@ant-design/icons';
 import { User } from '@/services/cos/user';
-import { timestampInMinute } from '@/utils/func';
+import {convertToQueryParams, timestampInMinute} from '@/utils/func';
 
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
@@ -59,13 +59,11 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
     footerRender: () => <Footer />,
     onPageChange: () => {
       const { location } = history;
-
-      if (location.pathname.indexOf('_t_=') === -1) {
-        if (location.pathname.indexOf('?') === -1) {
-          history.push(location.pathname + '?_t_=' + timestampInMinute());
-        } else {
-          history.push(location.pathname + '&_t_=' + timestampInMinute());
-        }
+      const query = location.query || {};
+      if (!query._t_) {
+        query._t_ = timestampInMinute();
+        const queryParams = convertToQueryParams(query);
+        history.push(location.pathname + '?' + queryParams);
       }
       // 如果没有登录，重定向到 login
       if (!initialState?.currentUser && location.pathname.indexOf(loginPath) === -1) {

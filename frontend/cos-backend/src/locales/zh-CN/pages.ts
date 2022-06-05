@@ -144,5 +144,6 @@ export default {
   'pages.config.config-management.confirm.disable': '确定要禁用当前配置吗 ?',
   'pages.config.config-management.confirm.enable': '确定要启用当前配置吗 ?',
   'pages.config.config-management.confirm.delete': '确定要删除当前配置吗 ?',
+  'pages.config.config-management.error.missingNamespaceId': '请选择命名空间',
 
 };

@@ -9,27 +9,30 @@ export type AsyncSelectorProp = {
   defaultFirst?: boolean;
   defaultValue?: any;
   request?: () => Promise<API.SelectorResp>;
+  onChangeValue?: (v: number | string | undefined) => void;
 };
 
 export const AsyncSelector: React.FC<AsyncSelectorProp> = (props) => {
   const intl = useIntl();
-  const { all, defaultFirst, defaultValue, request } = props;
+  const { all, defaultFirst, defaultValue, request, onChangeValue } = props;
   const [items, setItems] = useState<API.SelectorItem[]>([]);
   const [currentValue, setCurrentValue] = useState<any>();
 
   useEffect(() => {
+    console.log('AsyncSelector useEffect');
     const initValue = (list: API.SelectorItem[]) => {
       let finalList = list;
-      if (all)
+      if (all) {
         finalList = [
           { label: intl.formatMessage({ id: 'pages.label.all' }), value: 'undefined' },
           ...list,
         ];
+      }
       if (defaultFirst || defaultValue) {
         setCurrentValue(defaultFirst || defaultValue);
-      }
-      if (all && !defaultFirst && !defaultValue && list.length > 0) {
+      } else {
         setCurrentValue(finalList[0].value);
+        if (onChangeValue) onChangeValue(finalList[0].value);
       }
       if (items.length === 0) setItems(finalList);
     };
@@ -38,19 +41,14 @@ export const AsyncSelector: React.FC<AsyncSelectorProp> = (props) => {
       initValue(res.list);
     });
   });
-  if (items.length === 0) {
-    return <div />;
-  } else {
-    return (
-      <Select defaultValue={currentValue}>
-        {items.map((item) => (
-          <Option key={item.value} value={item.value}>
-            {item.label}
-          </Option>
-        ))}
-      </Select>
-    );
-  }
+
+  return (<Select value={currentValue} onChange={onChangeValue}>
+    {items.map((item) => (
+      <Option key={item.value} value={item.value}>
+        {item.label}
+      </Option>
+    ))}
+  </Select>);
 };
 
 export default AsyncSelector;
