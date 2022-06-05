@@ -102,8 +102,8 @@ export default (): React.ReactNode => {
       hideInSearch: true,
     },
     {
-      title: intl.formatMessage({ id: 'pages.config.namespace.column.namespace' }),
-      dataIndex: 'namespace',
+      title: intl.formatMessage({ id: 'pages.config.config-management.column.configId' }),
+      dataIndex: 'configId',
       hideInSearch: true,
     },
     {

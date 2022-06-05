@@ -43,6 +43,7 @@ const ConfigEditorModal: React.FC<ConfigEditorProp> = (props) => {
       const params = formRef.current?.getFieldsValue() || ({} as API.Config.SaveReq);
       const resp = await Config.save({
         ...params,
+        namespaceId: props.oldData?.namespaceId,
         id: props.oldData?.id || undefined,
       });
       if (resp.code !== 0) {

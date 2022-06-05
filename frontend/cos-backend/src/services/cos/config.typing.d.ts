@@ -5,7 +5,7 @@ declare namespace API {
   declare namespace Config {
     type SaveReq = {
       id?: string;
-      namespaceId: string | number;
+      namespaceId: string | number | undefined;
       configId: string;
       baseId?: string;
     };
