@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import { Namespace } from '@/services/cos/namespace';
-import { useIntl } from 'umi';
+import { useIntl, history } from 'umi';
 import { Button, Popconfirm, Space, Tag } from 'antd';
 import { FormattedMessage } from '@@/plugin-locale/localeExports';
 import { PlusOutlined } from '@ant-design/icons';
@@ -77,6 +77,13 @@ export default (): React.ReactNode => {
       title: intl.formatMessage({ id: 'pages.config.namespace.column.namespace' }),
       dataIndex: 'namespace',
       hideInSearch: true,
+      render: (node, record) => {
+        return <a onClick={() => {
+          history.push('/config/config-management?namespaceId=' + record.id);
+        }}>
+          { record.namespace }
+        </a>
+      }
     },
     {
       title: intl.formatMessage({ id: 'pages.action.search' }),
