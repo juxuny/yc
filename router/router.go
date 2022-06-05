@@ -147,9 +147,14 @@ func (t *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		} else if len(responses) == 2 {
 			secondResponse := responses[1].Interface()
 			if secondResponse != nil {
-				if err, ok := secondResponse.(error); ok {
+				if err, ok := secondResponse.(errors.Error); ok {
 					statusCode = http.StatusBadRequest
 					WriteJson(w, err, http.StatusBadRequest)
+					return
+				}
+				if err, ok := secondResponse.(error); ok {
+					statusCode = http.StatusBadRequest
+					WriteJson(w, errors.SystemError.InternalError.Wrap(err), http.StatusBadRequest)
 					return
 				}
 			}

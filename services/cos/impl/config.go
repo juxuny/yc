@@ -72,6 +72,18 @@ func CreateConfig(ctx context.Context, modelConfig db.ModelConfig) (lastInsertId
 	modelConfig.DeletedAt = orm.Now()
 	modelConfig.LastSeqNo = 1
 	modelConfig.LastRecordType = cos.ConfigRecordType_ConfigRecordTypeCreate
+
+	// check duplicated configId
+	where := orm.NewAndWhereWrapper().Eq(db.TableConfig.ConfigId, modelConfig.ConfigId).Eq(db.TableConfig.NamespaceId, modelConfig.NamespaceId).Eq(db.TableConfig.CreatorId, modelConfig.CreatorId)
+	_, found, err := db.TableConfig.FindOne(ctx, where)
+	if err != nil {
+		log.Error(err)
+		return lastInsertId, err
+	}
+	if found {
+		return dt.NewID(0), cos.Error.ConfigIdDuplicated.WithField(db.TableConfig.ConfigId.LowerFirstHump(), modelConfig.ConfigId)
+	}
+
 	lastInsertId, err = db.TableConfig.CreateWithLastId(ctx, modelConfig)
 	if err != nil {
 		log.Error(err)

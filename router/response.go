@@ -22,7 +22,8 @@ func WriteJson(w http.ResponseWriter, data interface{}, code ...int) {
 	} else {
 		w.WriteHeader(http.StatusOK)
 	}
-	jsonData, _ := json.Marshal(data)
+	var jsonData []byte
+	jsonData, _ = json.Marshal(data)
 	_, _ = w.Write(jsonData)
 }
 

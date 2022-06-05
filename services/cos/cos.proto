@@ -397,7 +397,11 @@ message ListConfigResponse {
 }
 
 message CloneConfigRequest {
+  // @v: required
   dt.ID id = 1;
+  // @v: length.min=1
+  // @msg: invalid configId: {{.NewConfigId}}
+  string newConfigId = 2;
 }
 
 message CloneConfigResponse {}

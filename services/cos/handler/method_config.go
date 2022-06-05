@@ -142,9 +142,78 @@ func (t *handler) ListConfig(ctx context.Context, req *cos.ListConfigRequest) (r
 		List:       list.MapToListConfigItemList(),
 	}, nil
 }
+
 func (t *handler) CloneConfig(ctx context.Context, req *cos.CloneConfigRequest) (resp *cos.CloneConfigResponse, err error) {
+	userId, _ := yc.GetUserId(ctx)
+	modelConfig, found, err := db.TableConfig.FindOneById(ctx, *req.Id)
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+	if !found {
+		return nil, cos.Error.ConfigNotFound
+	}
+	if modelConfig.CreatorId == nil || !modelConfig.CreatorId.Equal(userId) {
+		return nil, cos.Error.NoPermissionToAssessConfig
+	}
+
+	modelKeyValues, err := db.TableKeyValue.FindByConfigId(ctx, *modelConfig.Id)
+	if err != nil {
+		return nil, err
+	}
+	lastConfigId, err := impl.CreateConfig(ctx, db.ModelConfig{
+		Id:             nil,
+		CreateTime:     orm.Now(),
+		UpdateTime:     orm.Now(),
+		DeletedAt:      0,
+		ConfigId:       req.NewConfigId,
+		IsDisabled:     false,
+		CreatorId:      &userId,
+		BaseId:         nil,
+		NamespaceId:    modelConfig.NamespaceId,
+		LastSeqNo:      0,
+		LastRecordType: 0,
+		LinkCount:      0,
+	})
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+	if len(modelKeyValues) > 0 {
+		for i := range modelKeyValues {
+			modelKeyValues[i].ConfigId = &lastConfigId
+			modelKeyValues[i].CreateTime = orm.Now()
+			modelKeyValues[i].UpdateTime = orm.Now()
+			modelKeyValues[i].Id = nil
+		}
+		_, err = db.TableKeyValue.Create(ctx, modelKeyValues...)
+		if err != nil {
+			log.Error(err)
+			return nil, err
+		}
+	}
 	return &cos.CloneConfigResponse{}, nil
 }
+
 func (t *handler) UpdateStatusConfig(ctx context.Context, req *cos.UpdateStatusConfigRequest) (resp *cos.UpdateStatusConfigResponse, err error) {
+	userId, _ := yc.GetUserId(ctx)
+	modelConfig, found, err := db.TableConfig.FindOneById(ctx, *req.Id)
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+	if !found {
+		return nil, cos.Error.ConfigNotFound
+	}
+	if modelConfig.CreatorId == nil || !modelConfig.CreatorId.Equal(userId) {
+		return nil, cos.Error.NoPermissionToAssessConfig
+	}
+	_, err = db.TableConfig.UpdateById(ctx, *req.Id, orm.H{
+		db.TableConfig.IsDisabled: req.IsDisabled,
+	})
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
 	return &cos.UpdateStatusConfigResponse{}, nil
 }

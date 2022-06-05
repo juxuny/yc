@@ -17,6 +17,8 @@ const (
 	ValidatorTemplateDeleteNamespaceRequestId           = "invalid id"
 	ValidatorTemplateSaveConfigRequestConfigId          = ""
 	ValidatorTemplateListConfigRequestNamespaceId       = ""
+	ValidatorTemplateCloneConfigRequestId               = ""
+	ValidatorTemplateCloneConfigRequestNewConfigId      = "invalid configId: {{.NewConfigId}}"
 	ValidatorTemplateDeleteValueRequestKey              = "missing config key name"
 	ValidatorTemplateUserUpdateStatusRequestUserId      = ""
 	ValidatorTemplateUserDeleteRequestUserId            = ""
@@ -36,6 +38,8 @@ var templateList = []string{
 	ValidatorTemplateDeleteNamespaceRequestId,
 	ValidatorTemplateSaveConfigRequestConfigId,
 	ValidatorTemplateListConfigRequestNamespaceId,
+	ValidatorTemplateCloneConfigRequestId,
+	ValidatorTemplateCloneConfigRequestNewConfigId,
 	ValidatorTemplateDeleteValueRequestKey,
 	ValidatorTemplateUserUpdateStatusRequestUserId,
 	ValidatorTemplateUserDeleteRequestUserId,
@@ -137,6 +141,12 @@ func (m *ListConfigRequest) Validate() error {
 	return nil
 }
 func (m *CloneConfigRequest) Validate() error {
+	if err := validator.Run(m.Id, validator.CreateAction("required", ``, ValidatorTemplateCloneConfigRequestId), m, "id"); err != nil {
+		return err
+	}
+	if err := validator.Run(m.NewConfigId, validator.CreateAction("length.min", `1`, ValidatorTemplateCloneConfigRequestNewConfigId), m, "newConfigId"); err != nil {
+		return err
+	}
 	return nil
 }
 func (m *SaveValueRequest) Validate() error {
