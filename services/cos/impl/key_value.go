@@ -23,6 +23,21 @@ func getMaxSeqNoFromKeyValue(ctx context.Context, configId dt.ID) (maxSeqNo uint
 }
 
 func SaveValue(ctx context.Context, modelKeyValue db.ModelKeyValue) error {
+	// update key-value record
+	if modelKeyValue.Id != nil && modelKeyValue.Id.Valid {
+		_, err := db.TableKeyValue.UpdateById(ctx, *modelKeyValue.Id, orm.H{
+			db.TableKeyValue.ConfigValue: modelKeyValue.ConfigValue,
+			db.TableKeyValue.IsHot:       modelKeyValue.IsHot,
+			db.TableKeyValue.ValueType:   modelKeyValue.ValueType,
+		})
+		if err != nil {
+			log.Error(err)
+			return err
+		}
+		return nil
+	}
+
+	// create new key-value
 	if modelKeyValue.ConfigId == nil || !modelKeyValue.ConfigId.Valid {
 		return cos.Error.MissingConfigId
 	}

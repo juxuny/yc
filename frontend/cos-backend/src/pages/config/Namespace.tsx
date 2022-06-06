@@ -122,14 +122,14 @@ export default (): React.ReactNode => {
       },
     },
     {
-      title: intl.formatMessage({ id: 'pages.config.namespace.column.createTime' }),
+      title: intl.formatMessage({ id: 'pages.column.createTime' }),
       dataIndex: 'createTime',
       hideInTable: false,
       hideInSearch: true,
       renderText: Formatter.convertTimestampFromMillionSeconds,
     },
     {
-      title: intl.formatMessage({ id: 'pages.config.namespace.column.updateTime' }),
+      title: intl.formatMessage({ id: 'pages.column.updateTime' }),
       dataIndex: 'updateTime',
       hideInTable: false,
       hideInSearch: true,

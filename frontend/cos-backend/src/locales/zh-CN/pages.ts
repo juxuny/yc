@@ -77,6 +77,7 @@ export default {
   'pages.status.all': '全部',
   'pages.action.create': '新建',
   'pages.action.edit': '编辑',
+  'pages.action.settings': '设置',
   'pages.action.derive': '派生',
   'pages.action.delete': '删除',
   'pages.action': '操作',
@@ -146,5 +147,10 @@ export default {
   'pages.config.config-management.confirm.enable': '确定要启用当前配置吗 ?',
   'pages.config.config-management.confirm.delete': '确定要删除当前配置吗 ?',
   'pages.config.config-management.error.missingNamespaceId': '请选择命名空间',
-
+  'pages.config.config-management.drawer.title': 'Key-Values',
+  'pages.config.key-value.column.configKey': 'Key',
+  'pages.config.key-value.column.configValue': 'Value',
+  'pages.config.key-value.column.isHot': '热更新',
+  'pages.config.key-value.missing.configId': '未选择配置',
+  'pages.config.key-value.column.cold': '冷更新',
 };

@@ -2,7 +2,7 @@ import React, {useRef, useState, useEffect} from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import { Config } from '@/services/cos/config';
 import { useIntl } from 'umi';
-import {Button, Popconfirm, Space, Tag, message} from 'antd';
+import {Button, Popconfirm, Space, Tag, message, Drawer} from 'antd';
 import type { FormInstance } from 'antd';
 import { FormattedMessage } from '@@/plugin-locale/localeExports';
 import { PlusOutlined } from '@ant-design/icons';
@@ -12,13 +12,21 @@ import ConfigEditorModal from '@/pages/config/component/ConfigEditorModal';
 import { Formatter } from '@/utils/formatter';
 import { Namespace } from '@/services/cos/namespace';
 import { history } from 'umi';
+import KeyValuePairs from "@/pages/config/component/KeyValuePairs";
+
+const calculateDrawerWidth = () => {
+  return window.innerWidth * 0.8;
+}
 
 export default (): React.ReactNode => {
   const intl = useIntl();
   const actionRef = useRef<ActionType>();
   const formRef = useRef<FormInstance<API.Config.ListReq> | undefined>();
-  const [visible, setVisible] = useState<boolean>(false);
+  const [editorVisible, setEditorVisible] = useState<boolean>(false);
+  const [drawerVisible, setDrawerVisible] = useState<boolean>(false);
   const [selectedData, setSelectedData] = useState<API.Config.SaveReq>();
+  const [drawerWidth, setDrawerWidth] = useState<number>(calculateDrawerWidth);
+  const [keyValueListReq, setKeyValueListReq] = useState<API.KeyValue.ListReq | undefined>(undefined);
   const loadData = async (
     params: API.QueryParams<API.Config.ListReq>,
   ): Promise<{ data: API.Config.ListItem[]; success: boolean; total: number }> => {
@@ -57,6 +65,26 @@ export default (): React.ReactNode => {
     }
   });
 
+  // auto resize drawer
+  const updateDrawerWidth = () => {
+    setDrawerWidth(calculateDrawerWidth());
+  }
+  useEffect(() => {
+    window.addEventListener('resize', updateDrawerWidth);
+    return () => {
+      window.removeEventListener('resize', updateDrawerWidth);
+    }
+  });
+
+  const showKeyValueDrawer = (configId: string) => {
+    setDrawerVisible(true);
+    setKeyValueListReq({
+      configId: configId,
+      searchKey: '',
+      pagination: { pageNum: 1, pageSize: 10 }
+    } as API.KeyValue.ListReq);
+  }
+
   const showEditor = (record: API.Config.SaveReq) => {
     const selectedNamespaceId = formRef.current?.getFieldsValue().namespaceId;
     setSelectedData({
@@ -65,7 +93,7 @@ export default (): React.ReactNode => {
       namespaceId: selectedNamespaceId || 0,
       baseId: record.baseId,
     });
-    setVisible(true);
+    setEditorVisible(true);
   };
 
   const updateStatus = async (record: API.Config.ListItem, isDisabled: boolean) => {
@@ -105,6 +133,11 @@ export default (): React.ReactNode => {
       title: intl.formatMessage({ id: 'pages.config.config-management.column.configId' }),
       dataIndex: 'configId',
       hideInSearch: true,
+      render: (node, record) => {
+        return <a onClick={() => showKeyValueDrawer(record.id)}>
+          { record.configId }
+        </a>
+      }
     },
     {
       title: intl.formatMessage({ id: 'pages.action.search' }),
@@ -161,14 +194,14 @@ export default (): React.ReactNode => {
       },
     },
     {
-      title: intl.formatMessage({ id: 'pages.config.namespace.column.createTime' }),
+      title: intl.formatMessage({ id: 'pages.column.createTime' }),
       dataIndex: 'createTime',
       hideInTable: false,
       hideInSearch: true,
       renderText: Formatter.convertTimestampFromMillionSeconds,
     },
     {
-      title: intl.formatMessage({ id: 'pages.config.namespace.column.updateTime' }),
+      title: intl.formatMessage({ id: 'pages.column.updateTime' }),
       dataIndex: 'updateTime',
       hideInTable: false,
       hideInSearch: true,
@@ -206,7 +239,7 @@ export default (): React.ReactNode => {
           </a>
           <Popconfirm
             key={'enable'}
-            title={intl.formatMessage({ id: record.isDisabled ? 'pages.config.namespace.confirm.enable' : 'pages.config.namespace.confirm.disable' })}
+            title={intl.formatMessage({ id: record.isDisabled ? 'pages.config.config-management.confirm.enable' : 'pages.config.config-management.confirm.disable' })}
             cancelText={intl.formatMessage({ id: 'pages.confirm.cancel' })}
             okText={intl.formatMessage({ id: 'pages.confirm.ok' })}
             onConfirm={async () => {
@@ -219,7 +252,7 @@ export default (): React.ReactNode => {
           </Popconfirm>
           <Popconfirm
             key={'delete'}
-            title={intl.formatMessage({ id: 'pages.config.namespace.confirm.delete' })}
+            title={intl.formatMessage({ id: 'pages.config.config-management.confirm.delete' })}
             cancelText={intl.formatMessage({ id: 'pages.confirm.cancel' })}
             okButtonProps={{ type: 'primary' }}
             okType={'danger'}
@@ -262,13 +295,22 @@ export default (): React.ReactNode => {
         ]}
       />
       <ConfigEditorModal
-        visible={visible}
-        onChangeVisible={setVisible}
+        visible={editorVisible}
+        onChangeVisible={setEditorVisible}
         oldData={selectedData}
         onSuccess={() => {
           actionRef.current?.reload();
         }}
       />
+      <Drawer
+        title={intl.formatMessage({ id: 'pages.config.config-management.drawer.title' })}
+        placement="right"
+        width={drawerWidth}
+        onClose={() => setDrawerVisible(false)}
+        visible={drawerVisible}
+      >
+        { drawerVisible && <KeyValuePairs reqData={keyValueListReq} /> }
+      </Drawer>
     </PageContainer>
   );
 };

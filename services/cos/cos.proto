@@ -61,6 +61,8 @@ service Cos {
   rpc DisableValue(DisableValueRequest) returns(DisableValueResponse) {}
   // @group: key_value
   rpc ListAllValue(ListAllValueRequest) returns (ListAllValueResponse) {}
+  // @group: key_value
+  rpc UpdateStatusValue(UpdateStatusValueRequest) returns(UpdateStatusValueResponse) {}
 }
 
 message HealthRequest {}
@@ -409,10 +411,13 @@ message CloneConfigResponse {}
 
 message SaveValueRequest {
   dt.ID configId = 1;
-  string key = 2;
-  string value = 3;
+  // @v: required
+  string configKey = 2;
+  // @v: required
+  string configValue = 3;
   bool isHot = 4;
   ValueType valueType = 5;
+  dt.ID id = 6;
 }
 
 message SaveValueResponse {}
@@ -445,9 +450,19 @@ message DisableValueRequest {
 
 message DisableValueResponse {}
 
+message UpdateStatusValueRequest {
+  // @v: required
+  dt.ID id = 1;
+  bool isDisabled = 2;
+}
+
+message UpdateStatusValueResponse {}
+
 message ListAllValueRequest {
   dt.ID configId = 1;
   dt.NullBool isDisabled = 2;
+  dt.NullBool isHot = 3;
+  string searchKey = 4;
 }
 
 message ListAllValueResponse {

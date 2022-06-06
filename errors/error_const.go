@@ -41,6 +41,7 @@ var SystemError = struct {
 	NotFoundRpcToken              Error `code:"-10037" msg:"no token"`
 	InvalidToken                  Error `code:"-10038" msg:"invalid token"`
 	NoFields                      Error `code:"-10039" msg:"no fields"`
+	DisabledMethod                Error `code:"-10040" msg:"disabled method"`
 }{}
 
 func init() {

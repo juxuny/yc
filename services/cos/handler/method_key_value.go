@@ -4,11 +4,13 @@ import (
 	"context"
 	"fmt"
 	"github.com/juxuny/yc"
+	"github.com/juxuny/yc/errors"
 	"github.com/juxuny/yc/log"
 	"github.com/juxuny/yc/orm"
 	cos "github.com/juxuny/yc/services/cos"
 	"github.com/juxuny/yc/services/cos/db"
 	"github.com/juxuny/yc/services/cos/impl"
+	"strings"
 )
 
 func (t *handler) SaveValue(ctx context.Context, req *cos.SaveValueRequest) (resp *cos.SaveValueResponse, err error) {
@@ -32,12 +34,13 @@ func (t *handler) SaveValue(ctx context.Context, req *cos.SaveValueRequest) (res
 		return nil, cos.Error.ConfigDisabled
 	}
 	if err := impl.SaveValue(ctx, db.ModelKeyValue{
+		Id:          req.Id,
 		CreateTime:  orm.Now(),
 		UpdateTime:  orm.Now(),
 		DeletedAt:   0,
 		IsDisabled:  false,
-		ConfigKey:   req.Key,
-		ConfigValue: req.Value,
+		ConfigKey:   req.ConfigKey,
+		ConfigValue: req.ConfigValue,
 		ValueType:   req.ValueType,
 		ConfigId:    req.ConfigId,
 		CreatorId:   &currentId,
@@ -107,33 +110,11 @@ func (t *handler) ListValue(ctx context.Context, req *cos.ListValueRequest) (res
 	resp.List = items.MapToKeyValueRespList()
 	return resp, nil
 }
+
 func (t *handler) DisableValue(ctx context.Context, req *cos.DisableValueRequest) (resp *cos.DisableValueResponse, err error) {
-	userId, err := yc.GetUserId(ctx)
-	if err != nil {
-		log.Error(err)
-		return nil, err
-	}
-	if req.Id == nil || !req.Id.Valid {
-		return nil, cos.Error.MissingArguments.Wrap(fmt.Errorf("missing: configId"))
-	}
-	modelKeyValue, found, err := db.TableKeyValue.FindOne(ctx, orm.NewAndWhereWrapper().Eq(db.TableKeyValue.CreatorId, userId).Eq(db.TableKeyValue.Id, req.Id))
-	if err != nil {
-		log.Error(err)
-		return nil, err
-	}
-	if !found {
-		return nil, cos.Error.KeyNotFound
-	}
-	_, err = db.TableKeyValue.UpdateById(ctx, *modelKeyValue.Id, orm.H{
-		db.TableKeyValue.IsDisabled: req.IsDisabled,
-		db.TableKeyValue.UpdateTime: orm.Now(),
-	})
-	if err != nil {
-		log.Error(err)
-		return nil, err
-	}
-	return &cos.DisableValueResponse{}, nil
+	return nil, errors.SystemError.DisabledMethod
 }
+
 func (t *handler) ListAllValue(ctx context.Context, req *cos.ListAllValueRequest) (resp *cos.ListAllValueResponse, err error) {
 	userId, err := yc.GetUserId(ctx)
 	if err != nil {
@@ -143,7 +124,12 @@ func (t *handler) ListAllValue(ctx context.Context, req *cos.ListAllValueRequest
 	if req.ConfigId == nil || !req.ConfigId.Valid {
 		return nil, cos.Error.MissingConfigId
 	}
-	where := orm.NewAndWhereWrapper().Eq(db.TableKeyValue.CreatorId, userId).Eq(db.TableKeyValue.ConfigId, req.ConfigId).Eq(db.TableKeyValue.IsDisabled, req.IsDisabled)
+	where := orm.NewAndWhereWrapper().Eq(db.TableKeyValue.CreatorId, userId).Eq(db.TableKeyValue.ConfigId, req.ConfigId).Eq(db.TableKeyValue.IsDisabled, req.IsDisabled).Eq(db.TableKeyValue.IsHot, req.IsHot)
+	req.SearchKey = strings.TrimSpace(req.SearchKey)
+	if req.SearchKey != "" {
+		where.Nested(orm.NewOrWhereWrapper().Like(db.TableKeyValue.ConfigKey, fmt.Sprintf("%%%s%%", req.SearchKey)))
+	}
+
 	count, err := db.TableKeyValue.Count(ctx, where)
 	if err != nil {
 		log.Error(err)
@@ -161,4 +147,28 @@ func (t *handler) ListAllValue(ctx context.Context, req *cos.ListAllValueRequest
 	}
 	resp.List = items.MapToKeyValueRespList()
 	return resp, nil
+}
+
+func (t *handler) UpdateStatusValue(ctx context.Context, req *cos.UpdateStatusValueRequest) (resp *cos.UpdateStatusValueResponse, err error) {
+	userId, _ := yc.GetUserId(ctx)
+	if req.Id == nil || !req.Id.Valid {
+		return nil, cos.Error.MissingArguments.Wrap(fmt.Errorf("missing: id"))
+	}
+	modelKeyValue, found, err := db.TableKeyValue.FindOne(ctx, orm.NewAndWhereWrapper().Eq(db.TableKeyValue.CreatorId, userId).Eq(db.TableKeyValue.Id, req.Id))
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+	if !found {
+		return nil, cos.Error.KeyNotFound
+	}
+	_, err = db.TableKeyValue.UpdateById(ctx, *modelKeyValue.Id, orm.H{
+		db.TableKeyValue.IsDisabled: req.IsDisabled,
+		db.TableKeyValue.UpdateTime: orm.Now(),
+	})
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+	return &cos.UpdateStatusValueResponse{}, nil
 }

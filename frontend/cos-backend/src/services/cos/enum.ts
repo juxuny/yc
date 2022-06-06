@@ -23,3 +23,11 @@ export const AccountTypeEnumMap: { [key: string]: API.AccountType } = {
 };
 
 export const AccountTypeEnumMapReserve: Record<number, string> = reverseMap(AccountTypeEnumMap);
+
+
+export const ValueTypeEnumMap: { [key: string]: API.KeyValue.ValueType } = {
+  number: 1,
+  string: 2,
+};
+
+export const ValueTypeEnumMapReverse: Record<number, string> = reverseMap(ValueTypeEnumMap);

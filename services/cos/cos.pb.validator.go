@@ -19,7 +19,10 @@ const (
 	ValidatorTemplateListConfigRequestNamespaceId       = ""
 	ValidatorTemplateCloneConfigRequestId               = ""
 	ValidatorTemplateCloneConfigRequestNewConfigId      = "invalid configId: {{.NewConfigId}}"
+	ValidatorTemplateSaveValueRequestConfigKey          = ""
+	ValidatorTemplateSaveValueRequestConfigValue        = ""
 	ValidatorTemplateDeleteValueRequestKey              = "missing config key name"
+	ValidatorTemplateUpdateStatusValueRequestId         = ""
 	ValidatorTemplateUserUpdateStatusRequestUserId      = ""
 	ValidatorTemplateUserDeleteRequestUserId            = ""
 	ValidatorTemplateUpdateStatusNamespaceRequestId     = ""
@@ -40,7 +43,10 @@ var templateList = []string{
 	ValidatorTemplateListConfigRequestNamespaceId,
 	ValidatorTemplateCloneConfigRequestId,
 	ValidatorTemplateCloneConfigRequestNewConfigId,
+	ValidatorTemplateSaveValueRequestConfigKey,
+	ValidatorTemplateSaveValueRequestConfigValue,
 	ValidatorTemplateDeleteValueRequestKey,
+	ValidatorTemplateUpdateStatusValueRequestId,
 	ValidatorTemplateUserUpdateStatusRequestUserId,
 	ValidatorTemplateUserDeleteRequestUserId,
 	ValidatorTemplateUpdateStatusNamespaceRequestId,
@@ -150,6 +156,12 @@ func (m *CloneConfigRequest) Validate() error {
 	return nil
 }
 func (m *SaveValueRequest) Validate() error {
+	if err := validator.Run(m.ConfigKey, validator.CreateAction("required", ``, ValidatorTemplateSaveValueRequestConfigKey), m, "configKey"); err != nil {
+		return err
+	}
+	if err := validator.Run(m.ConfigValue, validator.CreateAction("required", ``, ValidatorTemplateSaveValueRequestConfigValue), m, "configValue"); err != nil {
+		return err
+	}
 	return nil
 }
 func (m *ListValueRequest) Validate() error {
@@ -162,6 +174,12 @@ func (m *DeleteValueRequest) Validate() error {
 	return nil
 }
 func (m *DisableValueRequest) Validate() error {
+	return nil
+}
+func (m *UpdateStatusValueRequest) Validate() error {
+	if err := validator.Run(m.Id, validator.CreateAction("required", ``, ValidatorTemplateUpdateStatusValueRequestId), m, "id"); err != nil {
+		return err
+	}
 	return nil
 }
 func (m *ListAllValueRequest) Validate() error {
