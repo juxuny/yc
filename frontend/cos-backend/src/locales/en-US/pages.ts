@@ -80,6 +80,7 @@ export default {
   'pages.status.all': 'All',
   'pages.action.create': 'Create',
   'pages.action.edit': 'Edit',
+  'pages.action.derive': 'Derive',
   'pages.action.delete': 'Delete',
   'pages.action': 'Action',
   'pages.action.enable': 'Enable',

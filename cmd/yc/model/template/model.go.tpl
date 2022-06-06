@@ -156,9 +156,9 @@ func ({{.TableName|lowerFirst}}) Find(ctx context.Context, where orm.WhereWrappe
 }
 
 func ({{.TableName|lowerFirst}}) FindOne(ctx context.Context, where orm.WhereWrapper, orderBy ...orm.Order) (ret {{.ModelName}}, found bool, err error) {
-	w := orm.NewQueryWrapper({{.ModelName}}{}){{if .HasDeletedAt}}
+	w := orm.NewQueryWrapper({{.ModelName}}{})
+	w.SetWhere(where).Order(orderBy...){{if .HasDeletedAt}}
 	w.Nested(orm.NewOrWhereWrapper().Eq({{.TableName}}.DeletedAt, 0).IsNull({{.TableName}}.DeletedAt)){{end}}
-	w.SetWhere(where).Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &ret)
 	if err != nil {
 		if e, ok := err.(errors.Error); ok && e.Code == errors.SystemError.DatabaseNoData.Code {

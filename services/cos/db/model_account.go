@@ -349,8 +349,8 @@ func (tableAccount) Find(ctx context.Context, where orm.WhereWrapper, orderBy ..
 
 func (tableAccount) FindOne(ctx context.Context, where orm.WhereWrapper, orderBy ...orm.Order) (ret ModelAccount, found bool, err error) {
 	w := orm.NewQueryWrapper(ModelAccount{})
-	w.Nested(orm.NewOrWhereWrapper().Eq(TableAccount.DeletedAt, 0).IsNull(TableAccount.DeletedAt))
 	w.SetWhere(where).Order(orderBy...)
+	w.Nested(orm.NewOrWhereWrapper().Eq(TableAccount.DeletedAt, 0).IsNull(TableAccount.DeletedAt))
 	err = orm.Select(ctx, cos.Name, w, &ret)
 	if err != nil {
 		if e, ok := err.(errors.Error); ok && e.Code == errors.SystemError.DatabaseNoData.Code {

@@ -77,6 +77,7 @@ export default {
   'pages.status.all': '全部',
   'pages.action.create': '新建',
   'pages.action.edit': '编辑',
+  'pages.action.derive': '派生',
   'pages.action.delete': '删除',
   'pages.action': '操作',
   'pages.action.enable': '启用',

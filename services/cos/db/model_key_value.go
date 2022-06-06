@@ -445,8 +445,8 @@ func (tableKeyValue) Find(ctx context.Context, where orm.WhereWrapper, orderBy .
 
 func (tableKeyValue) FindOne(ctx context.Context, where orm.WhereWrapper, orderBy ...orm.Order) (ret ModelKeyValue, found bool, err error) {
 	w := orm.NewQueryWrapper(ModelKeyValue{})
-	w.Nested(orm.NewOrWhereWrapper().Eq(TableKeyValue.DeletedAt, 0).IsNull(TableKeyValue.DeletedAt))
 	w.SetWhere(where).Order(orderBy...)
+	w.Nested(orm.NewOrWhereWrapper().Eq(TableKeyValue.DeletedAt, 0).IsNull(TableKeyValue.DeletedAt))
 	err = orm.Select(ctx, cos.Name, w, &ret)
 	if err != nil {
 		if e, ok := err.(errors.Error); ok && e.Code == errors.SystemError.DatabaseNoData.Code {

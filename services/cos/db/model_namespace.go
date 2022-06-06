@@ -289,8 +289,8 @@ func (tableNamespace) Find(ctx context.Context, where orm.WhereWrapper, orderBy 
 
 func (tableNamespace) FindOne(ctx context.Context, where orm.WhereWrapper, orderBy ...orm.Order) (ret ModelNamespace, found bool, err error) {
 	w := orm.NewQueryWrapper(ModelNamespace{})
-	w.Nested(orm.NewOrWhereWrapper().Eq(TableNamespace.DeletedAt, 0).IsNull(TableNamespace.DeletedAt))
 	w.SetWhere(where).Order(orderBy...)
+	w.Nested(orm.NewOrWhereWrapper().Eq(TableNamespace.DeletedAt, 0).IsNull(TableNamespace.DeletedAt))
 	err = orm.Select(ctx, cos.Name, w, &ret)
 	if err != nil {
 		if e, ok := err.(errors.Error); ok && e.Code == errors.SystemError.DatabaseNoData.Code {

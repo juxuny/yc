@@ -53,6 +53,7 @@ func (t ModelConfig) ToListConfigItem() cos.ListConfigItem {
 		NamespaceId: t.NamespaceId,
 		ConfigId:    t.ConfigId,
 		LinkCount:   t.LinkCount,
+		IsDisabled:  t.IsDisabled,
 	}
 }
 
@@ -389,8 +390,8 @@ func (tableConfig) Find(ctx context.Context, where orm.WhereWrapper, orderBy ...
 
 func (tableConfig) FindOne(ctx context.Context, where orm.WhereWrapper, orderBy ...orm.Order) (ret ModelConfig, found bool, err error) {
 	w := orm.NewQueryWrapper(ModelConfig{})
-	w.Nested(orm.NewOrWhereWrapper().Eq(TableConfig.DeletedAt, 0).IsNull(TableConfig.DeletedAt))
 	w.SetWhere(where).Order(orderBy...)
+	w.Nested(orm.NewOrWhereWrapper().Eq(TableConfig.DeletedAt, 0).IsNull(TableConfig.DeletedAt))
 	err = orm.Select(ctx, cos.Name, w, &ret)
 	if err != nil {
 		if e, ok := err.(errors.Error); ok && e.Code == errors.SystemError.DatabaseNoData.Code {

@@ -57,13 +57,13 @@ export default (): React.ReactNode => {
     }
   });
 
-  const showEditor = (record: API.Config.ListItem) => {
+  const showEditor = (record: API.Config.SaveReq) => {
     const selectedNamespaceId = formRef.current?.getFieldsValue().namespaceId;
     setSelectedData({
       id: record.id,
       configId: record.configId,
       namespaceId: selectedNamespaceId || 0,
-      baseId: undefined,
+      baseId: record.baseId,
     });
     setVisible(true);
   };
@@ -71,7 +71,7 @@ export default (): React.ReactNode => {
   const updateStatus = async (record: API.Config.ListItem, isDisabled: boolean) => {
     try {
       const resp = await Config.updateStatus({
-        id: record.id,
+        id: record.id ,
         isDisabled: isDisabled,
       });
       if (resp && resp.code === 0) {
@@ -185,10 +185,24 @@ export default (): React.ReactNode => {
             onClick={() => {
               showEditor({
                 ...record,
+                baseId: undefined
               });
             }}
           >
             <FormattedMessage id={'pages.action.edit'} />
+          </a>
+          <a
+            key={'derive'}
+            onClick={() => {
+              showEditor({
+                ...record,
+                configId: record.configId + '(copy)',
+                baseId: record.id,
+                id: undefined
+              });
+            }}
+          >
+            <FormattedMessage id={'pages.action.derive'} />
           </a>
           <Popconfirm
             key={'enable'}
@@ -199,7 +213,7 @@ export default (): React.ReactNode => {
               await updateStatus(record, !record.isDisabled);
             }}
           >
-            <a>
+            <a style={{color: record.isDisabled ? '' : 'red'}}>
               <FormattedMessage id={record.isDisabled ? 'pages.action.enable' : 'pages.action.disable'} />
             </a>
           </Popconfirm>
@@ -240,7 +254,7 @@ export default (): React.ReactNode => {
             icon={<PlusOutlined />}
             type="primary"
             onClick={() => {
-              showEditor({} as API.Config.ListItem);
+              showEditor({} as API.Config.SaveReq);
             }}
           >
             <FormattedMessage id="pages.action.create" />

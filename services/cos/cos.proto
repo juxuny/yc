@@ -389,6 +389,7 @@ message ListConfigItem {
   dt.ID namespaceId = 5;
   string configId = 6;
   uint64 linkCount = 7;
+  bool isDisabled = 8;
 }
 
 message ListConfigResponse {
