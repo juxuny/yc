@@ -177,7 +177,7 @@ const KeyValuePairs: React.FC<KeyValuePairsProps> = (props) => {
                 configId: record.configId,
                 configKey: record.configKey,
                 configValue: record.configValue,
-                isHot: record.isHot,
+                isHot: record.isHot || false,
               } as API.KeyValue.SaveReq);
               setEditorVisible(true);
             }}

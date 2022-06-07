@@ -35,4 +35,12 @@ export class Config {
       ...(options || {}),
     });
   }
+
+  static async clone(body?: API.Config.CloneReq, options?: { [key: string]: any }) {
+    return doRequest<API.Config.CloneResp>('/cos/clone-config', {
+      method: 'POST',
+      data: body,
+      ...(options || {}),
+    });
+  }
 }

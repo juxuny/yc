@@ -1,7 +1,7 @@
-import moment from 'moment';
+import dayjs from 'dayjs'
 
 export class Formatter {
   static convertTimestampFromMillionSeconds = (timestampInMillionSeconds: number): string => {
-    return moment(timestampInMillionSeconds).format('YYYY-MM-DD hh:mm:ss');
+    return dayjs(timestampInMillionSeconds).format('YYYY-MM-DD hh:mm:ss');
   };
 }

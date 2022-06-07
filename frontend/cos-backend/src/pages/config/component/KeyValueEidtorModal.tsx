@@ -1,4 +1,5 @@
-import { Button, Form, Input, Modal, message } from 'antd';
+import { Button, Form, Input, Modal, message, Select } from 'antd';
+const { Option } = Select;
 import useMergedState from 'rc-util/es/hooks/useMergedState';
 import React, { useRef, useEffect, useState } from 'react';
 import { useIntl } from '@@/plugin-locale/localeExports';
@@ -104,6 +105,16 @@ const KeyValueEditorModal: React.FC<KeyValueEditorProp> = (props) => {
               setEditingData(Object.assign(editingData, { configValue: value }));
             }}
           />
+        </Form.Item>
+        <Form.Item
+          required
+          label={intl.formatMessage({ id: 'pages.config.key-value.column.isHot' })}
+          name="isHot"
+        >
+          <Select>
+            <Option key={'hot'} value={true}>{intl.formatMessage({ id: 'pages.config.key-value.column.isHot' })}</Option>
+            <Option key={'cold'} value={false}>{intl.formatMessage({ id: 'pages.config.key-value.column.cold' })}</Option>
+          </Select>
         </Form.Item>
       </ProForm>
     </Modal>

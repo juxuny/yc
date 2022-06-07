@@ -91,6 +91,7 @@ export default {
   'pages.action.reset': 'Reset',
   'pages.action.save': 'Save',
   'pages.action.search': 'Search',
+  'pages.action.clone': 'Clone',
 
   'pages.confirm.ok': 'OK',
   'pages.confirm.cancel': 'Cancel',

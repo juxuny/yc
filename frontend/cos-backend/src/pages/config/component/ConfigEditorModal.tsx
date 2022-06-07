@@ -12,6 +12,7 @@ export type ConfigEditorProp = {
   oldData?: API.Config.SaveReq;
   trigger?: JSX.Element | undefined;
   onSuccess?: () => void;
+  isClone: boolean;
 };
 
 const layout = {
@@ -21,13 +22,13 @@ const layout = {
 
 const ConfigEditorModal: React.FC<ConfigEditorProp> = (props) => {
   const intl = useIntl();
-  const { visible, onChangeVisible, onSuccess } = props;
+  const { visible, onChangeVisible, onSuccess, isClone, oldData } = props;
   const formRef = useRef<ProFormInstance<API.Config.SaveReq> | undefined>();
 
   const [editingData, setEditingData] = useMergedState<API.Config.SaveReq>(
     {} as API.Config.SaveReq,
     {
-      value: props.oldData,
+      value: oldData,
     },
   );
 
@@ -37,7 +38,7 @@ const ConfigEditorModal: React.FC<ConfigEditorProp> = (props) => {
     formRef.current?.setFieldsValue(editingData);
   });
 
-  const onSubmit = async () => {
+  const onSubmitSave = async () => {
     try {
       setLoading(true);
       const params = formRef.current?.getFieldsValue() || ({} as API.Config.SaveReq);
@@ -46,6 +47,28 @@ const ConfigEditorModal: React.FC<ConfigEditorProp> = (props) => {
         baseId: props.oldData?.baseId,
         namespaceId: props.oldData?.namespaceId,
         id: props.oldData?.id || undefined,
+      });
+      if (resp.code !== 0) {
+        message.error(resp.msg);
+      } else {
+        if (onChangeVisible) onChangeVisible(false);
+        if (onSuccess) onSuccess();
+        formRef.current?.resetFields();
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onSubmitClone = async () => {
+    try {
+      setLoading(true);
+      const params = formRef.current?.getFieldsValue() || ({} as API.Config.SaveReq);
+      const resp = await Config.clone({
+        id: oldData?.id || 0,
+        newConfigId: params.configId
       });
       if (resp.code !== 0) {
         message.error(resp.msg);
@@ -72,7 +95,7 @@ const ConfigEditorModal: React.FC<ConfigEditorProp> = (props) => {
         <Button key="cancel" onClick={() => onChangeVisible(false)}>
           {intl.formatMessage({ id: 'pages.confirm.cancel' })}
         </Button>,
-        <Button key="ok" type="primary" onClick={onSubmit} loading={loading}>
+        <Button key="ok" type="primary" onClick={isClone ? onSubmitClone : onSubmitSave} loading={loading}>
           {intl.formatMessage({ id: 'pages.confirm.ok' })}
         </Button>,
       ]}

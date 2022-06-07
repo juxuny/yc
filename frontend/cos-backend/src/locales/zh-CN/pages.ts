@@ -88,6 +88,7 @@ export default {
   'pages.action.reset': '重置',
   'pages.action.save': '保存',
   'pages.action.search': '搜索',
+  'pages.action.clone': '克隆',
 
   'pages.confirm.ok': '确定',
   'pages.confirm.cancel': '取消',

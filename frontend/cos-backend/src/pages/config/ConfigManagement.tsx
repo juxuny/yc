@@ -27,6 +27,7 @@ export default (): React.ReactNode => {
   const [selectedData, setSelectedData] = useState<API.Config.SaveReq>();
   const [drawerWidth, setDrawerWidth] = useState<number>(calculateDrawerWidth);
   const [keyValueListReq, setKeyValueListReq] = useState<API.KeyValue.ListReq | undefined>(undefined);
+  const [isCloneEditor, setIsCloneEditor] = useState<boolean>(false);
   const loadData = async (
     params: API.QueryParams<API.Config.ListReq>,
   ): Promise<{ data: API.Config.ListItem[]; success: boolean; total: number }> => {
@@ -85,8 +86,9 @@ export default (): React.ReactNode => {
     } as API.KeyValue.ListReq);
   }
 
-  const showEditor = (record: API.Config.SaveReq) => {
+  const showEditor = (record: API.Config.SaveReq, isClone: boolean) => {
     const selectedNamespaceId = formRef.current?.getFieldsValue().namespaceId;
+    setIsCloneEditor(isClone);
     setSelectedData({
       id: record.id,
       configId: record.configId,
@@ -219,7 +221,7 @@ export default (): React.ReactNode => {
               showEditor({
                 ...record,
                 baseId: undefined
-              });
+              }, false);
             }}
           >
             <FormattedMessage id={'pages.action.edit'} />
@@ -232,10 +234,22 @@ export default (): React.ReactNode => {
                 configId: record.configId + '(copy)',
                 baseId: record.id,
                 id: undefined
-              });
+              }, false);
             }}
           >
             <FormattedMessage id={'pages.action.derive'} />
+          </a>
+          <a
+            key={'clone'}
+            onClick={() => {
+              showEditor({
+                ...record,
+                configId: record.configId + '(copy)',
+                id: record.id
+              }, true);
+            }}
+          >
+            <FormattedMessage id={'pages.action.clone'} />
           </a>
           <Popconfirm
             key={'enable'}
@@ -287,7 +301,7 @@ export default (): React.ReactNode => {
             icon={<PlusOutlined />}
             type="primary"
             onClick={() => {
-              showEditor({} as API.Config.SaveReq);
+              showEditor({} as API.Config.SaveReq, false);
             }}
           >
             <FormattedMessage id="pages.action.create" />
@@ -295,6 +309,7 @@ export default (): React.ReactNode => {
         ]}
       />
       <ConfigEditorModal
+        isClone={isCloneEditor}
         visible={editorVisible}
         onChangeVisible={setEditorVisible}
         oldData={selectedData}

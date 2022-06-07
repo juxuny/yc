@@ -40,5 +40,12 @@ declare namespace API {
     };
 
     type UpdateStatusResp = {};
+
+    type CloneReq = {
+      id: number | string;
+      newConfigId: string;
+    }
+
+    type CloneResp = {};
   }
 }

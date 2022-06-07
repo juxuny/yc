@@ -1,8 +1,8 @@
 {
-  "name": "ant-design-pro",
+  "name": "cos",
   "version": "5.0.0",
   "private": true,
-  "description": "An out-of-box UI solution for enterprise applications",
+  "description": "Configuration OS",
   "scripts": {
     "analyze": "cross-env ANALYZE=1 umi build",
     "build": "umi build",
@@ -58,6 +58,7 @@
     "antd": "^4.14.0",
     "btoa": "^1.2.1",
     "classnames": "^2.2.6",
+    "dayjs": "^1.11.3",
     "jsonlint": "^1.6.3",
     "lodash": "^4.17.11",
     "moment": "^2.29.1",
