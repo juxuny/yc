@@ -127,7 +127,7 @@ export default {
   'pages.system.user-management.query.search': 'Search',
   'pages.system.user-management.confirm.disable': 'Do you want to disable the user ?',
   'pages.system.user-management.confirm.enable': 'Do you want to enable the user ?',
-  'pages.system.user-management.confirm.delete': 'Do you want to delete th user ?',
+  'pages.system.user-management.confirm.delete': 'Do you want to delete the user ?',
 
   // account
   'pages.account.modify-password.label.old': 'Old Password',
@@ -136,6 +136,14 @@ export default {
   'pages.account.modify-password.placeholder': 'Please input',
   'pages.account.modify-password.missing.old': 'missing old password',
   'pages.account.modify-password.missing.new': 'missing new password',
+  'pages.account.access-key.column.accessKey': 'AccessKey',
+  'pages.account.access-key.column.validStartTime': 'StartTime',
+  'pages.account.access-key.column.validEndTime': 'EndTime',
+  'pages.account.access-key.column.remark': 'Remark',
+  'pages.account.access-key.title.setRemark': 'Set Remark',
+  'pages.account.access-key.confirm.disable': 'Do you want to disable the access_key ?',
+  'pages.account.access-key.confirm.enable': 'Do you want to enable the access_key ?',
+  'pages.account.access-key.confirm.delete': 'Do you want to delete the access_key ?',
 
   // config
   'pages.config.namespace.column.id': 'ID',

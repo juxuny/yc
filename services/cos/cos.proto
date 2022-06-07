@@ -28,6 +28,16 @@ service Cos {
   rpc UserUpdateStatus(UserUpdateStatusRequest) returns (UserUpdateStatusResponse) {}
   // @group: user
   rpc UserDelete(UserDeleteRequest) returns (UserDeleteResponse) {}
+  // @group: user
+  rpc AccessKeyList(AccessKeyListRequest) returns (AccessKeyListResponse) {}
+  // @group: user
+  rpc CreateAccessKey(CreateAccessKeyRequest) returns (CreateAccessKeyResponse) {}
+  // @group: user
+  rpc UpdateStatusAccessKey(UpdateStatusAccessKeyRequest) returns (UpdateStatusAccessKeyResponse) {}
+  // @group: user
+  rpc DeleteAccessKey(DeleteAccessKeyRequest) returns (DeleteAccessKeyResponse) {}
+  // @group: user
+  rpc SetRemarkAccessKey(SetAccessKeyRemarkRequest) returns (SetAccessKeyRemarkResponse) {}
 
   // @group: namespace
   rpc SaveNamespace(SaveNamespaceRequest) returns (SaveNamespaceResponse) {}
@@ -513,3 +523,87 @@ message SelectorItem {
 message SelectorResponse {
   repeated SelectorItem list = 1;
 }
+
+message ModelAccessKey {
+  // @index
+  dt.ID id = 1;
+  int64 createTime = 2;
+  int64 updateTime = 3;
+  bool isDisabled = 4;
+  int64 deletedAt = 5;
+
+  // @index
+  dt.ID userId = 6;
+  // @index
+  string accessKey = 7;
+  bool hasValidity = 8;
+  int64 validStartTime = 9;
+  int64 validEndTime = 10;
+  string remark = 11;
+}
+
+// @ref: ModelAccessKey
+message AccessKeyItem {
+  dt.ID id = 1;
+  int64 createTime = 2;
+  int64 updateTime = 3;
+  bool isDisabled = 4;
+  int64 deletedAt = 5;
+
+  // @index
+  dt.ID userId = 6;
+  // @index
+  string accessKey = 7;
+  bool hasValidity = 8;
+  int64 validStartTime = 9;
+  int64 validEndTime = 10;
+  string remark = 11;
+}
+
+message AccessKeyListRequest {
+  string searchKey = 1;
+  // @v: required
+  dt.Pagination pagination = 2;
+  dt.NullBool isDisabled = 3;
+}
+
+message AccessKeyListResponse {
+  dt.PaginationResp pagination = 1;
+  repeated AccessKeyItem list = 2;
+}
+
+message CreateAccessKeyRequest {
+  // @v: required
+  string remark = 1;
+  bool hasValidity = 2;
+  int64 validStartTime = 3;
+  int64 validEndTime = 4;
+}
+
+message CreateAccessKeyResponse {
+  string accessKey = 1;
+  string remark = 2;
+}
+
+message UpdateStatusAccessKeyRequest {
+  dt.ID id = 1;
+  bool isDisabled = 2;
+}
+
+message UpdateStatusAccessKeyResponse {}
+
+message DeleteAccessKeyRequest {
+  dt.ID id = 1;
+}
+
+message DeleteAccessKeyResponse {}
+
+message SetAccessKeyRemarkRequest {
+  // @v: required
+  dt.ID id = 1;
+  // @v: length.min=1
+  // @msg: invalid remark {{.Remark}}
+  string remark = 2;
+}
+
+message SetAccessKeyRemarkResponse {}

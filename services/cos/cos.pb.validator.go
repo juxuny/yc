@@ -27,6 +27,10 @@ const (
 	ValidatorTemplateUserDeleteRequestUserId            = ""
 	ValidatorTemplateUpdateStatusNamespaceRequestId     = ""
 	ValidatorTemplateUpdateStatusConfigRequestId        = ""
+	ValidatorTemplateAccessKeyListRequestPagination     = ""
+	ValidatorTemplateCreateAccessKeyRequestRemark       = ""
+	ValidatorTemplateSetAccessKeyRemarkRequestId        = ""
+	ValidatorTemplateSetAccessKeyRemarkRequestRemark    = "invalid remark {{.Remark}}"
 )
 
 var templateList = []string{
@@ -51,6 +55,10 @@ var templateList = []string{
 	ValidatorTemplateUserDeleteRequestUserId,
 	ValidatorTemplateUpdateStatusNamespaceRequestId,
 	ValidatorTemplateUpdateStatusConfigRequestId,
+	ValidatorTemplateAccessKeyListRequestPagination,
+	ValidatorTemplateCreateAccessKeyRequestRemark,
+	ValidatorTemplateSetAccessKeyRemarkRequestId,
+	ValidatorTemplateSetAccessKeyRemarkRequestRemark,
 }
 
 func init() {
@@ -210,5 +218,32 @@ func (m *UpdateStatusConfigRequest) Validate() error {
 	return nil
 }
 func (m *SelectorRequest) Validate() error {
+	return nil
+}
+func (m *AccessKeyListRequest) Validate() error {
+	if err := validator.Run(m.Pagination, validator.CreateAction("required", ``, ValidatorTemplateAccessKeyListRequestPagination), m, "pagination"); err != nil {
+		return err
+	}
+	return nil
+}
+func (m *CreateAccessKeyRequest) Validate() error {
+	if err := validator.Run(m.Remark, validator.CreateAction("required", ``, ValidatorTemplateCreateAccessKeyRequestRemark), m, "remark"); err != nil {
+		return err
+	}
+	return nil
+}
+func (m *UpdateStatusAccessKeyRequest) Validate() error {
+	return nil
+}
+func (m *DeleteAccessKeyRequest) Validate() error {
+	return nil
+}
+func (m *SetAccessKeyRemarkRequest) Validate() error {
+	if err := validator.Run(m.Id, validator.CreateAction("required", ``, ValidatorTemplateSetAccessKeyRemarkRequestId), m, "id"); err != nil {
+		return err
+	}
+	if err := validator.Run(m.Remark, validator.CreateAction("length.min", `1`, ValidatorTemplateSetAccessKeyRemarkRequestRemark), m, "remark"); err != nil {
+		return err
+	}
 	return nil
 }

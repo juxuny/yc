@@ -131,6 +131,16 @@ export default {
   'pages.account.modify-password.label.new': '新密码',
   'pages.account.modify-password.tips': '至少6位，最长22位字母数字组合',
   'pages.account.modify-password.placeholder': '请输入',
+  'pages.account.modify-password.missing.old': '缺少旧密码',
+  'pages.account.modify-password.missing.new': '缺少新密码',
+  'pages.account.access-key.column.accessKey': 'AccessKey',
+  'pages.account.access-key.column.validStartTime': '开始时间',
+  'pages.account.access-key.column.validEndTime': '失效时间',
+  'pages.account.access-key.column.remark': '备注',
+  'pages.account.access-key.title.setRemark': '设置备注',
+  'pages.account.access-key.confirm.disable': '确定要禁用当前access_key吗?',
+  'pages.account.access-key.confirm.enable': '确定要启用当前access_key吗?',
+  'pages.account.access-key.confirm.delete': '确定要删除当前access_key吗?',
 
   // config
   'pages.config.namespace.column.id': 'ID',

@@ -1,4 +1,5 @@
-﻿export default [
+﻿
+export default [
   {
     path: '/user',
     layout: false,
@@ -32,26 +33,28 @@
       {
         path: '/account/settings',
         name: 'settings',
-        icon: 'settings',
         component: './account/Settings'
+      },
+      {
+        path: '/account/access-key',
+        name: 'access-key',
+        component: './account/AccessKeyManagement'
       }
     ]
   },
   {
     path: '/config',
     name: 'config',
-    icon: 'user',
+    icon: 'database',
     routes: [
       {
         path: '/config/namespace',
         name: 'namespace',
-        icon: 'settings',
         component: './config/Namespace'
       },
       {
         path: '/config/config-management',
         name: 'config-management',
-        icon: 'settings',
         component: './config/ConfigManagement'
       }
     ]
@@ -64,7 +67,6 @@
       {
         path: '/system/user-management',
         name: 'user-management',
-        icon: 'user',
         component: './system/UserManagement',
       }
     ],

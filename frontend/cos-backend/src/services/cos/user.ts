@@ -51,4 +51,44 @@ export class User {
       ...(options || {}),
     });
   }
+
+  static async accessKeyList(body?: API.User.AccessKeyListReq, options?: { [key: string]: any }) {
+    return doPaginationRequest<API.User.AccessKeyListItem>('/cos/access-key-list', {
+      method: 'POST',
+      data: body,
+      ...(options || {}),
+    });
+  }
+
+  static async createAccessKey(body?: API.User.CreateAccessKeyReq, options?: { [key: string]: any }) {
+    return doRequest<API.User.CreateAccessKeyResp>('/cos/create-access-key', {
+      method: 'POST',
+      data: body,
+      ...(options || {}),
+    });
+  }
+
+  static async updateStatusAccessKey(body?: API.User.UpdateStatusAccessKeyReq, options?: { [key: string]: any }) {
+    return doRequest<API.User.UpdateStatusAccessKeyResp>('/cos/update-status-access-key', {
+      method: 'POST',
+      data: body,
+      ...(options || {}),
+    });
+  }
+
+  static async deleteAccessKey(body?: API.User.DeleteAccessKeyReq, options?: { [key: string]: any }) {
+    return doRequest<API.User.DeleteAccessKeyResp>('/cos/delete-access-key', {
+      method: 'POST',
+      data: body,
+      ...(options || {}),
+    });
+  }
+
+  static async setRemarkAccessKey(body?: API.User.SetRemarkAccessKeyReq, options?: { [key: string]: any }) {
+    return doRequest<API.User.SetRemarkAccessKeyResp>('/cos/set-remark-access-key', {
+      method: 'POST',
+      data: body,
+      ...(options || {}),
+    });
+  }
 }

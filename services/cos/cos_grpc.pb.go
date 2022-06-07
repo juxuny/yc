@@ -38,6 +38,16 @@ type CosClient interface {
 	UserUpdateStatus(ctx context.Context, in *UserUpdateStatusRequest, opts ...grpc.CallOption) (*UserUpdateStatusResponse, error)
 	// @group: user
 	UserDelete(ctx context.Context, in *UserDeleteRequest, opts ...grpc.CallOption) (*UserDeleteResponse, error)
+	// @group: user
+	AccessKeyList(ctx context.Context, in *AccessKeyListRequest, opts ...grpc.CallOption) (*AccessKeyListResponse, error)
+	// @group: user
+	CreateAccessKey(ctx context.Context, in *CreateAccessKeyRequest, opts ...grpc.CallOption) (*CreateAccessKeyResponse, error)
+	// @group: user
+	UpdateStatusAccessKey(ctx context.Context, in *UpdateStatusAccessKeyRequest, opts ...grpc.CallOption) (*UpdateStatusAccessKeyResponse, error)
+	// @group: user
+	DeleteAccessKey(ctx context.Context, in *DeleteAccessKeyRequest, opts ...grpc.CallOption) (*DeleteAccessKeyResponse, error)
+	// @group: user
+	SetRemarkAccessKey(ctx context.Context, in *SetAccessKeyRemarkRequest, opts ...grpc.CallOption) (*SetAccessKeyRemarkResponse, error)
 	// @group: namespace
 	SaveNamespace(ctx context.Context, in *SaveNamespaceRequest, opts ...grpc.CallOption) (*SaveNamespaceResponse, error)
 	// @group: namespace
@@ -155,6 +165,51 @@ func (c *cosClient) UserUpdateStatus(ctx context.Context, in *UserUpdateStatusRe
 func (c *cosClient) UserDelete(ctx context.Context, in *UserDeleteRequest, opts ...grpc.CallOption) (*UserDeleteResponse, error) {
 	out := new(UserDeleteResponse)
 	err := c.cc.Invoke(ctx, "/cos.Cos/UserDelete", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *cosClient) AccessKeyList(ctx context.Context, in *AccessKeyListRequest, opts ...grpc.CallOption) (*AccessKeyListResponse, error) {
+	out := new(AccessKeyListResponse)
+	err := c.cc.Invoke(ctx, "/cos.Cos/AccessKeyList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *cosClient) CreateAccessKey(ctx context.Context, in *CreateAccessKeyRequest, opts ...grpc.CallOption) (*CreateAccessKeyResponse, error) {
+	out := new(CreateAccessKeyResponse)
+	err := c.cc.Invoke(ctx, "/cos.Cos/CreateAccessKey", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *cosClient) UpdateStatusAccessKey(ctx context.Context, in *UpdateStatusAccessKeyRequest, opts ...grpc.CallOption) (*UpdateStatusAccessKeyResponse, error) {
+	out := new(UpdateStatusAccessKeyResponse)
+	err := c.cc.Invoke(ctx, "/cos.Cos/UpdateStatusAccessKey", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *cosClient) DeleteAccessKey(ctx context.Context, in *DeleteAccessKeyRequest, opts ...grpc.CallOption) (*DeleteAccessKeyResponse, error) {
+	out := new(DeleteAccessKeyResponse)
+	err := c.cc.Invoke(ctx, "/cos.Cos/DeleteAccessKey", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *cosClient) SetRemarkAccessKey(ctx context.Context, in *SetAccessKeyRemarkRequest, opts ...grpc.CallOption) (*SetAccessKeyRemarkResponse, error) {
+	out := new(SetAccessKeyRemarkResponse)
+	err := c.cc.Invoke(ctx, "/cos.Cos/SetRemarkAccessKey", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -329,6 +384,16 @@ type CosServer interface {
 	UserUpdateStatus(context.Context, *UserUpdateStatusRequest) (*UserUpdateStatusResponse, error)
 	// @group: user
 	UserDelete(context.Context, *UserDeleteRequest) (*UserDeleteResponse, error)
+	// @group: user
+	AccessKeyList(context.Context, *AccessKeyListRequest) (*AccessKeyListResponse, error)
+	// @group: user
+	CreateAccessKey(context.Context, *CreateAccessKeyRequest) (*CreateAccessKeyResponse, error)
+	// @group: user
+	UpdateStatusAccessKey(context.Context, *UpdateStatusAccessKeyRequest) (*UpdateStatusAccessKeyResponse, error)
+	// @group: user
+	DeleteAccessKey(context.Context, *DeleteAccessKeyRequest) (*DeleteAccessKeyResponse, error)
+	// @group: user
+	SetRemarkAccessKey(context.Context, *SetAccessKeyRemarkRequest) (*SetAccessKeyRemarkResponse, error)
 	// @group: namespace
 	SaveNamespace(context.Context, *SaveNamespaceRequest) (*SaveNamespaceResponse, error)
 	// @group: namespace
@@ -394,6 +459,21 @@ func (UnimplementedCosServer) UserUpdateStatus(context.Context, *UserUpdateStatu
 }
 func (UnimplementedCosServer) UserDelete(context.Context, *UserDeleteRequest) (*UserDeleteResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UserDelete not implemented")
+}
+func (UnimplementedCosServer) AccessKeyList(context.Context, *AccessKeyListRequest) (*AccessKeyListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AccessKeyList not implemented")
+}
+func (UnimplementedCosServer) CreateAccessKey(context.Context, *CreateAccessKeyRequest) (*CreateAccessKeyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateAccessKey not implemented")
+}
+func (UnimplementedCosServer) UpdateStatusAccessKey(context.Context, *UpdateStatusAccessKeyRequest) (*UpdateStatusAccessKeyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateStatusAccessKey not implemented")
+}
+func (UnimplementedCosServer) DeleteAccessKey(context.Context, *DeleteAccessKeyRequest) (*DeleteAccessKeyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteAccessKey not implemented")
+}
+func (UnimplementedCosServer) SetRemarkAccessKey(context.Context, *SetAccessKeyRemarkRequest) (*SetAccessKeyRemarkResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetRemarkAccessKey not implemented")
 }
 func (UnimplementedCosServer) SaveNamespace(context.Context, *SaveNamespaceRequest) (*SaveNamespaceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SaveNamespace not implemented")
@@ -614,6 +694,96 @@ func _Cos_UserDelete_Handler(srv interface{}, ctx context.Context, dec func(inte
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(CosServer).UserDelete(ctx, req.(*UserDeleteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Cos_AccessKeyList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AccessKeyListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CosServer).AccessKeyList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/cos.Cos/AccessKeyList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CosServer).AccessKeyList(ctx, req.(*AccessKeyListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Cos_CreateAccessKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateAccessKeyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CosServer).CreateAccessKey(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/cos.Cos/CreateAccessKey",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CosServer).CreateAccessKey(ctx, req.(*CreateAccessKeyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Cos_UpdateStatusAccessKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateStatusAccessKeyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CosServer).UpdateStatusAccessKey(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/cos.Cos/UpdateStatusAccessKey",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CosServer).UpdateStatusAccessKey(ctx, req.(*UpdateStatusAccessKeyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Cos_DeleteAccessKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteAccessKeyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CosServer).DeleteAccessKey(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/cos.Cos/DeleteAccessKey",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CosServer).DeleteAccessKey(ctx, req.(*DeleteAccessKeyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Cos_SetRemarkAccessKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetAccessKeyRemarkRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CosServer).SetRemarkAccessKey(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/cos.Cos/SetRemarkAccessKey",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CosServer).SetRemarkAccessKey(ctx, req.(*SetAccessKeyRemarkRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -948,6 +1118,26 @@ var Cos_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UserDelete",
 			Handler:    _Cos_UserDelete_Handler,
+		},
+		{
+			MethodName: "AccessKeyList",
+			Handler:    _Cos_AccessKeyList_Handler,
+		},
+		{
+			MethodName: "CreateAccessKey",
+			Handler:    _Cos_CreateAccessKey_Handler,
+		},
+		{
+			MethodName: "UpdateStatusAccessKey",
+			Handler:    _Cos_UpdateStatusAccessKey_Handler,
+		},
+		{
+			MethodName: "DeleteAccessKey",
+			Handler:    _Cos_DeleteAccessKey_Handler,
+		},
+		{
+			MethodName: "SetRemarkAccessKey",
+			Handler:    _Cos_SetRemarkAccessKey_Handler,
 		},
 		{
 			MethodName: "SaveNamespace",
