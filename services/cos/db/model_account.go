@@ -70,6 +70,40 @@ func (t ModelAccount) ToUserListItemAsPointer() *cos.UserListItem {
 
 type ModelAccountList []ModelAccount
 
+func (t ModelAccountList) Filter(f func(index int, item ModelAccount) bool) ModelAccountList {
+	ret := make(ModelAccountList, 0)
+	for i, item := range t {
+		if f(i, item) {
+			ret = append(ret, item)
+		}
+	}
+	return ret
+}
+
+func (t ModelAccountList) MergeSort(list ModelAccountList, less func(a, b ModelAccount) bool) ModelAccountList {
+	ret := make(ModelAccountList, 0)
+	i, j := 0, 0
+	for i < len(t) || j < len(list) {
+		if i < len(t) && j < len(list) {
+			if less(t[i], list[j]) {
+				ret = append(ret, t[i])
+				i += 1
+			} else {
+				ret = append(ret, list[j])
+				j += 1
+			}
+			continue
+		} else if i < len(t) {
+			ret = append(ret, t[i])
+			i += 1
+		} else if j < len(list) {
+			ret = append(ret, list[j])
+			j += 1
+		}
+	}
+	return ret
+}
+
 func (t ModelAccountList) MapToUserInfoResponseList() []*cos.UserInfoResponse {
 	ret := make([]*cos.UserInfoResponse, 0)
 	for _, item := range t {

@@ -64,6 +64,40 @@ func (t ModelConfig) ToListConfigItemAsPointer() *cos.ListConfigItem {
 
 type ModelConfigList []ModelConfig
 
+func (t ModelConfigList) Filter(f func(index int, item ModelConfig) bool) ModelConfigList {
+	ret := make(ModelConfigList, 0)
+	for i, item := range t {
+		if f(i, item) {
+			ret = append(ret, item)
+		}
+	}
+	return ret
+}
+
+func (t ModelConfigList) MergeSort(list ModelConfigList, less func(a, b ModelConfig) bool) ModelConfigList {
+	ret := make(ModelConfigList, 0)
+	i, j := 0, 0
+	for i < len(t) || j < len(list) {
+		if i < len(t) && j < len(list) {
+			if less(t[i], list[j]) {
+				ret = append(ret, t[i])
+				i += 1
+			} else {
+				ret = append(ret, list[j])
+				j += 1
+			}
+			continue
+		} else if i < len(t) {
+			ret = append(ret, t[i])
+			i += 1
+		} else if j < len(list) {
+			ret = append(ret, list[j])
+			j += 1
+		}
+	}
+	return ret
+}
+
 func (t ModelConfigList) MapToListConfigItemList() []*cos.ListConfigItem {
 	ret := make([]*cos.ListConfigItem, 0)
 	for _, item := range t {

@@ -417,7 +417,7 @@ message SaveValueRequest {
   string configValue = 3;
   bool isHot = 4;
   ValueType valueType = 5;
-  dt.ID id = 6;
+  reserved 6;
 }
 
 message SaveValueResponse {}

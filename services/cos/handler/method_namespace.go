@@ -149,7 +149,7 @@ func (t *handler) SelectorNamespace(ctx context.Context, req *cos.SelectorReques
 	for _, item := range modelNamespaceList {
 		list = append(list, &cos.SelectorItem{
 			Label: item.Namespace,
-			Value: item.Id.NumberInString(),
+			Value: item.Id.NumberAsString(),
 		})
 	}
 	resp = &cos.SelectorResponse{

@@ -8,6 +8,7 @@ type StringSet interface {
 	Data() []string
 	Clone() StringSet
 	Exists(k string) bool
+	Intersect(set StringSet) StringSet
 }
 
 type stringSet map[string]bool
@@ -54,6 +55,16 @@ func (t stringSet) Clone() StringSet {
 
 func (t stringSet) Exists(k string) bool {
 	return t[k]
+}
+
+func (t stringSet) Intersect(set StringSet) StringSet {
+	ret := NewStringSet()
+	for _, s := range t.Data() {
+		if set.Exists(s) {
+			ret.Add(s)
+		}
+	}
+	return ret
 }
 
 func NewStringSet(in ...string) StringSet {

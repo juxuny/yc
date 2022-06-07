@@ -67,6 +67,40 @@ func (t ModelKeyValue) ToKeyValueRespAsPointer() *cos.KeyValueResp {
 
 type ModelKeyValueList []ModelKeyValue
 
+func (t ModelKeyValueList) Filter(f func(index int, item ModelKeyValue) bool) ModelKeyValueList {
+	ret := make(ModelKeyValueList, 0)
+	for i, item := range t {
+		if f(i, item) {
+			ret = append(ret, item)
+		}
+	}
+	return ret
+}
+
+func (t ModelKeyValueList) MergeSort(list ModelKeyValueList, less func(a, b ModelKeyValue) bool) ModelKeyValueList {
+	ret := make(ModelKeyValueList, 0)
+	i, j := 0, 0
+	for i < len(t) || j < len(list) {
+		if i < len(t) && j < len(list) {
+			if less(t[i], list[j]) {
+				ret = append(ret, t[i])
+				i += 1
+			} else {
+				ret = append(ret, list[j])
+				j += 1
+			}
+			continue
+		} else if i < len(t) {
+			ret = append(ret, t[i])
+			i += 1
+		} else if j < len(list) {
+			ret = append(ret, list[j])
+			j += 1
+		}
+	}
+	return ret
+}
+
 func (t ModelKeyValueList) MapToKeyValueRespList() []*cos.KeyValueResp {
 	ret := make([]*cos.KeyValueResp, 0)
 	for _, item := range t {

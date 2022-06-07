@@ -32,6 +32,40 @@ func (ModelConfigRecord) TableName() string {
 
 type ModelConfigRecordList []ModelConfigRecord
 
+func (t ModelConfigRecordList) Filter(f func(index int, item ModelConfigRecord) bool) ModelConfigRecordList {
+	ret := make(ModelConfigRecordList, 0)
+	for i, item := range t {
+		if f(i, item) {
+			ret = append(ret, item)
+		}
+	}
+	return ret
+}
+
+func (t ModelConfigRecordList) MergeSort(list ModelConfigRecordList, less func(a, b ModelConfigRecord) bool) ModelConfigRecordList {
+	ret := make(ModelConfigRecordList, 0)
+	i, j := 0, 0
+	for i < len(t) || j < len(list) {
+		if i < len(t) && j < len(list) {
+			if less(t[i], list[j]) {
+				ret = append(ret, t[i])
+				i += 1
+			} else {
+				ret = append(ret, list[j])
+				j += 1
+			}
+			continue
+		} else if i < len(t) {
+			ret = append(ret, t[i])
+			i += 1
+		} else if j < len(list) {
+			ret = append(ret, list[j])
+			j += 1
+		}
+	}
+	return ret
+}
+
 type tableConfigRecord struct {
 	Id         orm.FieldName
 	ConfigId   orm.FieldName

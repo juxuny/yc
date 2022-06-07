@@ -139,7 +139,7 @@ const KeyValuePairs: React.FC<KeyValuePairsProps> = (props) => {
       render: (node, record) => {
         return (
           <Tag color={record.isDisabled ? 'error' : 'success'}>
-            <FormattedMessage id={record.isDisabled ? 'pages.status.disabled': 'pages.status.enable'}/>
+            <FormattedMessage id={record.isDisabled ? 'pages.status.disable': 'pages.status.enable'}/>
           </Tag>
         );
       },

@@ -23,21 +23,6 @@ func getMaxSeqNoFromKeyValue(ctx context.Context, configId dt.ID) (maxSeqNo uint
 }
 
 func SaveValue(ctx context.Context, modelKeyValue db.ModelKeyValue) error {
-	// update key-value record
-	if modelKeyValue.Id != nil && modelKeyValue.Id.Valid {
-		_, err := db.TableKeyValue.UpdateById(ctx, *modelKeyValue.Id, orm.H{
-			db.TableKeyValue.ConfigValue: modelKeyValue.ConfigValue,
-			db.TableKeyValue.IsHot:       modelKeyValue.IsHot,
-			db.TableKeyValue.ValueType:   modelKeyValue.ValueType,
-		})
-		if err != nil {
-			log.Error(err)
-			return err
-		}
-		return nil
-	}
-
-	// create new key-value
 	if modelKeyValue.ConfigId == nil || !modelKeyValue.ConfigId.Valid {
 		return cos.Error.MissingConfigId
 	}
@@ -50,7 +35,17 @@ func SaveValue(ctx context.Context, modelKeyValue db.ModelKeyValue) error {
 			return true, err
 		}
 		if count > 0 {
-			return true, cos.Error.KeyDuplicated.WithField(db.TableKeyValue.ConfigKey.LowerFirstHump(), modelKeyValue.ConfigKey)
+			_, err := db.TableKeyValue.Update(ctx, orm.H{
+				db.TableKeyValue.ConfigValue: modelKeyValue.ConfigValue,
+				db.TableKeyValue.IsHot:       modelKeyValue.IsHot,
+				db.TableKeyValue.ValueType:   modelKeyValue.ValueType,
+				db.TableKeyValue.UpdateTime:  orm.Now(),
+			}, orm.NewAndWhereWrapper().Eq(db.TableKeyValue.ConfigId, modelKeyValue.ConfigId).Eq(db.TableKeyValue.ConfigKey, modelKeyValue.ConfigKey))
+			if err != nil {
+				log.Error(err)
+				return true, err
+			}
+			return true, nil
 		}
 		modelKeyValue.SeqNo = maxSeqNo + 1
 		_, err = db.TableKeyValue.Create(ctx, modelKeyValue)

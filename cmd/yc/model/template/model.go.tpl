@@ -39,6 +39,40 @@ func (t {{$modelName}}) To{{$ref.ModelName}}AsPointer() *{{$packageAlias}}.{{$re
 
 type {{.ModelName}}List []{{.ModelName}}
 
+func (t {{.ModelName}}List) Filter(f func(index int, item {{.ModelName}}) bool) {{.ModelName}}List {
+	ret := make({{.ModelName}}List, 0)
+	for i, item := range t {
+		if f(i, item) {
+			ret = append(ret, item)
+		}
+	}
+	return ret
+}
+
+func (t {{.ModelName}}List) MergeSort(list {{.ModelName}}List, less func (a, b {{.ModelName}}) bool ) {{.ModelName}}List {
+	ret := make({{.ModelName}}List, 0)
+	i, j := 0, 0
+	for i {{.Lt}} len(t) || j {{.Lt}} len(list) {
+		if i {{.Lt}} len(t) && j {{.Lt}} len(list) {
+			if less(t[i], list[j]) {
+				ret = append(ret, t[i])
+				i += 1
+			} else {
+				ret = append(ret, list[j])
+				j += 1
+			}
+			continue
+		} else if i {{.Lt}} len(t) {
+			ret = append(ret, t[i])
+			i += 1
+		} else if j {{.Lt}} len(list) {
+			ret = append(ret, list[j])
+			j += 1
+		}
+	}
+	return ret
+}
+
 {{range $ref := .Refs}}
 func (t {{$modelName}}List) MapTo{{$ref.ModelName}}List() []*{{$packageAlias}}.{{$ref.ModelName}}  {
 	ret := make([]*{{$packageAlias}}.{{$ref.ModelName}} , 0)

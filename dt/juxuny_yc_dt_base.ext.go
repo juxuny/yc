@@ -10,7 +10,7 @@ func (m *ID) NewPointer() *ID {
 	return NewIDPointer(m.Uint64)
 }
 
-func (m *ID) NumberInString() string {
+func (m *ID) NumberAsString() string {
 	return fmt.Sprintf("%d", m.Uint64)
 }
 
