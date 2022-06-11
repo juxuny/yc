@@ -66,6 +66,9 @@ func (t *UpdateCommand) Run() {
 
 func (t *UpdateCommand) getServiceName() string {
 	serviceName := ""
+	if _, err := os.Stat(t.WorkDir); os.IsNotExist(err) {
+		log.Fatal(err)
+	}
 	if err := filepath.Walk(t.WorkDir, func(filePath string, info fs.FileInfo, err error) error {
 		if info.IsDir() {
 			return nil

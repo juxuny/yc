@@ -47,7 +47,7 @@ func GetJSON(url string, out interface{}, headers ...map[string]interface{}) (co
 	return resp.StatusCode, nil
 }
 
-// post json 数据到 url， 解析返回的json到out
+// PostJSON  POST数据到指定的URL
 func PostJSON(url string, param interface{}, out interface{}, headers ...map[string]interface{}) (code int, err error) {
 	d, _ := json.Marshal(param)
 	logger.Debug("post: ", url, " data: ", string(d))

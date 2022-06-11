@@ -14,4 +14,5 @@ require (
 	github.com/yoheimuta/go-protoparser/v4 v4.5.4
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
 	google.golang.org/grpc v1.45.0
+	google.golang.org/protobuf v1.26.0
 )

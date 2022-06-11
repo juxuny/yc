@@ -1,6 +1,11 @@
 # yc
 远界云微服务开发框架
 
+## Prepare
+
+### Install `protoc`
+
+
 ### Validator
 
 * length.min
