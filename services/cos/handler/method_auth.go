@@ -22,7 +22,7 @@ func (t *handler) Login(ctx context.Context, req *cos.LoginRequest) (resp *cos.L
 	if !utils.IsBcryptMatched(req.Password, modelAccount.Credential) {
 		return nil, cos.Error.IncorrectPassword
 	}
-	token, err := jwt.GenerateToken(*modelAccount.Id, modelAccount.Identifier)
+	token, err := jwt.GenerateToken(modelAccount.Id, modelAccount.Identifier)
 	if err != nil {
 		log.Error(err)
 		return nil, cos.Error.AuthorizeFailed.Wrap(err)

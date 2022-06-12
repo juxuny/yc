@@ -19,7 +19,7 @@ func (t *handler) UserInfo(ctx context.Context, req *cos.UserInfoRequest) (resp 
 	if err != nil {
 		return nil, err
 	}
-	if req.UserId != nil && req.UserId.Valid && !req.UserId.Equal(&currentId) {
+	if req.UserId != nil && req.UserId.Valid && !req.UserId.Equal(currentId) {
 		return nil, cos.Error.NoPermissionAccessUserInfo.WithField("userId", req.UserId)
 	}
 	modelAccount, found, err := db.TableAccount.FindOneById(ctx, currentId)
@@ -38,7 +38,7 @@ func (t *handler) UpdateInfo(ctx context.Context, req *cos.UpdateInfoRequest) (r
 	if err != nil {
 		return nil, err
 	}
-	if req.UserId != nil && req.UserId.Valid && !req.UserId.Equal(&currentId) {
+	if req.UserId != nil && req.UserId.Valid && !req.UserId.Equal(currentId) {
 		return nil, cos.Error.NoPermissionAccessUserInfo.WithField("userId", req.UserId)
 	}
 	modelAccount, found, err := db.TableAccount.FindOneById(ctx, currentId)
@@ -67,7 +67,7 @@ func (t *handler) ModifyPassword(ctx context.Context, req *cos.ModifyPasswordReq
 	if err != nil {
 		return nil, err
 	}
-	if req.UserId != nil && req.UserId.Valid && !req.UserId.Equal(&currentId) {
+	if req.UserId != nil && req.UserId.Valid && !req.UserId.Equal(currentId) {
 		return nil, cos.Error.NoPermissionAccessUserInfo.WithField("userId", req.UserId)
 	}
 	modelAccount, found, err := db.TableAccount.FindOneById(ctx, currentId)
@@ -93,7 +93,7 @@ func (t *handler) ModifyPassword(ctx context.Context, req *cos.ModifyPasswordReq
 func (t *handler) SaveOrCreateUser(ctx context.Context, req *cos.SaveOrCreateUserRequest) (resp *cos.SaveOrCreateUserResponse, err error) {
 	userId, _ := yc.GetUserId(ctx)
 	if req.UserId != nil && req.GetUserId().Valid && req.GetUserId().Uint64 > 0 {
-		userInfo, found, err := db.TableAccount.FindOneById(ctx, *req.UserId)
+		userInfo, found, err := db.TableAccount.FindOneById(ctx, req.UserId)
 		if err != nil {
 			log.Error(err)
 			return nil, err
@@ -101,10 +101,10 @@ func (t *handler) SaveOrCreateUser(ctx context.Context, req *cos.SaveOrCreateUse
 		if !found {
 			return nil, cos.Error.AccountNotFound.Wrap(fmt.Errorf("userId=%v", req.UserId.Uint64))
 		}
-		if userInfo.CreatorId == nil || !userInfo.CreatorId.Valid || !userInfo.CreatorId.Equal(&userId) {
+		if userInfo.CreatorId == nil || !userInfo.CreatorId.Valid || !userInfo.CreatorId.Equal(userId) {
 			return nil, cos.Error.NoPermissionUpdateUserInfo
 		}
-		rowsAffected, err := db.TableAccount.UpdateById(ctx, *req.UserId, orm.H{
+		rowsAffected, err := db.TableAccount.UpdateById(ctx, req.UserId, orm.H{
 			db.TableAccount.Nick: req.Nick,
 		})
 		if err != nil {
@@ -190,7 +190,7 @@ func (t *handler) UserList(ctx context.Context, req *cos.UserListRequest) (resp 
 
 func (t *handler) UserUpdateStatus(ctx context.Context, req *cos.UserUpdateStatusRequest) (resp *cos.UserUpdateStatusResponse, err error) {
 	userId, _ := yc.GetUserId(ctx)
-	modelAccount, found, err := db.TableAccount.FindOneById(ctx, *req.UserId)
+	modelAccount, found, err := db.TableAccount.FindOneById(ctx, req.UserId)
 	if err != nil {
 		log.Error(err)
 		return nil, err
@@ -198,11 +198,11 @@ func (t *handler) UserUpdateStatus(ctx context.Context, req *cos.UserUpdateStatu
 	if !found {
 		return nil, cos.Error.AccountNotFound
 	}
-	if !modelAccount.CreatorId.Equal(&userId) {
+	if !modelAccount.CreatorId.Equal(userId) {
 		log.Error("no permission set user status")
 		return nil, cos.Error.NoPermissionAccessUserInfo
 	}
-	_, err = db.TableAccount.UpdateById(ctx, *req.UserId, orm.H{
+	_, err = db.TableAccount.UpdateById(ctx, req.UserId, orm.H{
 		db.TableAccount.IsDisabled: req.IsDisabled,
 	})
 	if err != nil {
@@ -214,7 +214,7 @@ func (t *handler) UserUpdateStatus(ctx context.Context, req *cos.UserUpdateStatu
 
 func (t *handler) UserDelete(ctx context.Context, req *cos.UserDeleteRequest) (resp *cos.UserDeleteResponse, err error) {
 	userId, _ := yc.GetUserId(ctx)
-	modelAccount, found, err := db.TableAccount.FindOneById(ctx, *req.UserId)
+	modelAccount, found, err := db.TableAccount.FindOneById(ctx, req.UserId)
 	if err != nil {
 		log.Error(err)
 		return nil, err
@@ -222,10 +222,10 @@ func (t *handler) UserDelete(ctx context.Context, req *cos.UserDeleteRequest) (r
 	if !found {
 		return nil, cos.Error.AccountNotFound
 	}
-	if !modelAccount.CreatorId.Equal(&userId) {
+	if !modelAccount.CreatorId.Equal(userId) {
 		return nil, cos.Error.NoPermissionAccessUserInfo
 	}
-	_, err = db.TableAccount.SoftDeleteById(ctx, *req.UserId)
+	_, err = db.TableAccount.SoftDeleteById(ctx, req.UserId)
 	if err != nil {
 		log.Error(err)
 		return nil, err
@@ -275,7 +275,7 @@ func (t *handler) CreateAccessKey(ctx context.Context, req *cos.CreateAccessKeyR
 			UpdateTime:     orm.Now(),
 			IsDisabled:     false,
 			DeletedAt:      0,
-			UserId:         &userId,
+			UserId:         userId,
 			AccessKey:      resp.AccessKey,
 			HasValidity:    req.HasValidity,
 			ValidStartTime: req.ValidStartTime,
@@ -292,10 +292,10 @@ func (t *handler) CreateAccessKey(ctx context.Context, req *cos.CreateAccessKeyR
 }
 
 func (t *handler) UpdateStatusAccessKey(ctx context.Context, req *cos.UpdateStatusAccessKeyRequest) (resp *cos.UpdateStatusAccessKeyResponse, err error) {
-	if err := impl.CheckIfAllowToAccessAccessKey(ctx, *req.Id); err != nil {
+	if err := impl.CheckIfAllowToAccessAccessKey(ctx, req.Id); err != nil {
 		return nil, err
 	}
-	_, err = db.TableAccessKey.UpdateById(ctx, *req.Id, orm.H{
+	_, err = db.TableAccessKey.UpdateById(ctx, req.Id, orm.H{
 		db.TableAccessKey.IsDisabled: req.IsDisabled,
 		db.TableAccessKey.UpdateTime: orm.Now(),
 	})
@@ -303,18 +303,18 @@ func (t *handler) UpdateStatusAccessKey(ctx context.Context, req *cos.UpdateStat
 }
 
 func (t *handler) DeleteAccessKey(ctx context.Context, req *cos.DeleteAccessKeyRequest) (resp *cos.DeleteAccessKeyResponse, err error) {
-	if err := impl.CheckIfAllowToAccessAccessKey(ctx, *req.Id); err != nil {
+	if err := impl.CheckIfAllowToAccessAccessKey(ctx, req.Id); err != nil {
 		return nil, err
 	}
-	_, err = db.TableAccessKey.SoftDeleteById(ctx, *req.Id)
+	_, err = db.TableAccessKey.SoftDeleteById(ctx, req.Id)
 	return &cos.DeleteAccessKeyResponse{}, err
 }
 
 func (t *handler) SetRemarkAccessKey(ctx context.Context, req *cos.SetAccessKeyRemarkRequest) (resp *cos.SetAccessKeyRemarkResponse, err error) {
-	if err := impl.CheckIfAllowToAccessAccessKey(ctx, *req.Id); err != nil {
+	if err := impl.CheckIfAllowToAccessAccessKey(ctx, req.Id); err != nil {
 		return nil, err
 	}
-	_, err = db.TableAccessKey.UpdateById(ctx, *req.Id, orm.H{
+	_, err = db.TableAccessKey.UpdateById(ctx, req.Id, orm.H{
 		db.TableAccessKey.Remark:     req.Remark,
 		db.TableAccessKey.UpdateTime: orm.Now(),
 	})

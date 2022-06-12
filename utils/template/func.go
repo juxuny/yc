@@ -31,7 +31,7 @@ func raw(s interface{}) template.HTML {
 	return template.HTML(fmt.Sprintf("%v", s))
 }
 
-func CaseNumber(v interface{}) string {
+func castNumber(v interface{}) string {
 	in := reflect.ValueOf(v)
 	if !in.IsValid() {
 		return ""

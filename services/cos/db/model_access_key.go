@@ -125,7 +125,7 @@ func (tableAccessKey) TableName() string {
 	return cos.Name + "_" + "access_key"
 }
 
-func (tableAccessKey) FindOneById(ctx context.Context, id dt.ID, orderBy ...orm.Order) (data ModelAccessKey, found bool, err error) {
+func (tableAccessKey) FindOneById(ctx context.Context, id *dt.ID, orderBy ...orm.Order) (data ModelAccessKey, found bool, err error) {
 	w := orm.NewQueryWrapper(data).Limit(1)
 	w.Eq(TableAccessKey.Id, id)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableAccessKey.DeletedAt, 0).IsNull(TableAccessKey.DeletedAt))
@@ -141,7 +141,7 @@ func (tableAccessKey) FindOneById(ctx context.Context, id dt.ID, orderBy ...orm.
 	return data, true, nil
 }
 
-func (tableAccessKey) FindOneByUserId(ctx context.Context, userId dt.ID, orderBy ...orm.Order) (data ModelAccessKey, found bool, err error) {
+func (tableAccessKey) FindOneByUserId(ctx context.Context, userId *dt.ID, orderBy ...orm.Order) (data ModelAccessKey, found bool, err error) {
 	w := orm.NewQueryWrapper(data).Limit(1)
 	w.Eq(TableAccessKey.UserId, userId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableAccessKey.DeletedAt, 0).IsNull(TableAccessKey.DeletedAt))
@@ -173,7 +173,7 @@ func (tableAccessKey) FindOneByAccessKey(ctx context.Context, accessKey string, 
 	return data, true, nil
 }
 
-func (tableAccessKey) UpdateById(ctx context.Context, id dt.ID, update orm.H) (rowsAffected int64, err error) {
+func (tableAccessKey) UpdateById(ctx context.Context, id *dt.ID, update orm.H) (rowsAffected int64, err error) {
 	w := orm.NewUpdateWrapper(ModelAccessKey{})
 	w.Eq(TableAccessKey.Id, id)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableAccessKey.DeletedAt, 0).IsNull(TableAccessKey.DeletedAt))
@@ -186,7 +186,7 @@ func (tableAccessKey) UpdateById(ctx context.Context, id dt.ID, update orm.H) (r
 	return result.RowsAffected()
 }
 
-func (tableAccessKey) UpdateByUserId(ctx context.Context, userId dt.ID, update orm.H) (rowsAffected int64, err error) {
+func (tableAccessKey) UpdateByUserId(ctx context.Context, userId *dt.ID, update orm.H) (rowsAffected int64, err error) {
 	w := orm.NewUpdateWrapper(ModelAccessKey{})
 	w.Eq(TableAccessKey.UserId, userId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableAccessKey.DeletedAt, 0).IsNull(TableAccessKey.DeletedAt))
@@ -224,7 +224,7 @@ func (tableAccessKey) Update(ctx context.Context, update orm.H, where orm.WhereW
 	return result.RowsAffected()
 }
 
-func (tableAccessKey) DeleteById(ctx context.Context, id dt.ID) (rowsAffected int64, err error) {
+func (tableAccessKey) DeleteById(ctx context.Context, id *dt.ID) (rowsAffected int64, err error) {
 	w := orm.NewDeleteWrapper(ModelAccessKey{})
 	w.Eq(TableAccessKey.Id, id)
 	result, err := orm.Delete(ctx, cos.Name, w)
@@ -235,7 +235,7 @@ func (tableAccessKey) DeleteById(ctx context.Context, id dt.ID) (rowsAffected in
 	return result.RowsAffected()
 }
 
-func (tableAccessKey) DeleteByUserId(ctx context.Context, userId dt.ID) (rowsAffected int64, err error) {
+func (tableAccessKey) DeleteByUserId(ctx context.Context, userId *dt.ID) (rowsAffected int64, err error) {
 	w := orm.NewDeleteWrapper(ModelAccessKey{})
 	w.Eq(TableAccessKey.UserId, userId)
 	result, err := orm.Delete(ctx, cos.Name, w)
@@ -257,7 +257,7 @@ func (tableAccessKey) DeleteByAccessKey(ctx context.Context, accessKey string) (
 	return result.RowsAffected()
 }
 
-func (tableAccessKey) SoftDeleteById(ctx context.Context, id dt.ID) (rowsAffected int64, err error) {
+func (tableAccessKey) SoftDeleteById(ctx context.Context, id *dt.ID) (rowsAffected int64, err error) {
 	w := orm.NewUpdateWrapper(ModelAccessKey{})
 	w.SetValue(TableAccessKey.DeletedAt, orm.Now())
 	w.Eq(TableAccessKey.Id, id)
@@ -269,7 +269,7 @@ func (tableAccessKey) SoftDeleteById(ctx context.Context, id dt.ID) (rowsAffecte
 	return result.RowsAffected()
 }
 
-func (tableAccessKey) SoftDeleteByUserId(ctx context.Context, userId dt.ID) (rowsAffected int64, err error) {
+func (tableAccessKey) SoftDeleteByUserId(ctx context.Context, userId *dt.ID) (rowsAffected int64, err error) {
 	w := orm.NewUpdateWrapper(ModelAccessKey{})
 	w.SetValue(TableAccessKey.DeletedAt, orm.Now())
 	w.Eq(TableAccessKey.UserId, userId)
@@ -333,7 +333,7 @@ func (tableAccessKey) FindOne(ctx context.Context, where orm.WhereWrapper, order
 	return ret, true, nil
 }
 
-func (tableAccessKey) FindById(ctx context.Context, id dt.ID, orderBy ...orm.Order) (list ModelAccessKeyList, err error) {
+func (tableAccessKey) FindById(ctx context.Context, id *dt.ID, orderBy ...orm.Order) (list ModelAccessKeyList, err error) {
 	w := orm.NewQueryWrapper(ModelAccessKey{})
 	w.Eq(TableAccessKey.Id, id)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableAccessKey.DeletedAt, 0).IsNull(TableAccessKey.DeletedAt))
@@ -346,7 +346,7 @@ func (tableAccessKey) FindById(ctx context.Context, id dt.ID, orderBy ...orm.Ord
 	return
 }
 
-func (tableAccessKey) FindByUserId(ctx context.Context, userId dt.ID, orderBy ...orm.Order) (list ModelAccessKeyList, err error) {
+func (tableAccessKey) FindByUserId(ctx context.Context, userId *dt.ID, orderBy ...orm.Order) (list ModelAccessKeyList, err error) {
 	w := orm.NewQueryWrapper(ModelAccessKey{})
 	w.Eq(TableAccessKey.UserId, userId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableAccessKey.DeletedAt, 0).IsNull(TableAccessKey.DeletedAt))
@@ -384,7 +384,7 @@ func (tableAccessKey) Page(ctx context.Context, pageNum, pageSize int64, where o
 	return
 }
 
-func (tableAccessKey) PageById(ctx context.Context, pageNum, pageSize int64, id dt.ID, orderBy ...orm.Order) (list ModelAccessKeyList, err error) {
+func (tableAccessKey) PageById(ctx context.Context, pageNum, pageSize int64, id *dt.ID, orderBy ...orm.Order) (list ModelAccessKeyList, err error) {
 	w := orm.NewQueryWrapper(ModelAccessKey{})
 	w.Eq(TableAccessKey.Id, id)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableAccessKey.DeletedAt, 0).IsNull(TableAccessKey.DeletedAt))
@@ -397,7 +397,7 @@ func (tableAccessKey) PageById(ctx context.Context, pageNum, pageSize int64, id 
 	return
 }
 
-func (tableAccessKey) PageByUserId(ctx context.Context, pageNum, pageSize int64, userId dt.ID, orderBy ...orm.Order) (list ModelAccessKeyList, err error) {
+func (tableAccessKey) PageByUserId(ctx context.Context, pageNum, pageSize int64, userId *dt.ID, orderBy ...orm.Order) (list ModelAccessKeyList, err error) {
 	w := orm.NewQueryWrapper(ModelAccessKey{})
 	w.Eq(TableAccessKey.UserId, userId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableAccessKey.DeletedAt, 0).IsNull(TableAccessKey.DeletedAt))
@@ -435,7 +435,7 @@ func (tableAccessKey) Count(ctx context.Context, where orm.WhereWrapper) (count 
 	return count, err
 }
 
-func (tableAccessKey) CountById(ctx context.Context, id dt.ID) (count int64, err error) {
+func (tableAccessKey) CountById(ctx context.Context, id *dt.ID) (count int64, err error) {
 	w := orm.NewQueryWrapper(ModelAccessKey{})
 	w.Eq(TableAccessKey.Id, id)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableAccessKey.DeletedAt, 0).IsNull(TableAccessKey.DeletedAt))
@@ -447,7 +447,7 @@ func (tableAccessKey) CountById(ctx context.Context, id dt.ID) (count int64, err
 	return count, err
 }
 
-func (tableAccessKey) CountByUserId(ctx context.Context, userId dt.ID) (count int64, err error) {
+func (tableAccessKey) CountByUserId(ctx context.Context, userId *dt.ID) (count int64, err error) {
 	w := orm.NewQueryWrapper(ModelAccessKey{})
 	w.Eq(TableAccessKey.UserId, userId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableAccessKey.DeletedAt, 0).IsNull(TableAccessKey.DeletedAt))

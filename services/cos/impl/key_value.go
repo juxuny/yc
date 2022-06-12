@@ -10,7 +10,7 @@ import (
 	"github.com/juxuny/yc/services/cos/db"
 )
 
-func getMaxSeqNoFromKeyValue(ctx context.Context, configId dt.ID) (maxSeqNo uint64) {
+func getMaxSeqNoFromKeyValue(ctx context.Context, configId *dt.ID) (maxSeqNo uint64) {
 	modelKeyValue, found, err := db.TableKeyValue.FindOneByConfigId(ctx, configId, orm.DESC(db.TableKeyValue.SeqNo))
 	if err != nil {
 		log.Error(err)
@@ -27,7 +27,7 @@ func SaveValue(ctx context.Context, modelKeyValue db.ModelKeyValue) error {
 		return cos.Error.MissingConfigId
 	}
 	return yc.Retry(func() (isEnd bool, err error) {
-		maxSeqNo := getMaxSeqNoFromKeyValue(ctx, *modelKeyValue.ConfigId)
+		maxSeqNo := getMaxSeqNoFromKeyValue(ctx, modelKeyValue.ConfigId)
 		// check duplicated key
 		count, err := db.TableKeyValue.Count(ctx, orm.NewAndWhereWrapper().Eq(db.TableKeyValue.ConfigId, modelKeyValue.ConfigId).Le(db.TableKeyValue.SeqNo, maxSeqNo).Eq(db.TableKeyValue.ConfigKey, modelKeyValue.ConfigKey))
 		if err != nil {

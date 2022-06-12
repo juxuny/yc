@@ -67,11 +67,11 @@ func ParseJwt(ctx context.Context) (*jwt.Claims, error) {
 	return claim, nil
 }
 
-func GetUserId(ctx context.Context) (userId dt.ID, err error) {
+func GetUserId(ctx context.Context) (userId *dt.ID, err error) {
 	claims, err := ParseJwt(ctx)
 	if err != nil {
 		log.Error(err)
-		return dt.InvalidID(), err
+		return dt.InvalidIDPointer(), err
 	}
 	return claims.UserId, nil
 }

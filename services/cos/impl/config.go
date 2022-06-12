@@ -10,7 +10,7 @@ import (
 	"github.com/juxuny/yc/services/cos/db"
 )
 
-func fixConfigLastSeqNo(ctx context.Context, configId dt.ID) (lastSeqNo uint64, recordType cos.ConfigRecordType, linkCount uint64, err error) {
+func fixConfigLastSeqNo(ctx context.Context, configId *dt.ID) (lastSeqNo uint64, recordType cos.ConfigRecordType, linkCount uint64, err error) {
 	modelConfig, found, err := db.TableConfig.FindOneById(ctx, configId)
 	if err != nil {
 		log.Error(err)
@@ -24,7 +24,7 @@ func fixConfigLastSeqNo(ctx context.Context, configId dt.ID) (lastSeqNo uint64, 
 		lastSeqNo = 1
 		recordType = cos.ConfigRecordType_ConfigRecordTypeCreate
 		_, _ = db.TableConfigRecord.Create(ctx, db.ModelConfigRecord{
-			ConfigId:   &configId,
+			ConfigId:   configId,
 			CreateTime: orm.Now(),
 			SeqNo:      lastSeqNo,
 			RecordType: recordType,
@@ -68,7 +68,7 @@ func fixConfigLastSeqNo(ctx context.Context, configId dt.ID) (lastSeqNo uint64, 
 	return
 }
 
-func CreateConfig(ctx context.Context, modelConfig db.ModelConfig) (lastInsertId dt.ID, err error) {
+func CreateConfig(ctx context.Context, modelConfig db.ModelConfig) (lastInsertId *dt.ID, err error) {
 	modelConfig.DeletedAt = orm.Now()
 	modelConfig.LastSeqNo = 1
 	modelConfig.LastRecordType = cos.ConfigRecordType_ConfigRecordTypeCreate
@@ -81,7 +81,7 @@ func CreateConfig(ctx context.Context, modelConfig db.ModelConfig) (lastInsertId
 		return lastInsertId, err
 	}
 	if found {
-		return dt.NewID(0), cos.Error.ConfigIdDuplicated.WithField(db.TableConfig.ConfigId.LowerFirstHump(), modelConfig.ConfigId)
+		return dt.NewIDPointer(0), cos.Error.ConfigIdDuplicated.WithField(db.TableConfig.ConfigId.LowerFirstHump(), modelConfig.ConfigId)
 	}
 
 	lastInsertId, err = db.TableConfig.CreateWithLastId(ctx, modelConfig)
@@ -91,7 +91,7 @@ func CreateConfig(ctx context.Context, modelConfig db.ModelConfig) (lastInsertId
 	}
 	if modelConfig.BaseId != nil && modelConfig.BaseId.Valid {
 		err = yc.Retry(func() (bool, error) {
-			baseConfigLastSeqNo, baseConfigLastRecordType, _, err := fixConfigLastSeqNo(ctx, *modelConfig.BaseId)
+			baseConfigLastSeqNo, baseConfigLastRecordType, _, err := fixConfigLastSeqNo(ctx, modelConfig.BaseId)
 			if err != nil {
 				log.Error(err)
 				return false, err
@@ -101,7 +101,7 @@ func CreateConfig(ctx context.Context, modelConfig db.ModelConfig) (lastInsertId
 			}
 			records := []db.ModelConfigRecord{
 				{
-					ConfigId:   &lastInsertId,
+					ConfigId:   lastInsertId,
 					CreateTime: orm.Now(),
 					SeqNo:      modelConfig.LastSeqNo,
 					RecordType: modelConfig.LastRecordType,
@@ -123,14 +123,14 @@ func CreateConfig(ctx context.Context, modelConfig db.ModelConfig) (lastInsertId
 			log.Error(err)
 			return lastInsertId, err
 		}
-		_, _, _, err = fixConfigLastSeqNo(ctx, *modelConfig.BaseId)
+		_, _, _, err = fixConfigLastSeqNo(ctx, modelConfig.BaseId)
 		if err != nil {
 			log.Error(err)
 		}
 		_, err = db.TableConfig.ResetDeletedAt(ctx, orm.NewAndWhereWrapper().Eq(db.TableConfig.Id, lastInsertId))
 	} else {
 		modelConfigRecord := db.ModelConfigRecord{
-			ConfigId:   &lastInsertId,
+			ConfigId:   lastInsertId,
 			CreateTime: orm.Now(),
 			SeqNo:      modelConfig.LastSeqNo,
 			RecordType: modelConfig.LastRecordType,
@@ -145,7 +145,7 @@ func CreateConfig(ctx context.Context, modelConfig db.ModelConfig) (lastInsertId
 	return
 }
 
-func DeleteConfig(ctx context.Context, id dt.ID) error {
+func DeleteConfig(ctx context.Context, id *dt.ID) error {
 	err := yc.Retry(func() (isEnd bool, err error) {
 		modelConfig, found, err := db.TableConfig.FindOneById(ctx, id)
 		if err != nil {
@@ -170,14 +170,14 @@ func DeleteConfig(ctx context.Context, id dt.ID) error {
 		}
 		records := []db.ModelConfigRecord{
 			{
-				ConfigId:   &id,
+				ConfigId:   id,
 				CreateTime: orm.Now(),
 				SeqNo:      configLastSeqNo + 1,
 				RecordType: cos.ConfigRecordType_ConfigRecordTypeDelete,
 			},
 		}
 		if modelConfig.BaseId != nil && modelConfig.BaseId.Valid {
-			baseConfigLastSeqNo, _, _, err := fixConfigLastSeqNo(ctx, *modelConfig.BaseId)
+			baseConfigLastSeqNo, _, _, err := fixConfigLastSeqNo(ctx, modelConfig.BaseId)
 			if err != nil {
 				log.Error(err)
 				return false, err
@@ -199,7 +199,7 @@ func DeleteConfig(ctx context.Context, id dt.ID) error {
 			log.Error(err)
 		}
 		if modelConfig.BaseId != nil && modelConfig.BaseId.Valid {
-			_, _, _, err = fixConfigLastSeqNo(ctx, *modelConfig.BaseId)
+			_, _, _, err = fixConfigLastSeqNo(ctx, modelConfig.BaseId)
 			if err != nil {
 				log.Error(err)
 			}

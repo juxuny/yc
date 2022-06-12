@@ -20,13 +20,13 @@ func SetTokenValidityPeriod(duration time.Duration) {
 }
 
 type Claims struct {
-	UserId   dt.ID     `json:"uid,omitempty"`
+	UserId   *dt.ID    `json:"uid,omitempty"`
 	UserName string    `json:"user,omitempty"`
 	Roles    []dt.Role `json:"roles,omitempty"`
 	jwt.RegisteredClaims
 }
 
-func GenerateToken(userId dt.ID, userName string, roles ...dt.Role) (string, error) {
+func GenerateToken(userId *dt.ID, userName string, roles ...dt.Role) (string, error) {
 	if len(jwtSecret) == 0 {
 		return "", fmt.Errorf("secret is empty")
 	}

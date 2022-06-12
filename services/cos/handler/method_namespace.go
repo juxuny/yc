@@ -33,7 +33,7 @@ func (t *handler) SaveNamespace(ctx context.Context, req *cos.SaveNamespaceReque
 		} else if found && !modelNamespace.Id.Equal(req.Id) {
 			return nil, cos.Error.NamespaceDuplicated
 		}
-		_, err = db.TableNamespace.UpdateById(ctx, *req.Id, orm.H{db.TableNamespace.Namespace: req.Namespace})
+		_, err = db.TableNamespace.UpdateById(ctx, req.Id, orm.H{db.TableNamespace.Namespace: req.Namespace})
 	} else {
 		count, err := db.TableNamespace.CountByNamespace(ctx, req.Namespace)
 		if err != nil {
@@ -95,7 +95,7 @@ func (t *handler) DeleteNamespace(ctx context.Context, req *cos.DeleteNamespaceR
 		log.Error(err)
 		return nil, err
 	}
-	modelNamespace, found, err := db.TableNamespace.FindOneById(ctx, *req.Id)
+	modelNamespace, found, err := db.TableNamespace.FindOneById(ctx, req.Id)
 	if err != nil {
 		log.Error(err)
 		return nil, err
@@ -103,16 +103,16 @@ func (t *handler) DeleteNamespace(ctx context.Context, req *cos.DeleteNamespaceR
 	if !found {
 		return nil, cos.Error.NamespaceNotFound
 	}
-	if !modelNamespace.CreatorId.Equal(&currentId) {
+	if !modelNamespace.CreatorId.Equal(currentId) {
 		return nil, cos.Error.NoPermissionDeleteNamespace
 	}
-	_, err = db.TableNamespace.SoftDeleteById(ctx, *req.Id)
+	_, err = db.TableNamespace.SoftDeleteById(ctx, req.Id)
 	return nil, err
 }
 
 func (t *handler) UpdateStatusNamespace(ctx context.Context, req *cos.UpdateStatusNamespaceRequest) (resp *cos.UpdateStatusNamespaceResponse, err error) {
 	userId, _ := yc.GetUserId(ctx)
-	modelNamespace, found, err := db.TableNamespace.FindOneById(ctx, *req.Id)
+	modelNamespace, found, err := db.TableNamespace.FindOneById(ctx, req.Id)
 	if err != nil {
 		log.Error(err)
 		return nil, err
@@ -121,10 +121,10 @@ func (t *handler) UpdateStatusNamespace(ctx context.Context, req *cos.UpdateStat
 		log.Error(err)
 		return nil, cos.Error.NamespaceNotFound
 	}
-	if !modelNamespace.CreatorId.Equal(&userId) {
+	if !modelNamespace.CreatorId.Equal(userId) {
 		return nil, cos.Error.NoPermissionAccessNamespace
 	}
-	_, err = db.TableNamespace.UpdateById(ctx, *req.Id, orm.H{
+	_, err = db.TableNamespace.UpdateById(ctx, req.Id, orm.H{
 		db.TableNamespace.IsDisabled: req.IsDisabled,
 	})
 	if err != nil {

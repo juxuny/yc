@@ -21,7 +21,7 @@ func (t *handler) SaveConfig(ctx context.Context, req *cos.SaveConfigRequest) (r
 		log.Error("namespace ID is nil")
 		return nil, cos.Error.NamespaceNotFound
 	}
-	modelNamespace, found, err := db.TableNamespace.FindOneById(ctx, *req.NamespaceId)
+	modelNamespace, found, err := db.TableNamespace.FindOneById(ctx, req.NamespaceId)
 	if err != nil {
 		log.Error(err)
 		return nil, err
@@ -55,7 +55,7 @@ func (t *handler) SaveConfig(ctx context.Context, req *cos.SaveConfigRequest) (r
 			db.TableConfig.ConfigId:   req.ConfigId,
 			db.TableConfig.UpdateTime: orm.Now(),
 		}
-		_, err = db.TableConfig.UpdateById(ctx, *req.Id, update)
+		_, err = db.TableConfig.UpdateById(ctx, req.Id, update)
 		if err != nil {
 			log.Error(err)
 			return nil, err
@@ -74,7 +74,7 @@ func (t *handler) SaveConfig(ctx context.Context, req *cos.SaveConfigRequest) (r
 			UpdateTime:  orm.Now(),
 			ConfigId:    req.ConfigId,
 			IsDisabled:  false,
-			CreatorId:   &currentId,
+			CreatorId:   currentId,
 			BaseId:      req.BaseId,
 			NamespaceId: req.NamespaceId,
 		}
@@ -104,7 +104,7 @@ func (t *handler) DeleteConfig(ctx context.Context, req *cos.DeleteConfigRequest
 		log.Error("not found config:", req.Id)
 		return nil, cos.Error.ConfigNotFound
 	}
-	err = impl.DeleteConfig(ctx, *modelConfig.Id)
+	err = impl.DeleteConfig(ctx, modelConfig.Id)
 	return nil, err
 }
 
@@ -145,7 +145,7 @@ func (t *handler) ListConfig(ctx context.Context, req *cos.ListConfigRequest) (r
 
 func (t *handler) CloneConfig(ctx context.Context, req *cos.CloneConfigRequest) (resp *cos.CloneConfigResponse, err error) {
 	userId, _ := yc.GetUserId(ctx)
-	modelConfig, found, err := db.TableConfig.FindOneById(ctx, *req.Id)
+	modelConfig, found, err := db.TableConfig.FindOneById(ctx, req.Id)
 	if err != nil {
 		log.Error(err)
 		return nil, err
@@ -153,11 +153,11 @@ func (t *handler) CloneConfig(ctx context.Context, req *cos.CloneConfigRequest) 
 	if !found {
 		return nil, cos.Error.ConfigNotFound
 	}
-	if modelConfig.CreatorId == nil || !modelConfig.CreatorId.Equal(&userId) {
+	if modelConfig.CreatorId == nil || !modelConfig.CreatorId.Equal(userId) {
 		return nil, cos.Error.NoPermissionToAssessConfig
 	}
 
-	modelKeyValues, err := db.TableKeyValue.FindByConfigId(ctx, *modelConfig.Id)
+	modelKeyValues, err := db.TableKeyValue.FindByConfigId(ctx, modelConfig.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -168,7 +168,7 @@ func (t *handler) CloneConfig(ctx context.Context, req *cos.CloneConfigRequest) 
 		DeletedAt:      0,
 		ConfigId:       req.NewConfigId,
 		IsDisabled:     false,
-		CreatorId:      &userId,
+		CreatorId:      userId,
 		BaseId:         nil,
 		NamespaceId:    modelConfig.NamespaceId,
 		LastSeqNo:      0,
@@ -181,7 +181,7 @@ func (t *handler) CloneConfig(ctx context.Context, req *cos.CloneConfigRequest) 
 	}
 	if len(modelKeyValues) > 0 {
 		for i := range modelKeyValues {
-			modelKeyValues[i].ConfigId = &lastConfigId
+			modelKeyValues[i].ConfigId = lastConfigId
 			modelKeyValues[i].CreateTime = orm.Now()
 			modelKeyValues[i].UpdateTime = orm.Now()
 			modelKeyValues[i].Id = nil
@@ -197,7 +197,7 @@ func (t *handler) CloneConfig(ctx context.Context, req *cos.CloneConfigRequest) 
 
 func (t *handler) UpdateStatusConfig(ctx context.Context, req *cos.UpdateStatusConfigRequest) (resp *cos.UpdateStatusConfigResponse, err error) {
 	userId, _ := yc.GetUserId(ctx)
-	modelConfig, found, err := db.TableConfig.FindOneById(ctx, *req.Id)
+	modelConfig, found, err := db.TableConfig.FindOneById(ctx, req.Id)
 	if err != nil {
 		log.Error(err)
 		return nil, err
@@ -205,10 +205,10 @@ func (t *handler) UpdateStatusConfig(ctx context.Context, req *cos.UpdateStatusC
 	if !found {
 		return nil, cos.Error.ConfigNotFound
 	}
-	if modelConfig.CreatorId == nil || !modelConfig.CreatorId.Equal(&userId) {
+	if modelConfig.CreatorId == nil || !modelConfig.CreatorId.Equal(userId) {
 		return nil, cos.Error.NoPermissionToAssessConfig
 	}
-	_, err = db.TableConfig.UpdateById(ctx, *req.Id, orm.H{
+	_, err = db.TableConfig.UpdateById(ctx, req.Id, orm.H{
 		db.TableConfig.IsDisabled: req.IsDisabled,
 	})
 	if err != nil {

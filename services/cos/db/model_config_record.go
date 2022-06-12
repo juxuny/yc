@@ -78,7 +78,7 @@ func (tableConfigRecord) TableName() string {
 	return cos.Name + "_" + "config_record"
 }
 
-func (tableConfigRecord) FindOneById(ctx context.Context, id dt.ID, orderBy ...orm.Order) (data ModelConfigRecord, found bool, err error) {
+func (tableConfigRecord) FindOneById(ctx context.Context, id *dt.ID, orderBy ...orm.Order) (data ModelConfigRecord, found bool, err error) {
 	w := orm.NewQueryWrapper(data).Limit(1)
 	w.Eq(TableConfigRecord.Id, id)
 	w.Order(orderBy...)
@@ -93,7 +93,7 @@ func (tableConfigRecord) FindOneById(ctx context.Context, id dt.ID, orderBy ...o
 	return data, true, nil
 }
 
-func (tableConfigRecord) FindOneByConfigId(ctx context.Context, configId dt.ID, orderBy ...orm.Order) (data ModelConfigRecord, found bool, err error) {
+func (tableConfigRecord) FindOneByConfigId(ctx context.Context, configId *dt.ID, orderBy ...orm.Order) (data ModelConfigRecord, found bool, err error) {
 	w := orm.NewQueryWrapper(data).Limit(1)
 	w.Eq(TableConfigRecord.ConfigId, configId)
 	w.Order(orderBy...)
@@ -123,7 +123,7 @@ func (tableConfigRecord) FindOneByRecordType(ctx context.Context, recordType cos
 	return data, true, nil
 }
 
-func (tableConfigRecord) UpdateById(ctx context.Context, id dt.ID, update orm.H) (rowsAffected int64, err error) {
+func (tableConfigRecord) UpdateById(ctx context.Context, id *dt.ID, update orm.H) (rowsAffected int64, err error) {
 	w := orm.NewUpdateWrapper(ModelConfigRecord{})
 	w.Eq(TableConfigRecord.Id, id)
 	w.Updates(update)
@@ -135,7 +135,7 @@ func (tableConfigRecord) UpdateById(ctx context.Context, id dt.ID, update orm.H)
 	return result.RowsAffected()
 }
 
-func (tableConfigRecord) UpdateByConfigId(ctx context.Context, configId dt.ID, update orm.H) (rowsAffected int64, err error) {
+func (tableConfigRecord) UpdateByConfigId(ctx context.Context, configId *dt.ID, update orm.H) (rowsAffected int64, err error) {
 	w := orm.NewUpdateWrapper(ModelConfigRecord{})
 	w.Eq(TableConfigRecord.ConfigId, configId)
 	w.Updates(update)
@@ -170,7 +170,7 @@ func (tableConfigRecord) Update(ctx context.Context, update orm.H, where orm.Whe
 	return result.RowsAffected()
 }
 
-func (tableConfigRecord) DeleteById(ctx context.Context, id dt.ID) (rowsAffected int64, err error) {
+func (tableConfigRecord) DeleteById(ctx context.Context, id *dt.ID) (rowsAffected int64, err error) {
 	w := orm.NewDeleteWrapper(ModelConfigRecord{})
 	w.Eq(TableConfigRecord.Id, id)
 	result, err := orm.Delete(ctx, cos.Name, w)
@@ -181,7 +181,7 @@ func (tableConfigRecord) DeleteById(ctx context.Context, id dt.ID) (rowsAffected
 	return result.RowsAffected()
 }
 
-func (tableConfigRecord) DeleteByConfigId(ctx context.Context, configId dt.ID) (rowsAffected int64, err error) {
+func (tableConfigRecord) DeleteByConfigId(ctx context.Context, configId *dt.ID) (rowsAffected int64, err error) {
 	w := orm.NewDeleteWrapper(ModelConfigRecord{})
 	w.Eq(TableConfigRecord.ConfigId, configId)
 	result, err := orm.Delete(ctx, cos.Name, w)
@@ -229,7 +229,7 @@ func (tableConfigRecord) FindOne(ctx context.Context, where orm.WhereWrapper, or
 	return ret, true, nil
 }
 
-func (tableConfigRecord) FindById(ctx context.Context, id dt.ID, orderBy ...orm.Order) (list ModelConfigRecordList, err error) {
+func (tableConfigRecord) FindById(ctx context.Context, id *dt.ID, orderBy ...orm.Order) (list ModelConfigRecordList, err error) {
 	w := orm.NewQueryWrapper(ModelConfigRecord{})
 	w.Eq(TableConfigRecord.Id, id)
 	w.Order(orderBy...)
@@ -241,7 +241,7 @@ func (tableConfigRecord) FindById(ctx context.Context, id dt.ID, orderBy ...orm.
 	return
 }
 
-func (tableConfigRecord) FindByConfigId(ctx context.Context, configId dt.ID, orderBy ...orm.Order) (list ModelConfigRecordList, err error) {
+func (tableConfigRecord) FindByConfigId(ctx context.Context, configId *dt.ID, orderBy ...orm.Order) (list ModelConfigRecordList, err error) {
 	w := orm.NewQueryWrapper(ModelConfigRecord{})
 	w.Eq(TableConfigRecord.ConfigId, configId)
 	w.Order(orderBy...)
@@ -276,7 +276,7 @@ func (tableConfigRecord) Page(ctx context.Context, pageNum, pageSize int64, wher
 	return
 }
 
-func (tableConfigRecord) PageById(ctx context.Context, pageNum, pageSize int64, id dt.ID, orderBy ...orm.Order) (list ModelConfigRecordList, err error) {
+func (tableConfigRecord) PageById(ctx context.Context, pageNum, pageSize int64, id *dt.ID, orderBy ...orm.Order) (list ModelConfigRecordList, err error) {
 	w := orm.NewQueryWrapper(ModelConfigRecord{})
 	w.Eq(TableConfigRecord.Id, id)
 	w.Offset((pageNum - 1) * pageSize).Limit(pageSize).Order(orderBy...)
@@ -288,7 +288,7 @@ func (tableConfigRecord) PageById(ctx context.Context, pageNum, pageSize int64, 
 	return
 }
 
-func (tableConfigRecord) PageByConfigId(ctx context.Context, pageNum, pageSize int64, configId dt.ID, orderBy ...orm.Order) (list ModelConfigRecordList, err error) {
+func (tableConfigRecord) PageByConfigId(ctx context.Context, pageNum, pageSize int64, configId *dt.ID, orderBy ...orm.Order) (list ModelConfigRecordList, err error) {
 	w := orm.NewQueryWrapper(ModelConfigRecord{})
 	w.Eq(TableConfigRecord.ConfigId, configId)
 	w.Offset((pageNum - 1) * pageSize).Limit(pageSize).Order(orderBy...)
@@ -323,7 +323,7 @@ func (tableConfigRecord) Count(ctx context.Context, where orm.WhereWrapper) (cou
 	return count, err
 }
 
-func (tableConfigRecord) CountById(ctx context.Context, id dt.ID) (count int64, err error) {
+func (tableConfigRecord) CountById(ctx context.Context, id *dt.ID) (count int64, err error) {
 	w := orm.NewQueryWrapper(ModelConfigRecord{})
 	w.Eq(TableConfigRecord.Id, id)
 	w.Select("COUNT(*)")
@@ -334,7 +334,7 @@ func (tableConfigRecord) CountById(ctx context.Context, id dt.ID) (count int64, 
 	return count, err
 }
 
-func (tableConfigRecord) CountByConfigId(ctx context.Context, configId dt.ID) (count int64, err error) {
+func (tableConfigRecord) CountByConfigId(ctx context.Context, configId *dt.ID) (count int64, err error) {
 	w := orm.NewQueryWrapper(ModelConfigRecord{})
 	w.Eq(TableConfigRecord.ConfigId, configId)
 	w.Select("COUNT(*)")

@@ -43,7 +43,7 @@ func (t *handler) SaveValue(ctx context.Context, req *cos.SaveValueRequest) (res
 		ConfigValue: req.ConfigValue,
 		ValueType:   req.ValueType,
 		ConfigId:    req.ConfigId,
-		CreatorId:   &currentId,
+		CreatorId:   currentId,
 		IsHot:       req.IsHot,
 	}); err != nil {
 		log.Error(err)
@@ -70,7 +70,7 @@ func (t *handler) DeleteValue(ctx context.Context, req *cos.DeleteValueRequest) 
 	if !found {
 		return nil, cos.Error.KeyNotFound
 	}
-	_, err = db.TableKeyValue.SoftDeleteById(ctx, *modelKeyValue.Id)
+	_, err = db.TableKeyValue.SoftDeleteById(ctx, modelKeyValue.Id)
 	if err != nil {
 		log.Error(err)
 		return nil, err
@@ -124,7 +124,7 @@ func (t *handler) ListAllValue(ctx context.Context, req *cos.ListAllValueRequest
 	if req.ConfigId == nil || !req.ConfigId.Valid {
 		return nil, cos.Error.MissingConfigId
 	}
-	modelConfig, found, err := db.TableConfig.FindOneById(ctx, *req.ConfigId)
+	modelConfig, found, err := db.TableConfig.FindOneById(ctx, req.ConfigId)
 	if err != nil {
 		log.Error(err)
 		return nil, err
@@ -197,7 +197,7 @@ func (t *handler) UpdateStatusValue(ctx context.Context, req *cos.UpdateStatusVa
 	if !found {
 		return nil, cos.Error.KeyNotFound
 	}
-	_, err = db.TableKeyValue.UpdateById(ctx, *modelKeyValue.Id, orm.H{
+	_, err = db.TableKeyValue.UpdateById(ctx, modelKeyValue.Id, orm.H{
 		db.TableKeyValue.IsDisabled: req.IsDisabled,
 		db.TableKeyValue.UpdateTime: orm.Now(),
 	})
