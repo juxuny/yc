@@ -49,3 +49,9 @@ message PaginationResp {
   int64 pageSize = 2;
   int64 total = 3;
 }
+
+message Error {
+  int64 code = 1;
+  string msg = 2;
+  map<string, string> data = 3;
+}

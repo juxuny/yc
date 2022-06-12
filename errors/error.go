@@ -9,7 +9,7 @@ import (
 )
 
 type Error struct {
-	Code int                    `json:"code"`
+	Code int64                  `json:"code"`
 	Msg  string                 `json:"msg"`
 	Data map[string]interface{} `json:"data,omitempty"`
 }
@@ -55,7 +55,7 @@ func (t Error) Error() string {
 	return string(jsonData)
 }
 
-func New(code int, msg string) error {
+func New(code int64, msg string) error {
 	return Error{
 		Code: code,
 		Msg:  msg,
@@ -109,7 +109,7 @@ func InitErrorStruct(in interface{}) error {
 			msg = v
 		}
 		elem.Field(i).Set(reflect.ValueOf(Error{
-			Code: int(code),
+			Code: code,
 			Msg:  msg,
 		}))
 		if field, ok := codeSet[code]; ok {

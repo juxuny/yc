@@ -30,7 +30,7 @@ func (t *handler) SaveNamespace(ctx context.Context, req *cos.SaveNamespaceReque
 		if modelNamespace, found, err := db.TableNamespace.FindOneByNamespace(ctx, req.Namespace); err != nil {
 			log.Error(err)
 			return nil, err
-		} else if found && !modelNamespace.Id.Equal(*req.Id) {
+		} else if found && !modelNamespace.Id.Equal(req.Id) {
 			return nil, cos.Error.NamespaceDuplicated
 		}
 		_, err = db.TableNamespace.UpdateById(ctx, *req.Id, orm.H{db.TableNamespace.Namespace: req.Namespace})
@@ -103,7 +103,7 @@ func (t *handler) DeleteNamespace(ctx context.Context, req *cos.DeleteNamespaceR
 	if !found {
 		return nil, cos.Error.NamespaceNotFound
 	}
-	if !modelNamespace.CreatorId.Equal(currentId) {
+	if !modelNamespace.CreatorId.Equal(&currentId) {
 		return nil, cos.Error.NoPermissionDeleteNamespace
 	}
 	_, err = db.TableNamespace.SoftDeleteById(ctx, *req.Id)
@@ -121,7 +121,7 @@ func (t *handler) UpdateStatusNamespace(ctx context.Context, req *cos.UpdateStat
 		log.Error(err)
 		return nil, cos.Error.NamespaceNotFound
 	}
-	if !modelNamespace.CreatorId.Equal(userId) {
+	if !modelNamespace.CreatorId.Equal(&userId) {
 		return nil, cos.Error.NoPermissionAccessNamespace
 	}
 	_, err = db.TableNamespace.UpdateById(ctx, *req.Id, orm.H{

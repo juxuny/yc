@@ -164,7 +164,7 @@ func (t *handler) ListAllValue(ctx context.Context, req *cos.ListAllValueRequest
 		baseKeys := utils.NewStringSet()
 		currentKeys := utils.NewStringSet()
 		for _, item := range items {
-			if item.ConfigId.Equal(*modelConfig.Id) {
+			if item.ConfigId.Equal(modelConfig.Id) {
 				currentKeys.Add(item.ConfigKey)
 				currentItems = append(currentItems, item)
 			} else {

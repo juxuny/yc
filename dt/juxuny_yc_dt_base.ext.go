@@ -2,6 +2,7 @@ package dt
 
 import (
 	"fmt"
+	"github.com/juxuny/yc/errors"
 	"strconv"
 	"strings"
 )
@@ -39,7 +40,7 @@ func (m ID) MarshalJSON() (data []byte, err error) {
 	return []byte(fmt.Sprintf("\"%v\"", m.Uint64)), nil
 }
 
-func (m ID) Equal(id ID) bool {
+func (m *ID) Equal(id *ID) bool {
 	return m.Valid == id.Valid && m.Uint64 == id.Uint64
 }
 
@@ -58,14 +59,14 @@ func (m *NullInt64) UnmarshalJSON(data []byte) error {
 	return err
 }
 
-func (m NullInt64) MarshalJSON() (data []byte, err error) {
+func (m *NullInt64) MarshalJSON() (data []byte, err error) {
 	if !m.Valid {
 		return []byte("null"), nil
 	}
 	return []byte(fmt.Sprintf("\"%v\"", m.Int64)), nil
 }
 
-func (m NullInt64) Equal(id NullInt64) bool {
+func (m *NullInt64) Equal(id *NullInt64) bool {
 	return m.Valid == id.Valid && m.Int64 == id.Int64
 }
 
@@ -84,14 +85,14 @@ func (m *NullInt32) UnmarshalJSON(data []byte) error {
 	return err
 }
 
-func (m NullInt32) MarshalJSON() (data []byte, err error) {
+func (m *NullInt32) MarshalJSON() (data []byte, err error) {
 	if !m.Valid {
 		return []byte("null"), nil
 	}
 	return []byte(fmt.Sprintf("\"%v\"", m.Int32)), nil
 }
 
-func (m NullInt32) Equal(id NullInt32) bool {
+func (m *NullInt32) Equal(id *NullInt32) bool {
 	return m.Valid == id.Valid && m.Int32 == id.Int32
 }
 
@@ -110,14 +111,14 @@ func (m *NullFloat32) UnmarshalJSON(data []byte) error {
 	return err
 }
 
-func (m NullFloat32) MarshalJSON() (data []byte, err error) {
+func (m *NullFloat32) MarshalJSON() (data []byte, err error) {
 	if !m.Valid {
 		return []byte("null"), nil
 	}
 	return []byte(fmt.Sprintf("\"%v\"", m.Float32)), nil
 }
 
-func (m NullFloat32) Equal(input NullFloat32) bool {
+func (m *NullFloat32) Equal(input *NullFloat32) bool {
 	return m.Valid == input.Valid && m.Float32 == input.Float32
 }
 
@@ -136,14 +137,14 @@ func (m *NullFloat64) UnmarshalJSON(data []byte) error {
 	return err
 }
 
-func (m NullFloat64) MarshalJSON() (data []byte, err error) {
+func (m *NullFloat64) MarshalJSON() (data []byte, err error) {
 	if !m.Valid {
 		return []byte("null"), nil
 	}
 	return []byte(fmt.Sprintf("\"%v\"", m.Float64)), nil
 }
 
-func (m NullFloat64) Equal(input NullFloat64) bool {
+func (m *NullFloat64) Equal(input *NullFloat64) bool {
 	return m.Valid == input.Valid && m.Float64 == input.Float64
 }
 
@@ -162,18 +163,18 @@ func (m *NullBool) UnmarshalJSON(data []byte) error {
 	return err
 }
 
-func (m NullBool) MarshalJSON() (data []byte, err error) {
+func (m *NullBool) MarshalJSON() (data []byte, err error) {
 	if !m.Valid {
 		return []byte("null"), nil
 	}
 	return []byte(fmt.Sprintf("%v", m.Bool)), nil
 }
 
-func (m NullBool) Equal(input NullBool) bool {
+func (m *NullBool) Equal(input *NullBool) bool {
 	return m.Valid == input.Valid && m.Bool == input.Bool
 }
 
-func (m Pagination) ToResp(total int64) PaginationResp {
+func (m *Pagination) ToResp(total int64) PaginationResp {
 	return PaginationResp{
 		PageNum:  m.PageNum,
 		PageSize: m.PageSize,
@@ -181,10 +182,34 @@ func (m Pagination) ToResp(total int64) PaginationResp {
 	}
 }
 
-func (m Pagination) ToRespPointer(total int64) *PaginationResp {
+func (m *Pagination) ToRespPointer(total int64) *PaginationResp {
 	return &PaginationResp{
 		PageNum:  m.PageNum,
 		PageSize: m.PageSize,
 		Total:    total,
+	}
+}
+
+func (m *Error) Error() errors.Error {
+	data := make(map[string]interface{})
+	for k, v := range m.Data {
+		data[k] = v
+	}
+	return errors.Error{
+		Code: m.Code,
+		Msg:  m.Msg,
+		Data: data,
+	}
+}
+
+func FromError(err errors.Error) *Error {
+	data := make(map[string]string)
+	for k, v := range err.Data {
+		data[k] = fmt.Sprintf("%v", v)
+	}
+	return &Error{
+		Code: err.Code,
+		Msg:  err.Msg,
+		Data: data,
 	}
 }

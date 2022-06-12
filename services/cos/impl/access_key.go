@@ -19,7 +19,7 @@ func CheckIfAllowToAccessAccessKey(ctx context.Context, id dt.ID) error {
 	if !found {
 		return cos.Error.AccessKeyNotFound
 	}
-	if modelAccessKey.UserId == nil || !modelAccessKey.UserId.Equal(userId) {
+	if modelAccessKey.UserId == nil || !modelAccessKey.UserId.Equal(&userId) {
 		log.Debug("no permission access access_key id =", id.NumberAsString(), " accessKey:", modelAccessKey.AccessKey)
 		return cos.Error.NoPermissionToAccessAccessKey
 	}

@@ -4,11 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/gorilla/schema"
+	"github.com/juxuny/yc/dt"
 	"github.com/juxuny/yc/errors"
 	"github.com/juxuny/yc/log"
 	"github.com/juxuny/yc/trace"
 	"github.com/juxuny/yc/utils"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/protobuf/proto"
 	"io/ioutil"
 	"net/http"
 	"reflect"
@@ -116,6 +118,30 @@ func (t *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				WriteJson(w, errors.SystemError.InvalidJsonData.Wrap(err), http.StatusBadRequest)
 				return
 			}
+		} else if r.Method == http.MethodPost && strings.Contains(ct, "protobuf") {
+			data, err := ioutil.ReadAll(r.Body)
+			if err != nil {
+				statusCode = http.StatusBadRequest
+				WriteJson(w, errors.SystemError.NotSupportedMethod, http.StatusBadRequest)
+				return
+			}
+			_ = r.Body.Close()
+			log.Info("request:", strings.ReplaceAll(string(data), "\n", ""))
+			if message, ok := requestParamInstance.(proto.Message); ok {
+				if err := proto.Unmarshal(data, message); err != nil {
+					statusCode = http.StatusBadRequest
+					WriteJson(w, errors.SystemError.InvalidProtobufData.Wrap(err), http.StatusBadRequest)
+				}
+			} else {
+				statusCode = http.StatusBadRequest
+				WriteJson(w, errors.SystemError.InvalidProtobufHolder.Wrap(err), http.StatusBadRequest)
+				return
+			}
+			if err := json.Unmarshal(data, requestParamInstance); err != nil {
+				statusCode = http.StatusBadRequest
+				WriteJson(w, errors.SystemError.InvalidJsonData.Wrap(err), http.StatusBadRequest)
+				return
+			}
 		} else {
 			if r.Method == http.MethodGet {
 				log.Info("request:", r.URL.Query().Encode())
@@ -147,18 +173,40 @@ func (t *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		} else if len(responses) == 2 {
 			secondResponse := responses[1].Interface()
 			if secondResponse != nil {
+				statusCode = http.StatusBadRequest
 				if err, ok := secondResponse.(errors.Error); ok {
-					statusCode = http.StatusBadRequest
-					WriteJson(w, err, http.StatusBadRequest)
+					if IsProtobufContentType(ct) {
+						WriteProtobufError(w, dt.FromError(err), statusCode)
+					} else {
+						WriteJson(w, err, statusCode)
+					}
 					return
 				}
+				if err, ok := secondResponse.(*errors.Error); ok {
+					if IsProtobufContentType(ct) {
+						WriteProtobufError(w, dt.FromError(*err), statusCode)
+					} else {
+						WriteJson(w, *err, statusCode)
+					}
+				}
 				if err, ok := secondResponse.(error); ok {
-					statusCode = http.StatusBadRequest
-					WriteJson(w, errors.SystemError.InternalError.Wrap(err), http.StatusBadRequest)
+					if IsProtobufContentType(ct) {
+						WriteProtobufError(w, dt.FromError(errors.SystemError.InternalError.Wrap(err)), statusCode)
+					} else {
+						WriteJson(w, errors.SystemError.InternalError.Wrap(err), statusCode)
+					}
 					return
 				}
 			}
-			WriteSuccessData(w, responses[0].Interface())
+			if strings.Contains(ct, "protobuf") {
+				if message, ok := responses[0].Interface().(proto.Message); ok {
+					WriteProtobuf(w, message)
+				} else {
+					WriteSuccessData(w, responses[0].Interface())
+				}
+			} else {
+				WriteSuccessData(w, responses[0].Interface())
+			}
 		}
 	})
 	<-callFinished

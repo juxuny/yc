@@ -19,7 +19,7 @@ func (t *handler) UserInfo(ctx context.Context, req *cos.UserInfoRequest) (resp 
 	if err != nil {
 		return nil, err
 	}
-	if req.UserId != nil && req.UserId.Valid && !req.UserId.Equal(currentId) {
+	if req.UserId != nil && req.UserId.Valid && !req.UserId.Equal(&currentId) {
 		return nil, cos.Error.NoPermissionAccessUserInfo.WithField("userId", req.UserId)
 	}
 	modelAccount, found, err := db.TableAccount.FindOneById(ctx, currentId)
@@ -38,7 +38,7 @@ func (t *handler) UpdateInfo(ctx context.Context, req *cos.UpdateInfoRequest) (r
 	if err != nil {
 		return nil, err
 	}
-	if req.UserId != nil && req.UserId.Valid && !req.UserId.Equal(currentId) {
+	if req.UserId != nil && req.UserId.Valid && !req.UserId.Equal(&currentId) {
 		return nil, cos.Error.NoPermissionAccessUserInfo.WithField("userId", req.UserId)
 	}
 	modelAccount, found, err := db.TableAccount.FindOneById(ctx, currentId)
@@ -67,7 +67,7 @@ func (t *handler) ModifyPassword(ctx context.Context, req *cos.ModifyPasswordReq
 	if err != nil {
 		return nil, err
 	}
-	if req.UserId != nil && req.UserId.Valid && !req.UserId.Equal(currentId) {
+	if req.UserId != nil && req.UserId.Valid && !req.UserId.Equal(&currentId) {
 		return nil, cos.Error.NoPermissionAccessUserInfo.WithField("userId", req.UserId)
 	}
 	modelAccount, found, err := db.TableAccount.FindOneById(ctx, currentId)
@@ -101,7 +101,7 @@ func (t *handler) SaveOrCreateUser(ctx context.Context, req *cos.SaveOrCreateUse
 		if !found {
 			return nil, cos.Error.AccountNotFound.Wrap(fmt.Errorf("userId=%v", req.UserId.Uint64))
 		}
-		if userInfo.CreatorId == nil || !userInfo.CreatorId.Valid || !userInfo.CreatorId.Equal(userId) {
+		if userInfo.CreatorId == nil || !userInfo.CreatorId.Valid || !userInfo.CreatorId.Equal(&userId) {
 			return nil, cos.Error.NoPermissionUpdateUserInfo
 		}
 		rowsAffected, err := db.TableAccount.UpdateById(ctx, *req.UserId, orm.H{
@@ -198,7 +198,7 @@ func (t *handler) UserUpdateStatus(ctx context.Context, req *cos.UserUpdateStatu
 	if !found {
 		return nil, cos.Error.AccountNotFound
 	}
-	if !modelAccount.CreatorId.Equal(userId) {
+	if !modelAccount.CreatorId.Equal(&userId) {
 		log.Error("no permission set user status")
 		return nil, cos.Error.NoPermissionAccessUserInfo
 	}
@@ -222,7 +222,7 @@ func (t *handler) UserDelete(ctx context.Context, req *cos.UserDeleteRequest) (r
 	if !found {
 		return nil, cos.Error.AccountNotFound
 	}
-	if !modelAccount.CreatorId.Equal(userId) {
+	if !modelAccount.CreatorId.Equal(&userId) {
 		return nil, cos.Error.NoPermissionAccessUserInfo
 	}
 	_, err = db.TableAccount.SoftDeleteById(ctx, *req.UserId)

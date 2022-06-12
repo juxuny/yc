@@ -29,7 +29,7 @@ func (t *handler) SaveConfig(ctx context.Context, req *cos.SaveConfigRequest) (r
 	if !found {
 		return nil, cos.Error.NamespaceNotFound
 	}
-	if modelNamespace.CreatorId == nil || !currentId.Equal(*modelNamespace.CreatorId) {
+	if modelNamespace.CreatorId == nil || !currentId.Equal(modelNamespace.CreatorId) {
 		return nil, cos.Error.NoPermissionToAssessConfig
 	}
 	if req.BaseId != nil {
@@ -153,7 +153,7 @@ func (t *handler) CloneConfig(ctx context.Context, req *cos.CloneConfigRequest) 
 	if !found {
 		return nil, cos.Error.ConfigNotFound
 	}
-	if modelConfig.CreatorId == nil || !modelConfig.CreatorId.Equal(userId) {
+	if modelConfig.CreatorId == nil || !modelConfig.CreatorId.Equal(&userId) {
 		return nil, cos.Error.NoPermissionToAssessConfig
 	}
 
@@ -205,7 +205,7 @@ func (t *handler) UpdateStatusConfig(ctx context.Context, req *cos.UpdateStatusC
 	if !found {
 		return nil, cos.Error.ConfigNotFound
 	}
-	if modelConfig.CreatorId == nil || !modelConfig.CreatorId.Equal(userId) {
+	if modelConfig.CreatorId == nil || !modelConfig.CreatorId.Equal(&userId) {
 		return nil, cos.Error.NoPermissionToAssessConfig
 	}
 	_, err = db.TableConfig.UpdateById(ctx, *req.Id, orm.H{

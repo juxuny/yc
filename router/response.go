@@ -2,6 +2,9 @@ package router
 
 import (
 	"encoding/json"
+	"github.com/juxuny/yc/dt"
+	"github.com/juxuny/yc/log"
+	"google.golang.org/protobuf/proto"
 	"net/http"
 )
 
@@ -32,4 +35,25 @@ func WriteSuccessData(w http.ResponseWriter, data interface{}) {
 		"code": 0,
 		"data": data,
 	})
+}
+
+func WriteProtobuf(w http.ResponseWriter, data proto.Message, code ...int) {
+	w.Header().Set("Content-Type", "application/protobuf")
+	if len(code) > 0 {
+		w.WriteHeader(code[0])
+	} else {
+		w.WriteHeader(http.StatusOK)
+	}
+	respBody, err := proto.Marshal(data)
+	if err != nil {
+		log.Error(err)
+	}
+	_, err = w.Write(respBody)
+	if err != nil {
+		log.Error(err)
+	}
+}
+
+func WriteProtobufError(w http.ResponseWriter, err *dt.Error, code ...int) {
+
 }
