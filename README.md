@@ -1,10 +1,47 @@
 # yc
 远界云微服务开发框架
 
+## Requirements
+
+* protoc v3.12.4
+* protoc-gen-go v1.28
+* protoc-gen-go-grpc v.2
+
 ## Prepare
 
 ### Install `protoc`
 
+1. Go plugins for the protocol compiler
+```shell
+go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28
+go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
+```
+
+2. Install protoc
+You can get the compiled binary file at [protoc-3.12.4](https://github.com/protocolbuffers/protobuf/releases)
+   
+**For OSX**
+
+```shell
+wget https://github.com/protocolbuffers/protobuf/releases/download/v3.12.4/protoc-3.12.4-osx-x86_64.zip
+mkdir -p $GOPATH/bin/protoc.d/protoc-3.12.4
+mv protoc-3.12.4-osx-x86_64.zip $GOPATH/bin/protoc.d
+cd $GOPATH/bin/protoc.d/protoc-3.12.4/ && unzip protoc-3.12.4-osx-x86_64.zip 
+cd $GOPATH/bin
+if [ -f protoc ]; then rm protoc; fi 
+ln -s $GOPATH/bin/protoc.d/protoc-3.12.4/bin/protoc protoc
+```
+
+**For Linux**
+```shell
+wget https://github.com/protocolbuffers/protobuf/releases/download/v3.12.4/protoc-3.12.4-linux-x86_64.zip
+mkdir -p $GOPATH/bin/protoc.d/protoc-3.12.4
+mv protoc-3.12.4-linux-x86_64.zip $GOPATH/bin/protoc.d
+cd $GOPATH/bin/protoc.d/protoc-3.12.4/ && unzip protoc-3.12.4-linux-x86_64.zip 
+cd $GOPATH/bin
+if [ -f protoc ]; then rm protoc; fi 
+ln -s $GOPATH/bin/protoc.d/protoc-3.12.4/bin/protoc protoc
+```
 
 ### Validator
 

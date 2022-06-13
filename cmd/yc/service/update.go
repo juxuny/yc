@@ -62,6 +62,7 @@ func (t *UpdateCommand) Run() {
 	// auto generate client and request entities
 	t.genRpc(service)
 	t.genExtend(service)
+	t.fmt()
 }
 
 func (t *UpdateCommand) getServiceName() string {
@@ -384,6 +385,18 @@ func (t *UpdateCommand) genValidator(service services.ServiceEntity, msgs []*par
 	}
 
 	if err := template.RunEmbedFile(templateFs, validatorFileName, path.Join(t.WorkDir, service.ProtoFileName+".pb.validator.go"), validatorEntities); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func (t *UpdateCommand) fmt() {
+	args := []string{
+		"fmt", "./...",
+	}
+	if err := cmd.Exec(
+		"go",
+		args...,
+	); err != nil {
 		log.Fatal(err)
 	}
 }
