@@ -43,7 +43,13 @@ if [ -f protoc ]; then rm protoc; fi
 ln -s $GOPATH/bin/protoc.d/protoc-3.12.4/bin/protoc protoc
 ```
 
-### Validator
+### Model Usage
+
+*waiting*
+
+### Validator Usage
+
+Add `@v: xxx` above field definition in `*.proto` file, and 'xxx' means validator formula, such as:
 
 * length.min
 * length.max
@@ -58,7 +64,26 @@ ln -s $GOPATH/bin/protoc.d/protoc-3.12.4/bin/protoc protoc
 * required
 * in
 
-#### 1.length.min or length.max
+framework will check all validator in the message with suffix `Request`,
+
+e.g. 
+```protobuf
+syntax="proto3";
+
+message LoginRequest {
+  // @v: length.min=10
+  // @msg: invalid userName: {{.UserName}}
+  string userName = 1;
+}
+```
+
+*Notice:* 
+
+`@msg` means `yc` will response the specified error message defined by `go-template`
+
+For examples: 
+
+**1.length.min or length.max**
 
 ```text
 // @v: length.min=10
@@ -70,7 +95,7 @@ List []int
 List []int
 ```
 
-##### 2. min or max
+**2. min or max**
 
 @msg 后面跟着一个 go template，可以通过双重花括号获取当前的值
 
@@ -84,7 +109,7 @@ Money float64
 Money float64
 ```
 
-##### 3. pattern
+**3. pattern**
 
 ```text
 // @v: pattern=^([\\d])$
@@ -92,7 +117,7 @@ Money float64
 Password string
 ```
 
-##### 4. required
+**4. required**
 
 表示某个参数必传，没有 @msg 就获取系统默认错误信息，（指针不能为空）
 
@@ -101,7 +126,7 @@ Password string
 Pagination *dt.Pagination
 ```
 
-##### 5. in
+**5. in**
 
 表示检查取值范围,通过逗号分割表示集合 
 
@@ -110,7 +135,7 @@ Pagination *dt.Pagination
 Type int64
 ```
 
-##### 6. password
+**6. password**
 
 密码检查，如果密码规则有特别要求，可以用pattern
 
