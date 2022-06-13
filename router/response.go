@@ -28,7 +28,6 @@ func WriteJson(w http.ResponseWriter, data interface{}, code ...int) {
 	var jsonData []byte
 	jsonData, _ = json.Marshal(data)
 	_, _ = w.Write(jsonData)
-	log.Debug("resp data: " + string(jsonData))
 }
 
 func WriteSuccessData(w http.ResponseWriter, data interface{}) {

@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"github.com/juxuny/yc/errors"
+	"github.com/juxuny/yc/log"
+	"reflect"
 )
 
 type execResult struct {
@@ -19,9 +21,9 @@ func (t execResult) LastInsertId() (int64, error) {
 	return t.lastInsertId, nil
 }
 
-func Exec(ctx context.Context, configName string, statement string, values ...interface{}) (result sql.Result, err error) {
-	return connectManagerInstance.Exec(ctx, configName, statement, values...)
-}
+//func Exec(ctx context.Context, configName string, statement string, values ...interface{}) (result sql.Result, err error) {
+//	return connectManagerInstance.Exec(ctx, configName, statement, values...)
+//}
 
 func QueryRows(ctx context.Context, configName string, statement string, values ...interface{}) (DataSet, error) {
 	return connectManagerInstance.QueryRows(ctx, configName, statement, values...)
@@ -31,6 +33,9 @@ func QueryScan(ctx context.Context, configName string, out interface{}, statemen
 	ds, err := connectManagerInstance.QueryRows(ctx, configName, statement, values...)
 	if err != nil {
 		return err
+	}
+	if len(ds) > 0 && len(ds[0]) == 12 {
+		log.Debug(ds[0][12].Elem().Convert(reflect.TypeOf("")).String())
 	}
 	return ds.Reform(out)
 }

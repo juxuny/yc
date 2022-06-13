@@ -2,7 +2,6 @@ package orm
 
 import (
 	"github.com/juxuny/yc/errors"
-	"github.com/juxuny/yc/log"
 	"github.com/juxuny/yc/utils"
 	"reflect"
 )
@@ -13,8 +12,6 @@ type Column struct {
 }
 
 type Row []Column
-
-var tempType = reflect.TypeOf("")
 
 func (t Row) Reform(out reflect.Value) error {
 	if out.Kind() != reflect.Ptr {
@@ -35,10 +32,6 @@ func (t Row) Reform(out reflect.Value) error {
 			if !ft.IsValid() {
 				continue
 			}
-			if fieldName == "AccessKey" && col.Elem().Convert(reflect.TypeOf("")).String() != "Wllf2JwzxOjs6QzkTQUsgdhpGKcxnOIjjyGqYoAG28BkvP22dNso0Xf13DJhznXB" {
-				log.Debug("set field:", fieldName, " field type:", ft.Type().String(), " kind:", ft.Kind())
-				log.Debug(col.Elem().Convert(reflect.TypeOf("")).String())
-			}
 			ft.Set(defaultConverter.Convert(col.Value, ft.Type()))
 		}
 	} else {
@@ -51,10 +44,6 @@ type DataSet []Row
 
 func NewDataSet() DataSet {
 	return make(DataSet, 0)
-}
-
-func (t *DataSet) AppendRow(r ...Row) {
-	*t = append(*t, r...)
 }
 
 func (t *DataSet) Reform(out interface{}) error {

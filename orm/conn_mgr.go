@@ -6,8 +6,6 @@ import (
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/juxuny/yc/errors"
-	"github.com/juxuny/yc/log"
-	"reflect"
 	"runtime/debug"
 )
 
@@ -80,7 +78,6 @@ func (t *connMgr) Query(ctx context.Context, configName string, statement string
 	if err != nil {
 		return nil, errors.SystemError.DatabaseQueryError.Wrap(err)
 	}
-	log.Debug(values...)
 	return result, err
 }
 
@@ -96,7 +93,6 @@ func (t connMgr) scanRows(result *sql.Rows) (ret DataSet, err error) {
 	}()
 	columnTypes, err := result.ColumnTypes()
 	ret = NewDataSet()
-	log.Debug("col num:", len(columnTypes))
 	if err != nil {
 		return nil, errors.SystemError.DatabaseColumnTypeError.Wrap(err)
 	}
@@ -108,15 +104,11 @@ func (t connMgr) scanRows(result *sql.Rows) (ret DataSet, err error) {
 		row := make(Row, len(values))
 		for i, v := range values {
 			row[i] = Column{
-				Value: v,
+				Value: cloneValue(v),
 				Name:  columnTypes[i].Name(),
 			}
-			log.Debug("column name:", columnTypes[i].Name())
-			if columnTypes[i].Name() == "access_key" {
-				log.Debug(values[i].Elem().Convert(reflect.TypeOf("")).String())
-			}
 		}
-		ret.AppendRow(row)
+		ret = append(ret, row)
 	}
 	return ret, nil
 }

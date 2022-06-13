@@ -255,7 +255,6 @@ func (t *handler) AccessKeyList(ctx context.Context, req *cos.AccessKeyListReque
 		log.Error(err)
 		return nil, err
 	}
-	log.Debug(utils.ToJson(items))
 	resp = &cos.AccessKeyListResponse{
 		Pagination: req.Pagination.ToRespPointer(count),
 		List:       items.MapToAccessKeyItemList(),

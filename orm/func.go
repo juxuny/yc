@@ -197,3 +197,19 @@ func printSqlStatement(statement string, values ...interface{}) {
 	s = fmt.Sprintf(s, l...)
 	log.Info(s)
 }
+
+func cloneValue(in reflect.Value) reflect.Value {
+	inputType := in.Type().String()
+	if inputType == "*sql.RawBytes" {
+		data, _ := in.Interface().(*sql.RawBytes)
+		ret := make(sql.RawBytes, len(*data))
+		copy(ret, *data)
+		return reflect.ValueOf(&ret)
+	} else if inputType == "sql.RawBytes" {
+		data, _ := in.Interface().(sql.RawBytes)
+		ret := make(sql.RawBytes, len(data))
+		copy(ret, data)
+		return reflect.ValueOf(ret)
+	}
+	return in
+}
