@@ -286,18 +286,18 @@ func ({{.TableName|lowerFirst}}) Create(ctx context.Context, data ...{{.ModelNam
 	return result.RowsAffected()
 }
 
-func ({{.TableName|lowerFirst}}) CreateWithLastId(ctx context.Context, data {{.ModelName}}) (lastInsertId dt.ID, err error) {
+func ({{.TableName|lowerFirst}}) CreateWithLastId(ctx context.Context, data {{.ModelName}}) (lastInsertId *dt.ID, err error) {
 	w := orm.NewInsertWrapper({{.ModelName}}{})
 	w.Add(data)
 	result, err := orm.Insert(ctx, cos.Name, w)
 	if err != nil {
 		log.Error(err)
-		return dt.InvalidID(), err
+		return dt.InvalidIDPointer(), err
 	}
 	if id, err := result.LastInsertId(); err != nil {
-		return dt.InvalidID(), err
+		return dt.InvalidIDPointer(), err
 	} else {
-		return dt.NewID(uint64(id)), nil
+		return dt.NewIDPointer(uint64(id)), nil
 	}
 }
 

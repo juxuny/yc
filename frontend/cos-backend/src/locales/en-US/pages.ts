@@ -144,6 +144,7 @@ export default {
   'pages.account.access-key.confirm.disable': 'Do you want to disable the access_key ?',
   'pages.account.access-key.confirm.enable': 'Do you want to enable the access_key ?',
   'pages.account.access-key.confirm.delete': 'Do you want to delete the access_key ?',
+  'pages.account.access-key.create-result.warning': "Please keep your AccessKey and Secret carefully, it couldn\'t show again",
 
   // config
   'pages.config.namespace.column.id': 'ID',

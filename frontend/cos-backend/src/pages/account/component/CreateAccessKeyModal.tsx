@@ -6,11 +6,17 @@ import { ProForm } from '@ant-design/pro-components';
 import type { ProFormInstance } from '@ant-design/pro-components';
 import { User } from '@/services/cos/user';
 
+
+export type CreateResult = {
+  accessKey: string;
+  secret: string;
+}
+
 export type CreateAccessKeyProps = {
   visible?: boolean;
   onChangeVisible: (v: boolean) => void;
   data?: API.User.CreateAccessKeyReq;
-  onSuccess?: () => void;
+  onSuccess?: (result: CreateResult) => void;
 };
 
 const layout = {
@@ -43,7 +49,11 @@ const CreateAccessKeyModal: React.FC<CreateAccessKeyProps> = (props) => {
       const resp = await User.createAccessKey(params);
       if (resp && resp.code === 0) {
         if (onChangeVisible) onChangeVisible(false);
-        if (onSuccess) onSuccess();
+        if (onSuccess) onSuccess({
+          accessKey: resp.data?.accessKey || '',
+          secret: resp.data?.secret || ''
+        });
+        formRef.current?.setFieldsValue(currentData);
       }
     } catch (err) {
       console.error(err);

@@ -92,6 +92,7 @@ declare namespace API {
     type CreateAccessKeyResp = {
       remark: string;
       accessKey: string;
+      secret: string;
     }
 
     type UpdateStatusAccessKeyReq = {

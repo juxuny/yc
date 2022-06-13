@@ -255,6 +255,7 @@ func (t *handler) AccessKeyList(ctx context.Context, req *cos.AccessKeyListReque
 		log.Error(err)
 		return nil, err
 	}
+	log.Debug(utils.ToJson(items))
 	resp = &cos.AccessKeyListResponse{
 		Pagination: req.Pagination.ToRespPointer(count),
 		List:       items.MapToAccessKeyItemList(),
@@ -270,6 +271,7 @@ func (t *handler) CreateAccessKey(ctx context.Context, req *cos.CreateAccessKeyR
 	userId, _ := yc.GetUserId(ctx)
 	err = yc.Retry(func() (isEnd bool, err error) {
 		resp.AccessKey = utils.StringHelper.RandString(64)
+		resp.Secret = utils.StringHelper.RandString(64)
 		_, err = db.TableAccessKey.Create(ctx, db.ModelAccessKey{
 			CreateTime:     orm.Now(),
 			UpdateTime:     orm.Now(),
@@ -281,6 +283,7 @@ func (t *handler) CreateAccessKey(ctx context.Context, req *cos.CreateAccessKeyR
 			ValidStartTime: req.ValidStartTime,
 			ValidEndTime:   req.ValidEndTime,
 			Remark:         req.Remark,
+			Secret:         resp.Secret,
 		})
 		if err != nil {
 			log.Error(err)

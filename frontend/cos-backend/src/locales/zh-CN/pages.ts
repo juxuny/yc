@@ -141,6 +141,7 @@ export default {
   'pages.account.access-key.confirm.disable': '确定要禁用当前access_key吗?',
   'pages.account.access-key.confirm.enable': '确定要启用当前access_key吗?',
   'pages.account.access-key.confirm.delete': '确定要删除当前access_key吗?',
+  'pages.account.access-key.create-result.warning': '请妥善保管你的 AccessKey 和 Secret，该信息无法再重新查看',
 
   // config
   'pages.config.namespace.column.id': 'ID',
