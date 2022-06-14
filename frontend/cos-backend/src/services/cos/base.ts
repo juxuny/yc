@@ -31,8 +31,12 @@ export function doRequest<Type>(path: string, options?: { [key: string]: any }) 
       'Client-Request-Id': genReqId(),
     },
     errorHandler: (error) => {
-      console.log(error.data?.msg);
-      message.error(error.data?.msg);
+      if (error.response.status === 504) {
+        message.error('Gateway Timeout');
+      } else {
+        console.log(error.data?.msg);
+        message.error(error.data?.msg);
+      }
     },
     ...(options || {}),
   });

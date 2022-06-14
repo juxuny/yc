@@ -68,6 +68,9 @@ export default {
   'pages.searchTable.batchDeletion': 'batch deletion',
   'pages.searchTable.batchApproval': 'batch approval',
 
+  // global
+  'pages.error.network': 'Network Error',
+
   'pages.label.all': 'All',
 
   'pages.result.saveSuccess': 'Save Success',

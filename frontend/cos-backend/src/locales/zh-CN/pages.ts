@@ -65,6 +65,9 @@ export default {
   'pages.searchTable.batchDeletion': '批量删除',
   'pages.searchTable.batchApproval': '批量审批',
 
+  // global
+  'pages.error.network': '网络错误',
+
   'pages.label.all': '全部',
 
   'pages.result.saveSuccess': '保存成功',
