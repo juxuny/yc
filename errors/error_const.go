@@ -50,6 +50,7 @@ var SystemError = struct {
 	InvalidProtobufHolder            Error `code:"-10046" msg:"invalid protobuf holder"`
 	InvalidProtobufData              Error `code:"-10047" msg:"invalid protobuf data"`
 	InvalidContentType               Error `code:"-10048" msg:"invalid content-type"`
+	HttpError                        Error `code:"-10049" msg:"HTTP error"`
 }{}
 
 func init() {
