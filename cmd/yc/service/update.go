@@ -226,7 +226,7 @@ func (t *UpdateCommand) genHandler(service services.ServiceEntity, svc []*parser
 	methodsMap := make(map[string][]services.MethodEntity)
 	for _, m := range svc[0].ServiceBody {
 		rpc := m.(*parser.RPC)
-		groupName, ok := getGroupNameFromRpcCommentsOfProto(rpc.Comments)
+		groupName, ok := services.GetGroupNameFromRpcCommentsOfProto(rpc.Comments)
 		if !ok {
 			groupName = "default"
 		}
@@ -235,7 +235,7 @@ func (t *UpdateCommand) genHandler(service services.ServiceEntity, svc []*parser
 			MethodName:        rpc.RPCName,
 			Request:           rpc.RPCRequest.MessageType,
 			Response:          rpc.RPCResponse.MessageType,
-			UseAuth:           getAuthFromRpcCommentsOfProto(rpc.Comments),
+			UseAuth:           services.GetAuthFromRpcCommentsOfProto(rpc.Comments),
 		}
 		methodsMap[groupName] = append(methodsMap[groupName], method)
 	}

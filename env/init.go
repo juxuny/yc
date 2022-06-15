@@ -62,8 +62,15 @@ func Init(ks interface{}, upper bool, prefix ...string) {
 				panic(fmt.Errorf("%s is not a bool: \"%v\"", value, finalValue))
 			}
 			v.Elem().Field(i).SetBool(boolValue)
+		case reflect.Slice:
+			if tt.Field(i).Type.String() == "[]string" {
+				list := reflect.ValueOf(strings.Split(finalValue, ","))
+				v.Elem().Field(i).Set(list)
+			} else {
+				panic("unknown type: " + tt.Field(i).Type.String())
+			}
 		default:
-			panic("unknown type: " + tt.Field(i).Type.Name())
+			panic("unknown type: " + tt.Field(i).Type.String())
 		}
 	}
 }

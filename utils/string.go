@@ -2,6 +2,7 @@ package utils
 
 import (
 	"github.com/fatih/camelcase"
+	"sort"
 	"strings"
 )
 
@@ -138,4 +139,15 @@ func (stringHelper) StartWith(s string, sub string) bool {
 
 func (stringHelper) EndWith(s string, sub string) bool {
 	return strings.Index(StringHelper.Reverse(s), StringHelper.Reverse(sub)) == 0
+}
+
+func (stringHelper) SortSlice(in []string) {
+	sortable := sortableStringSlice(in)
+	sort.Sort(sortable)
+}
+
+func (stringHelper) ReverseSlice(input []string) {
+	for i := 0; i < len(input)/2; i++ {
+		input[i], input[len(input)-i-1] = input[len(input)-i-1], input[i]
+	}
 }

@@ -76,12 +76,12 @@ func GetUserId(ctx context.Context) (userId *dt.ID, err error) {
 	return claims.UserId, nil
 }
 
-func GetHeader(ctx context.Context) metadata.MD {
+func GetHeader(ctx context.Context, extra ...metadata.MD) metadata.MD {
 	md, found := metadata.FromIncomingContext(ctx)
 	if !found {
 		return make(metadata.MD)
 	}
-	return md
+	return MergeMetadata(md, extra...)
 }
 
 func MergeRequestHeaderFromMetadata(req *http.Request, md ...metadata.MD) {
@@ -98,6 +98,16 @@ func MergeRequestHeaderFromMetadata(req *http.Request, md ...metadata.MD) {
 	}
 }
 
+func MergeMetadata(base metadata.MD, md ...metadata.MD) metadata.MD {
+	ret := base.Copy()
+	for _, m := range md {
+		for k, v := range m {
+			ret.Set(k, v...)
+		}
+	}
+	return ret
+}
+
 func RpcCall(ctx context.Context, host string, queryPath string, data proto.Message, out interface{}, md metadata.MD) (code int, err error) {
 	body, err := proto.Marshal(data)
 	if err != nil {
@@ -110,6 +120,7 @@ func RpcCall(ctx context.Context, host string, queryPath string, data proto.Mess
 	}
 	contextHeader := GetHeader(ctx)
 	MergeRequestHeaderFromMetadata(req, contextHeader, md)
+	req.Header.Set("content-type", "application/protobuf")
 	resp, err := httpClient.Do(req)
 	if err != nil {
 		return 0, errors.SystemError.RpcCallErrorBuildRequest.Wrap(err)
@@ -119,7 +130,7 @@ func RpcCall(ctx context.Context, host string, queryPath string, data proto.Mess
 	if err != nil {
 		return code, errors.SystemError.RpcCallErrorReadResponseBody.Wrap(err)
 	}
-	ct := resp.Header.Get("content-type")
+	ct := resp.Header.Get("Content-Type")
 	if strings.Contains(ct, "json") {
 		if code == http.StatusOK {
 			err = json.Unmarshal(respData, out)

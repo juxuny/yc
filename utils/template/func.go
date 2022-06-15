@@ -49,3 +49,11 @@ func castNumber(v interface{}) string {
 	}
 	return fmt.Sprintf("%v", in.Interface())
 }
+
+func lower(s string) string {
+	return strings.ToLower(s)
+}
+
+func upper(s string) string {
+	return strings.ToUpper(s)
+}

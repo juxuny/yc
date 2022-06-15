@@ -51,6 +51,9 @@ func getModuleFromGoModFile(file string) (packageName string, err error) {
 }
 
 func GetCurrentPackageName(w string) (packageName string, err error) {
+	if w == "." {
+		w, _ = os.Getwd()
+	}
 	stat, err := os.Stat(w)
 	if err != nil {
 		return "", errors.SystemError.FsIsNotDir.Wrap(err)

@@ -76,6 +76,7 @@ type HandlerInitEntity struct {
 
 type MethodEntity struct {
 	HandlerInitEntity
+	Group      string
 	MethodName string
 	Request    string
 	Response   string
@@ -125,4 +126,9 @@ type ModelEntity struct {
 	ServiceEntity
 	GoModuleName string
 	Model
+}
+
+type ClientSdkEntity struct {
+	Methods []MethodEntity
+	ServiceEntity
 }

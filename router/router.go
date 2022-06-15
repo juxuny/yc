@@ -97,6 +97,9 @@ func (t *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		in := []reflect.Value{reflect.ValueOf(ctx)}
 		tt := caller.Type()
 		ct := r.Header.Get("Content-Type")
+		if ct == "" {
+			ct = r.Header.Get("content-type")
+		}
 		var requestParam reflect.Value
 		if tt.In(1).Kind() == reflect.Ptr {
 			requestParam = reflect.New(tt.In(1).Elem())
@@ -126,23 +129,20 @@ func (t *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			_ = r.Body.Close()
-			log.Info("request:", strings.ReplaceAll(string(data), "\n", ""))
+			log.Info("request data size:", len(data))
 			if message, ok := requestParamInstance.(proto.Message); ok {
 				if err := proto.Unmarshal(data, message); err != nil {
 					statusCode = http.StatusBadRequest
-					WriteJson(w, errors.SystemError.InvalidProtobufData.Wrap(err), http.StatusBadRequest)
+					WriteProtobufError(w, dt.FromError(errors.SystemError.InvalidProtobufData.Wrap(err)), http.StatusBadRequest)
+					return
 				}
 			} else {
 				statusCode = http.StatusBadRequest
-				WriteJson(w, errors.SystemError.InvalidProtobufHolder.Wrap(err), http.StatusBadRequest)
-				return
-			}
-			if err := json.Unmarshal(data, requestParamInstance); err != nil {
-				statusCode = http.StatusBadRequest
-				WriteJson(w, errors.SystemError.InvalidJsonData.Wrap(err), http.StatusBadRequest)
+				WriteProtobufError(w, dt.FromError(errors.SystemError.InvalidProtobufHolder.Wrap(err)), http.StatusBadRequest)
 				return
 			}
 		} else {
+			log.Debug("content-type:", ct)
 			if r.Method == http.MethodGet {
 				log.Info("request:", r.URL.Query().Encode())
 				if err := decoder.Decode(requestParamInstance, r.URL.Query()); err != nil {
