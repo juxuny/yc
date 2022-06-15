@@ -35,17 +35,14 @@ func NewExpressionCondition(field FieldName, operator string, value interface{})
 func (t expressionCondition) Build() (statement string, values []interface{}, err error) {
 	statement = t.field.Wrap().String() + wrap(t.operator, " ")
 	value := reflect.ValueOf(t.value)
-	if value.Kind() == reflect.Ptr {
-		value = value.Elem()
-	}
 	if value.Kind() == reflect.Slice {
 		statement += "(" + strings.Trim(strings.Repeat("?, ", value.Len()), ", ") + ")"
 		for i := 0; i < value.Len(); i++ {
-			values = append(values, value.Index(i).Interface())
+			values = append(values, defaultConverter.convertToWhereHolderInterface(value.Index(i)))
 		}
 	} else {
 		statement += " ?"
-		values = append(values, value.Interface())
+		values = append(values, defaultConverter.convertToWhereHolderInterface(value))
 	}
 	return
 }

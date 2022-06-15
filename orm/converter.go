@@ -281,3 +281,67 @@ func (t *dataTypeConverter) convertSlice(in reflect.Value, dstType reflect.Type)
 		return ret.Elem()
 	}
 }
+
+func (t *dataTypeConverter) convertToWhereHolderInterface(in reflect.Value) interface{} {
+	switch in.Kind() {
+	case reflect.Ptr:
+		if in.IsNil() {
+			return nil
+		}
+		inType := in.Type().String()
+		if inType == "*dt.ID" {
+			data := in.Interface().(*dt.ID)
+			if data.Valid {
+				return data.Uint64
+			} else {
+				return nil
+			}
+		} else if inType == "*dt.NullString" {
+			data := in.Interface().(*dt.NullString)
+			if data.Valid {
+				return data.String_
+			} else {
+				return nil
+			}
+		} else if inType == "*dt.NullBool" {
+			data := in.Interface().(*dt.NullBool)
+			if data.Valid {
+				return data.Bool
+			} else {
+				return nil
+			}
+		} else if inType == "*dt.NullInt64" {
+			data := in.Interface().(*dt.NullInt64)
+			if data.Valid {
+				return data.Int64
+			} else {
+				return nil
+			}
+		} else if inType == "*dt.NullInt32" {
+			data := in.Interface().(*dt.NullInt32)
+			if data.Valid {
+				return data.Int32
+			} else {
+				return nil
+			}
+		} else if inType == "*dt.NullFloat64" {
+			data := in.Interface().(*dt.NullFloat64)
+			if data.Valid {
+				return data.Float64
+			} else {
+				return nil
+			}
+		} else if inType == "*dt.NullFloat32" {
+			data := in.Interface().(*dt.NullFloat32)
+			if data.Valid {
+				return data.Float32
+			} else {
+				return nil
+			}
+		} else {
+			return t.convertToWhereHolderInterface(in.Elem())
+		}
+	default:
+		return in.Interface()
+	}
+}

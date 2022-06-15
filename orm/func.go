@@ -58,56 +58,7 @@ func toPlacementValue(v reflect.Value) interface{} {
 		return v.Interface()
 	case reflect.Struct:
 		vn := v.Type().String()
-		if vn == "dt.ID" {
-			data := v.Interface().(dt.ID)
-			if data.Valid {
-				return data.Uint64
-			} else {
-				return nil
-			}
-		} else if vn == "dt.NullInt64" {
-			data := v.Interface().(dt.NullInt64)
-			if data.Valid {
-				return data.Int64
-			} else {
-				return nil
-			}
-		} else if vn == "dt.NullInt32" {
-			data := v.Interface().(dt.NullInt32)
-			if data.Valid {
-				return data.Int32
-			} else {
-				return nil
-			}
-		} else if vn == "dt.NullString" {
-			data := v.Interface().(dt.NullString)
-			if data.Valid {
-				return data.String_
-			} else {
-				return nil
-			}
-		} else if vn == "dt.NullBool" {
-			data := v.Interface().(dt.NullBool)
-			if data.Valid {
-				return data.Bool
-			} else {
-				return nil
-			}
-		} else if vn == "dt.NullFloat64" {
-			data := v.Interface().(dt.NullFloat64)
-			if data.Valid {
-				return data.Float64
-			} else {
-				return nil
-			}
-		} else if vn == "dt.NullFloat32" {
-			data := v.Interface().(dt.NullFloat32)
-			if data.Valid {
-				return data.Float32
-			} else {
-				return nil
-			}
-		} else if vn == "sql.NullInt64" {
+		if vn == "sql.NullInt64" {
 			data := v.Interface().(sql.NullInt64)
 			if data.Valid {
 				return data.Int64
@@ -122,7 +73,7 @@ func toPlacementValue(v reflect.Value) interface{} {
 				return nil
 			}
 		} else if vn == "sql.NullBool" {
-			data := v.Interface().(dt.NullBool)
+			data := v.Interface().(sql.NullBool)
 			if data.Valid {
 				return data.Bool
 			} else {
@@ -151,6 +102,99 @@ func toPlacementValue(v reflect.Value) interface{} {
 			}
 		}
 	case reflect.Ptr:
+		vn := v.Type().String()
+		if vn == "*dt.ID" {
+			data := v.Interface().(*dt.ID)
+			if data.Valid {
+				return data.Uint64
+			} else {
+				return nil
+			}
+		} else if vn == "*dt.NullInt64" {
+			data := v.Interface().(*dt.NullInt64)
+			if data.Valid {
+				return data.Int64
+			} else {
+				return nil
+			}
+		} else if vn == "*dt.NullInt32" {
+			data := v.Interface().(*dt.NullInt32)
+			if data.Valid {
+				return data.Int32
+			} else {
+				return nil
+			}
+		} else if vn == "*dt.NullString" {
+			data := v.Interface().(*dt.NullString)
+			if data.Valid {
+				return data.String_
+			} else {
+				return nil
+			}
+		} else if vn == "*dt.NullBool" {
+			data := v.Interface().(*dt.NullBool)
+			if data.Valid {
+				return data.Bool
+			} else {
+				return nil
+			}
+		} else if vn == "*dt.NullFloat64" {
+			data := v.Interface().(*dt.NullFloat64)
+			if data.Valid {
+				return data.Float64
+			} else {
+				return nil
+			}
+		} else if vn == "*dt.NullFloat32" {
+			data := v.Interface().(*dt.NullFloat32)
+			if data.Valid {
+				return data.Float32
+			} else {
+				return nil
+			}
+		} else if vn == "*sql.NullInt64" {
+			data := v.Interface().(*sql.NullInt64)
+			if data.Valid {
+				return data.Int64
+			} else {
+				return nil
+			}
+		} else if vn == "*sql.NullInt32" {
+			data := v.Interface().(*sql.NullInt32)
+			if data.Valid {
+				return data.Int32
+			} else {
+				return nil
+			}
+		} else if vn == "*sql.NullBool" {
+			data := v.Interface().(*sql.NullBool)
+			if data.Valid {
+				return data.Bool
+			} else {
+				return nil
+			}
+		} else if vn == "*sql.NullString" {
+			data := v.Interface().(*sql.NullString)
+			if data.Valid {
+				return data.String
+			} else {
+				return nil
+			}
+		} else if vn == "*sql.NullFloat64" {
+			data := v.Interface().(*sql.NullFloat64)
+			if data.Valid {
+				return data.Float64
+			} else {
+				return nil
+			}
+		} else if vn == "*sql.NullTime" {
+			data := v.Interface().(*sql.NullTime)
+			if data.Valid {
+				return data.Time
+			} else {
+				return nil
+			}
+		}
 		return toPlacementValue(v.Elem())
 	}
 	if v.IsValid() {
@@ -176,7 +220,7 @@ func printSqlStatement(statement string, values ...interface{}) {
 		case reflect.Float64, reflect.Float32:
 			l[i] = fmt.Sprintf("%v", vv.Float())
 		case reflect.String:
-			l[i] = fmt.Sprintf("%s", vv.String())
+			l[i] = fmt.Sprintf("'%s'", vv.String())
 		case reflect.Bool:
 			l[i] = fmt.Sprintf("%v", vv.Bool())
 		default:
