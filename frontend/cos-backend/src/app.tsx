@@ -5,7 +5,8 @@ import { history, Link } from 'umi';
 import RightContent from '@/components/RightContent';
 import Footer from '@/components/Footer';
 import { BookOutlined, LinkOutlined } from '@ant-design/icons';
-import { User } from '@/services/cos/user';
+import { cos } from '@/services/api';
+import type * as typing from '@/services/api/typing';
 import {convertToQueryParams, timestampInMinute} from '@/utils/func';
 
 const isDev = process.env.NODE_ENV === 'development';
@@ -21,12 +22,12 @@ export const initialStateConfig = {
  * */
 export async function getInitialState(): Promise<{
   settings?: Partial<LayoutSettings>;
-  currentUser?: API.User.InfoResp;
-  fetchUserInfo?: () => Promise<API.User.InfoResp | undefined>;
+  currentUser?: typing.UserInfoResponse;
+  fetchUserInfo?: () => Promise<typing.UserInfoResponse | undefined>;
 }> {
   const fetchUserInfo = async () => {
     try {
-      const userInfoResp = await User.userInfo();
+      const userInfoResp = await cos.userInfo({});
       return userInfoResp.data;
     } catch (error) {
       history.push(loginPath);

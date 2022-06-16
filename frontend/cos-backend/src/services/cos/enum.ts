@@ -31,3 +31,9 @@ export const ValueTypeEnumMap: { [key: string]: API.KeyValue.ValueType } = {
 };
 
 export const ValueTypeEnumMapReverse: Record<number, string> = reverseMap(ValueTypeEnumMap);
+
+export type UserType = 0 | 1 | 2;
+
+export class UserTypeEnum {
+  static password: UserType = 1;
+}

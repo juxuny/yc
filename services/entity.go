@@ -66,6 +66,7 @@ type MessageField struct {
 type Message struct {
 	Name   string
 	Fields []MessageField
+	Desc   string
 }
 
 type HandlerInitEntity struct {

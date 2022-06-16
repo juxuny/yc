@@ -81,8 +81,11 @@ message HealthResponse {
   string currentTime = 1;
 }
 
+// @desc: 登录请求
 message LoginRequest {
+  // @desc: 用户名
   string userName = 1;
+  // @desc: 登录密码
   string password = 2;
   // @v: in= 1
   // @msg: 无效登录类型: {{.AccountType|num}}
@@ -149,8 +152,11 @@ message ModifyPasswordRequest {
 
 message ModifyPasswordResponse {}
 
+// @desc: 账号类型
 enum AccountType {
+  // @desc: 未知
   AccountTypeUnknown = 0;
+  // @desc: 密码登录的账号
   AccountTypePassword = 1;
 }
 

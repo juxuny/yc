@@ -6,6 +6,19 @@ import (
 	"strings"
 )
 
+func getLinesContainTag(comments []*parser.Comment, tag string) (lines []string) {
+	for _, c := range comments {
+		lines := c.Lines()
+		for _, line := range lines {
+			line = strings.TrimSpace(line)
+			if strings.Index(line, tag) == 0 {
+				lines = append(lines, strings.Trim(strings.Replace(line, tag, "", 1), ": "))
+			}
+		}
+	}
+	return
+}
+
 func GetGroupNameFromRpcCommentsOfProto(comments []*parser.Comment) (groupName string, ok bool) {
 	for _, c := range comments {
 		lines := c.Lines()
@@ -36,4 +49,22 @@ func GetAuthFromRpcCommentsOfProto(comments []*parser.Comment) (auth bool) {
 		}
 	}
 	return true
+}
+
+func GetDescFromFieldCommentsOfProto(comments []*parser.Comment) string {
+	for _, c := range comments {
+		lines := c.Lines()
+		for _, line := range lines {
+			line = strings.TrimSpace(line)
+			if strings.Index(line, "@desc:") == 0 {
+				return strings.TrimSpace(strings.Replace(line, "@desc:", "", 1))
+			}
+		}
+	}
+	return ""
+}
+
+func CheckIfRequired(comments []*parser.Comment) bool {
+	lines := getLinesContainTag(comments, "@required")
+	return len(lines) > 0
 }

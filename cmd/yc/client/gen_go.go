@@ -13,7 +13,7 @@ import (
 
 func (t *GenCommand) genGo() {
 	serviceName := t.getServiceName()
-	log.Println("service name:", serviceName)
+	log.Println("generating go sdk:", serviceName)
 	service := services.NewServiceEntity(serviceName)
 	reader, err := os.Open(path.Join(t.WorkDir, service.ProtoFileName+".proto"))
 	if err != nil {
