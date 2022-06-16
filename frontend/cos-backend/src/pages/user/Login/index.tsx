@@ -14,14 +14,13 @@ const Login: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const [type, setType] = useState<string>('account');
   const { setInitialState } = useModel('@@initialState');
-
   const intl = useIntl();
 
   const handleSubmit = async (values: API.LoginReq) => {
     setSubmitting(true);
     try {
       // 登录
-      values.accountType = 1;
+      values.accountType = 1
       const resp = await cos.login({ ...values });
       // const resp = await Auth.login({ ...values });
       if (resp.code === 0) {

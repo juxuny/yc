@@ -1,11 +1,11 @@
+import type * as typing from './typing';
 import {doRequest} from '@/services/dt';
 import { prefix } from './index'
-import type * as typing from "./typing";
 
 export class cos {
 
   static health (body: typing.HealthRequest, options?: { [key: string]: any }) {
-    return doRequest<typing.HealthResponse>(prefix + 'cos/health}', {
+    return doRequest<typing.HealthResponse>(prefix + '/cos/health', {
       method: 'POST',
       data: body,
       ...(options || {}),
@@ -13,7 +13,7 @@ export class cos {
   }
 
   static login (body: typing.LoginRequest, options?: { [key: string]: any }) {
-    return doRequest<typing.LoginResponse>(prefix + 'cos/login}', {
+    return doRequest<typing.LoginResponse>(prefix + '/cos/login', {
       method: 'POST',
       data: body,
       ...(options || {}),
@@ -21,7 +21,7 @@ export class cos {
   }
 
   static userInfo (body: typing.UserInfoRequest, options?: { [key: string]: any }) {
-    return doRequest<typing.UserInfoResponse>(prefix + 'cos/user-info}', {
+    return doRequest<typing.UserInfoResponse>(prefix + '/cos/user-info', {
       method: 'POST',
       data: body,
       ...(options || {}),
@@ -29,7 +29,7 @@ export class cos {
   }
 
   static updateInfo (body: typing.UpdateInfoRequest, options?: { [key: string]: any }) {
-    return doRequest<typing.UpdateInfoResponse>(prefix + 'cos/update-info}', {
+    return doRequest<typing.UpdateInfoResponse>(prefix + '/cos/update-info', {
       method: 'POST',
       data: body,
       ...(options || {}),
@@ -37,7 +37,7 @@ export class cos {
   }
 
   static modifyPassword (body: typing.ModifyPasswordRequest, options?: { [key: string]: any }) {
-    return doRequest<typing.ModifyPasswordResponse>(prefix + 'cos/modify-password}', {
+    return doRequest<typing.ModifyPasswordResponse>(prefix + '/cos/modify-password', {
       method: 'POST',
       data: body,
       ...(options || {}),
@@ -45,7 +45,7 @@ export class cos {
   }
 
   static saveOrCreateUser (body: typing.SaveOrCreateUserRequest, options?: { [key: string]: any }) {
-    return doRequest<typing.SaveOrCreateUserResponse>(prefix + 'cos/save-or-create-user}', {
+    return doRequest<typing.SaveOrCreateUserResponse>(prefix + '/cos/save-or-create-user', {
       method: 'POST',
       data: body,
       ...(options || {}),
@@ -53,7 +53,7 @@ export class cos {
   }
 
   static userList (body: typing.UserListRequest, options?: { [key: string]: any }) {
-    return doRequest<typing.UserListResponse>(prefix + 'cos/user-list}', {
+    return doRequest<typing.UserListResponse>(prefix + '/cos/user-list', {
       method: 'POST',
       data: body,
       ...(options || {}),
@@ -61,7 +61,7 @@ export class cos {
   }
 
   static userUpdateStatus (body: typing.UserUpdateStatusRequest, options?: { [key: string]: any }) {
-    return doRequest<typing.UserUpdateStatusResponse>(prefix + 'cos/user-update-status}', {
+    return doRequest<typing.UserUpdateStatusResponse>(prefix + '/cos/user-update-status', {
       method: 'POST',
       data: body,
       ...(options || {}),
@@ -69,7 +69,7 @@ export class cos {
   }
 
   static userDelete (body: typing.UserDeleteRequest, options?: { [key: string]: any }) {
-    return doRequest<typing.UserDeleteResponse>(prefix + 'cos/user-delete}', {
+    return doRequest<typing.UserDeleteResponse>(prefix + '/cos/user-delete', {
       method: 'POST',
       data: body,
       ...(options || {}),
@@ -77,7 +77,7 @@ export class cos {
   }
 
   static accessKeyList (body: typing.AccessKeyListRequest, options?: { [key: string]: any }) {
-    return doRequest<typing.AccessKeyListResponse>(prefix + 'cos/access-key-list}', {
+    return doRequest<typing.AccessKeyListResponse>(prefix + '/cos/access-key-list', {
       method: 'POST',
       data: body,
       ...(options || {}),
@@ -85,7 +85,7 @@ export class cos {
   }
 
   static createAccessKey (body: typing.CreateAccessKeyRequest, options?: { [key: string]: any }) {
-    return doRequest<typing.CreateAccessKeyResponse>(prefix + 'cos/create-access-key}', {
+    return doRequest<typing.CreateAccessKeyResponse>(prefix + '/cos/create-access-key', {
       method: 'POST',
       data: body,
       ...(options || {}),
@@ -93,7 +93,7 @@ export class cos {
   }
 
   static updateStatusAccessKey (body: typing.UpdateStatusAccessKeyRequest, options?: { [key: string]: any }) {
-    return doRequest<typing.UpdateStatusAccessKeyResponse>(prefix + 'cos/update-status-access-key}', {
+    return doRequest<typing.UpdateStatusAccessKeyResponse>(prefix + '/cos/update-status-access-key', {
       method: 'POST',
       data: body,
       ...(options || {}),
@@ -101,7 +101,7 @@ export class cos {
   }
 
   static deleteAccessKey (body: typing.DeleteAccessKeyRequest, options?: { [key: string]: any }) {
-    return doRequest<typing.DeleteAccessKeyResponse>(prefix + 'cos/delete-access-key}', {
+    return doRequest<typing.DeleteAccessKeyResponse>(prefix + '/cos/delete-access-key', {
       method: 'POST',
       data: body,
       ...(options || {}),
@@ -109,7 +109,7 @@ export class cos {
   }
 
   static setRemarkAccessKey (body: typing.SetAccessKeyRemarkRequest, options?: { [key: string]: any }) {
-    return doRequest<typing.SetAccessKeyRemarkResponse>(prefix + 'cos/set-remark-access-key}', {
+    return doRequest<typing.SetAccessKeyRemarkResponse>(prefix + '/cos/set-remark-access-key', {
       method: 'POST',
       data: body,
       ...(options || {}),
@@ -117,7 +117,7 @@ export class cos {
   }
 
   static saveNamespace (body: typing.SaveNamespaceRequest, options?: { [key: string]: any }) {
-    return doRequest<typing.SaveNamespaceResponse>(prefix + 'cos/save-namespace}', {
+    return doRequest<typing.SaveNamespaceResponse>(prefix + '/cos/save-namespace', {
       method: 'POST',
       data: body,
       ...(options || {}),
@@ -125,7 +125,7 @@ export class cos {
   }
 
   static listNamespace (body: typing.ListNamespaceRequest, options?: { [key: string]: any }) {
-    return doRequest<typing.ListNamespaceResponse>(prefix + 'cos/list-namespace}', {
+    return doRequest<typing.ListNamespaceResponse>(prefix + '/cos/list-namespace', {
       method: 'POST',
       data: body,
       ...(options || {}),
@@ -133,7 +133,7 @@ export class cos {
   }
 
   static deleteNamespace (body: typing.DeleteNamespaceRequest, options?: { [key: string]: any }) {
-    return doRequest<typing.DeleteNamespaceResponse>(prefix + 'cos/delete-namespace}', {
+    return doRequest<typing.DeleteNamespaceResponse>(prefix + '/cos/delete-namespace', {
       method: 'POST',
       data: body,
       ...(options || {}),
@@ -141,7 +141,7 @@ export class cos {
   }
 
   static updateStatusNamespace (body: typing.UpdateStatusNamespaceRequest, options?: { [key: string]: any }) {
-    return doRequest<typing.UpdateStatusNamespaceResponse>(prefix + 'cos/update-status-namespace}', {
+    return doRequest<typing.UpdateStatusNamespaceResponse>(prefix + '/cos/update-status-namespace', {
       method: 'POST',
       data: body,
       ...(options || {}),
@@ -149,7 +149,7 @@ export class cos {
   }
 
   static selectorNamespace (body: typing.SelectorRequest, options?: { [key: string]: any }) {
-    return doRequest<typing.SelectorResponse>(prefix + 'cos/selector-namespace}', {
+    return doRequest<typing.SelectorResponse>(prefix + '/cos/selector-namespace', {
       method: 'POST',
       data: body,
       ...(options || {}),
@@ -157,7 +157,7 @@ export class cos {
   }
 
   static saveConfig (body: typing.SaveConfigRequest, options?: { [key: string]: any }) {
-    return doRequest<typing.SaveConfigResponse>(prefix + 'cos/save-config}', {
+    return doRequest<typing.SaveConfigResponse>(prefix + '/cos/save-config', {
       method: 'POST',
       data: body,
       ...(options || {}),
@@ -165,7 +165,7 @@ export class cos {
   }
 
   static deleteConfig (body: typing.DeleteConfigRequest, options?: { [key: string]: any }) {
-    return doRequest<typing.DeleteConfigResponse>(prefix + 'cos/delete-config}', {
+    return doRequest<typing.DeleteConfigResponse>(prefix + '/cos/delete-config', {
       method: 'POST',
       data: body,
       ...(options || {}),
@@ -173,7 +173,7 @@ export class cos {
   }
 
   static listConfig (body: typing.ListConfigRequest, options?: { [key: string]: any }) {
-    return doRequest<typing.ListConfigResponse>(prefix + 'cos/list-config}', {
+    return doRequest<typing.ListConfigResponse>(prefix + '/cos/list-config', {
       method: 'POST',
       data: body,
       ...(options || {}),
@@ -181,7 +181,7 @@ export class cos {
   }
 
   static cloneConfig (body: typing.CloneConfigRequest, options?: { [key: string]: any }) {
-    return doRequest<typing.CloneConfigResponse>(prefix + 'cos/clone-config}', {
+    return doRequest<typing.CloneConfigResponse>(prefix + '/cos/clone-config', {
       method: 'POST',
       data: body,
       ...(options || {}),
@@ -189,7 +189,7 @@ export class cos {
   }
 
   static updateStatusConfig (body: typing.UpdateStatusConfigRequest, options?: { [key: string]: any }) {
-    return doRequest<typing.UpdateStatusConfigResponse>(prefix + 'cos/update-status-config}', {
+    return doRequest<typing.UpdateStatusConfigResponse>(prefix + '/cos/update-status-config', {
       method: 'POST',
       data: body,
       ...(options || {}),
@@ -197,7 +197,7 @@ export class cos {
   }
 
   static saveValue (body: typing.SaveValueRequest, options?: { [key: string]: any }) {
-    return doRequest<typing.SaveValueResponse>(prefix + 'cos/save-value}', {
+    return doRequest<typing.SaveValueResponse>(prefix + '/cos/save-value', {
       method: 'POST',
       data: body,
       ...(options || {}),
@@ -205,7 +205,7 @@ export class cos {
   }
 
   static deleteValue (body: typing.DeleteValueRequest, options?: { [key: string]: any }) {
-    return doRequest<typing.DeleteValueRequest>(prefix + 'cos/delete-value}', {
+    return doRequest<typing.DeleteValueRequest>(prefix + '/cos/delete-value', {
       method: 'POST',
       data: body,
       ...(options || {}),
@@ -213,7 +213,7 @@ export class cos {
   }
 
   static listValue (body: typing.ListValueRequest, options?: { [key: string]: any }) {
-    return doRequest<typing.ListValueResponse>(prefix + 'cos/list-value}', {
+    return doRequest<typing.ListValueResponse>(prefix + '/cos/list-value', {
       method: 'POST',
       data: body,
       ...(options || {}),
@@ -221,7 +221,7 @@ export class cos {
   }
 
   static disableValue (body: typing.DisableValueRequest, options?: { [key: string]: any }) {
-    return doRequest<typing.DisableValueResponse>(prefix + 'cos/disable-value}', {
+    return doRequest<typing.DisableValueResponse>(prefix + '/cos/disable-value', {
       method: 'POST',
       data: body,
       ...(options || {}),
@@ -229,7 +229,7 @@ export class cos {
   }
 
   static listAllValue (body: typing.ListAllValueRequest, options?: { [key: string]: any }) {
-    return doRequest<typing.ListAllValueResponse>(prefix + 'cos/list-all-value}', {
+    return doRequest<typing.ListAllValueResponse>(prefix + '/cos/list-all-value', {
       method: 'POST',
       data: body,
       ...(options || {}),
@@ -237,7 +237,7 @@ export class cos {
   }
 
   static updateStatusValue (body: typing.UpdateStatusValueRequest, options?: { [key: string]: any }) {
-    return doRequest<typing.UpdateStatusValueResponse>(prefix + 'cos/update-status-value}', {
+    return doRequest<typing.UpdateStatusValueResponse>(prefix + '/cos/update-status-value', {
       method: 'POST',
       data: body,
       ...(options || {}),

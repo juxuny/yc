@@ -1,4 +1,4 @@
-import type * as dt from '@/services/base';
+import type * as dt from '@/services/dt';
 
 {{range $enum := .Enums}}export type {{$enum.EnumName}} = {{$enum.ValueSet}};
 
