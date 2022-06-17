@@ -10,7 +10,7 @@ import { Formatter } from '@/utils/formatter';
 import { history } from 'umi';
 import KeyValuePairs from "@/pages/config/component/KeyValuePairs";
 import {cos} from "@/services/api";
-import {
+import type {
   ListConfigItem,
   ListConfigRequest,
   ListValueRequest,
@@ -30,7 +30,7 @@ export default (): React.ReactNode => {
   const formRef = useRef<FormInstance<ListConfigRequest> | undefined>();
   const [editorVisible, setEditorVisible] = useState<boolean>(false);
   const [drawerVisible, setDrawerVisible] = useState<boolean>(false);
-  const [selectedData, setSelectedData] = useState<SaveConfigRequest>();
+  const [selectedData, setSelectedData] = useState<SaveConfigRequest | undefined>(undefined);
   const [drawerWidth, setDrawerWidth] = useState<number>(calculateDrawerWidth);
   const [keyValueListReq, setKeyValueListReq] = useState<ListValueRequest | undefined>(undefined);
   const [isCloneEditor, setIsCloneEditor] = useState<boolean>(false);
@@ -96,10 +96,8 @@ export default (): React.ReactNode => {
     const selectedNamespaceId = formRef.current?.getFieldsValue().namespaceId;
     setIsCloneEditor(isClone);
     setSelectedData({
-      id: record.id,
-      configId: record.configId,
+      ...record,
       namespaceId: selectedNamespaceId || 0,
-      baseId: record.baseId,
     });
     setEditorVisible(true);
   };

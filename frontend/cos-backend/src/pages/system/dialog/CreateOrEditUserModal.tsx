@@ -1,5 +1,4 @@
 import { Button, Form, Input, Modal, message } from 'antd';
-import useMergedState from 'rc-util/es/hooks/useMergedState';
 import React, { useRef, useEffect, useState } from 'react';
 import { useIntl } from '@@/plugin-locale/localeExports';
 import { ProForm } from '@ant-design/pro-components';
@@ -11,7 +10,6 @@ export type CreateOrEditUserProps = {
   visible?: boolean;
   onChangeVisible: (v: boolean) => void;
   oldData?: SaveOrCreateUserRequest,
-  trigger?: JSX.Element | undefined;
   onSuccess?: () => void;
 };
 
@@ -22,21 +20,13 @@ const layout = {
 
 const CreateOrEditUserModal: React.FC<CreateOrEditUserProps> = (props) => {
   const intl = useIntl();
-  const { visible, onChangeVisible, onSuccess } = props;
+  const { visible, onChangeVisible, onSuccess, oldData } = props;
   const formRef = useRef<ProFormInstance<SaveOrCreateUserRequest> | null>();
-
-  const [userInfo, setUserInfo] = useMergedState<SaveOrCreateUserRequest>(
-    { userId: '', identifier: '', nick: '', credential: '' },
-    {
-      value: props.oldData,
-    },
-  );
-
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    formRef.current?.setFieldsValue(userInfo);
-  });
+    formRef.current?.setFieldsValue({...oldData});
+  }, [oldData]);
 
   const onSubmit = async () => {
     try {
@@ -79,6 +69,7 @@ const CreateOrEditUserModal: React.FC<CreateOrEditUserProps> = (props) => {
         requiredMark={true}
         formRef={formRef}
         submitter={false}
+        initialValues={props.oldData}
       >
         <Form.Item
           required
@@ -86,11 +77,7 @@ const CreateOrEditUserModal: React.FC<CreateOrEditUserProps> = (props) => {
           name="identifier"
         >
           <Input
-            disabled={!!userInfo.userId}
-            value={userInfo.identifier}
-            onChange={({ target: { value } }) => {
-              setUserInfo(Object.assign(userInfo, { identifier: value }));
-            }}
+            disabled={!!props.oldData?.userId}
           />
         </Form.Item>
 
@@ -99,27 +86,16 @@ const CreateOrEditUserModal: React.FC<CreateOrEditUserProps> = (props) => {
           label={intl.formatMessage({ id: 'pages.system.user-management.column.nick' })}
           name="nick"
         >
-          <Input
-            value={userInfo.nick}
-            onChange={({ target: { value } }) => {
-              setUserInfo(Object.assign(userInfo, { nick: value }));
-            }}
-          />
+          <Input />
         </Form.Item>
 
-        {!userInfo.userId && (
+        {!props.oldData?.userId && (
           <Form.Item
             required
             label={intl.formatMessage({ id: 'pages.field.password' })}
             name="credential"
           >
-            <Input
-              type="password"
-              value={userInfo.credential}
-              onChange={({ target: { value } }) => {
-                setUserInfo(Object.assign(userInfo, { credential: value }));
-              }}
-            />
+            <Input type="password" />
           </Form.Item>
         )}
       </ProForm>

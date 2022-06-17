@@ -1,5 +1,4 @@
 import { Button, Form, Input, Modal, message } from 'antd';
-import useMergedState from 'rc-util/es/hooks/useMergedState';
 import React, { useRef, useEffect, useState } from 'react';
 import { useIntl } from '@@/plugin-locale/localeExports';
 import { ProForm } from '@ant-design/pro-components';
@@ -22,20 +21,13 @@ const layout = {
 
 const NamespaceEditorModal: React.FC<NamespaceEditorProp> = (props) => {
   const intl = useIntl();
-  const { visible, onChangeVisible, onSuccess } = props;
+  const { visible, onChangeVisible, onSuccess, oldData } = props;
   const formRef = useRef<ProFormInstance<SaveNamespaceRequest> | undefined>();
 
-  const [namespaceData, setNamespaceData] = useMergedState<SaveNamespaceRequest>(
-    {} as SaveNamespaceRequest,
-    {
-      value: props.oldData,
-    },
-  );
   const [loading, setLoading] = useState<boolean>(false);
   useEffect(() => {
-    console.log(namespaceData);
-    formRef.current?.setFieldsValue(namespaceData);
-  });
+    formRef.current?.setFieldsValue({...oldData});
+  }, [oldData]);
 
   const onSubmit = async () => {
     try {
@@ -43,7 +35,7 @@ const NamespaceEditorModal: React.FC<NamespaceEditorProp> = (props) => {
       const params = formRef.current?.getFieldsValue() || ({} as SaveNamespaceRequest);
       const resp = await cos.saveNamespace({
         ...params,
-        id: props.oldData?.id || undefined,
+        id: oldData?.id || undefined,
       });
       if (resp.code !== 0) {
         message.error(resp.msg);
@@ -80,19 +72,14 @@ const NamespaceEditorModal: React.FC<NamespaceEditorProp> = (props) => {
         requiredMark={true}
         formRef={formRef}
         submitter={false}
+        initialValues={oldData}
       >
         <Form.Item
           required
           label={intl.formatMessage({ id: 'pages.config.namespace.column.namespace' })}
           name="namespace"
         >
-          <Input
-            value={namespaceData.namespace}
-            onChange={({target: {value}}: {target: {value: string}}) => {
-              console.log(namespaceData);
-              setNamespaceData({...namespaceData, namespace: value});
-            }}
-          />
+          <Input />
         </Form.Item>
       </ProForm>
     </Modal>

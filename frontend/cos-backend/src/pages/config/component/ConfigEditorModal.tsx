@@ -1,5 +1,4 @@
 import { Button, Form, Input, Modal, message } from 'antd';
-import useMergedState from 'rc-util/es/hooks/useMergedState';
 import React, { useRef, useEffect, useState } from 'react';
 import { useIntl } from '@@/plugin-locale/localeExports';
 import { ProForm } from '@ant-design/pro-components';
@@ -25,13 +24,11 @@ const ConfigEditorModal: React.FC<ConfigEditorProp> = (props) => {
   const { visible, onChangeVisible, onSuccess, isClone, oldData } = props;
   const formRef = useRef<ProFormInstance<SaveConfigRequest> | undefined>();
 
-  const [editingData, setEditingData] = useMergedState<SaveConfigRequest>({} as SaveConfigRequest, { value: oldData });
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    console.log(editingData);
-    formRef.current?.setFieldsValue(editingData);
-  });
+    formRef.current?.setFieldsValue({...oldData});
+  }, [oldData]);
 
   const onSubmitSave = async () => {
     try {
@@ -100,18 +97,14 @@ const ConfigEditorModal: React.FC<ConfigEditorProp> = (props) => {
         requiredMark={true}
         formRef={formRef}
         submitter={false}
+        initialValues={props.oldData}
       >
         <Form.Item
           required
           label={intl.formatMessage({ id: 'pages.config.config-management.column.configId' })}
           name="configId"
         >
-          <Input
-            value={editingData.configId}
-            onChange={({ target: { value }}) => {
-              setEditingData(Object.assign(editingData, {configId: value}));
-            }}
-          />
+          <Input />
         </Form.Item>
       </ProForm>
     </Modal>

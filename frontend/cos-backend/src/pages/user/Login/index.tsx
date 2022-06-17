@@ -9,6 +9,9 @@ import styles from './index.less';
 import { LocalStorage, StorageKey } from '@/storage';
 import { useModel } from '@@/plugin-model/useModel';
 import {cos} from '@/services/api';
+import type {LoginRequest} from "@/services/api/typing";
+
+const logoIcon: string = '/logo.svg';
 
 const Login: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
@@ -16,7 +19,7 @@ const Login: React.FC = () => {
   const { setInitialState } = useModel('@@initialState');
   const intl = useIntl();
 
-  const handleSubmit = async (values: API.LoginReq) => {
+  const handleSubmit = async (values: LoginRequest) => {
     setSubmitting(true);
     try {
       // 登录
@@ -50,14 +53,14 @@ const Login: React.FC = () => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.lang} data-lang>
+      <div className={styles.lang}>
         {SelectLang && <SelectLang />}
       </div>
       <div className={styles.content}>
         <div className={styles.top}>
           <div className={styles.header}>
             <Link to="/">
-              <img alt="logo" className={styles.logo} src="/logo.svg" />
+              <img alt="logo" className={styles.logo} src={logoIcon} />
               <span className={styles.title}>Configuration OS</span>
             </Link>
           </div>
@@ -88,7 +91,7 @@ const Login: React.FC = () => {
               },
             }}
             onFinish={async (values) => {
-              await handleSubmit(values as API.LoginReq);
+              await handleSubmit(values);
             }}
           >
             <Tabs activeKey={type} onChange={setType}>

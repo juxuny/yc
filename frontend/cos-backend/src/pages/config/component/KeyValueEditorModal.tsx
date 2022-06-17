@@ -1,6 +1,5 @@
 import { Button, Form, Input, Modal, message, Select } from 'antd';
 const { Option } = Select;
-import useMergedState from 'rc-util/es/hooks/useMergedState';
 import React, { useRef, useEffect, useState } from 'react';
 import { useIntl } from '@@/plugin-locale/localeExports';
 import { ProForm } from '@ant-design/pro-components';
@@ -25,18 +24,11 @@ const KeyValueEditorModal: React.FC<KeyValueEditorProp> = (props) => {
   const { visible, onChangeVisible, onSuccess, oldData } = props;
   const formRef = useRef<ProFormInstance<SaveValueRequest> | undefined>();
 
-  const [editingData, setEditingData] = useMergedState<SaveValueRequest>(
-    {} as SaveValueRequest,
-    {
-      value: oldData,
-    },
-  );
-
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    formRef.current?.setFieldsValue(editingData);
-  });
+    formRef.current?.setFieldsValue({...oldData});
+  }, [oldData]);
 
   const onSubmit = async () => {
     try {
@@ -44,7 +36,7 @@ const KeyValueEditorModal: React.FC<KeyValueEditorProp> = (props) => {
       const params = formRef.current?.getFieldsValue() || ({} as SaveValueRequest);
       const resp = await cos.saveValue({
         ...params,
-        configId: editingData.configId
+        configId: oldData?.configId
       });
       if (resp.code !== 0) {
         message.error(resp.msg);
@@ -79,19 +71,14 @@ const KeyValueEditorModal: React.FC<KeyValueEditorProp> = (props) => {
         requiredMark={true}
         formRef={formRef}
         submitter={false}
+        initialValues={oldData}
       >
         <Form.Item
           required
           label={intl.formatMessage({ id: 'pages.config.key-value.column.configKey' })}
           name="configKey"
         >
-          <Input
-            disabled={editingData.configId !== undefined}
-            value={editingData.configKey}
-            onChange={({ target: { value }}: {target: {value: string}}) => {
-              setEditingData({...editingData, configKey: value});
-            }}
-          />
+          <Input disabled={oldData?.configKey !== undefined && oldData?.configKey !== ''} />
         </Form.Item>
         <Form.Item
           required
@@ -100,10 +87,6 @@ const KeyValueEditorModal: React.FC<KeyValueEditorProp> = (props) => {
         >
           <Input.TextArea
             autoSize={{ minRows: 3, maxRows: 6 }}
-            value={editingData.configValue}
-            onChange={({ target: { value } }: {target: {value: string}}) => {
-              setEditingData({...editingData, configValue: value});
-            }}
           />
         </Form.Item>
         <Form.Item
