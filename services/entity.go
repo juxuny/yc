@@ -82,6 +82,7 @@ type MethodEntity struct {
 	Request    string
 	Response   string
 	UseAuth    bool
+	Desc       string
 }
 
 type EntrypointEntity struct {

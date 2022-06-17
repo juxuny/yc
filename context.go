@@ -21,6 +21,8 @@ const (
 	MdContextCallerService = "x-rpc-caller-service"
 	MdContextCallerLevel   = "x-rpc-caller-level"
 	MdContextToken         = "x-rpc-token"
+	MdContextSign          = "x-rpc-sign"
+	MdContextSignMethod    = "x-rpc-sign-method"
 )
 
 func GetCallerLevelFromMd(md metadata.MD) (level int, err error) {
@@ -108,7 +110,7 @@ func MergeMetadata(base metadata.MD, md ...metadata.MD) metadata.MD {
 	return ret
 }
 
-func RpcCall(ctx context.Context, host string, queryPath string, data proto.Message, out interface{}, md metadata.MD) (code int, err error) {
+func RpcCall(ctx context.Context, host string, queryPath string, data proto.Message, out interface{}, md metadata.MD, signHandler RpcSignContentHandler) (code int, err error) {
 	body, err := proto.Marshal(data)
 	if err != nil {
 		return 0, errors.SystemError.RpcCallErrorIllegalRequestParams.Wrap(err)
@@ -119,6 +121,14 @@ func RpcCall(ctx context.Context, host string, queryPath string, data proto.Mess
 		return 0, errors.SystemError.RpcCallErrorNetwork.Wrap(err)
 	}
 	contextHeader := GetHeader(ctx)
+	if signHandler != nil {
+		method, sign, err := signHandler.Sum(body)
+		if err != nil {
+			return 0, err
+		}
+		md.Set(MdContextSign, string(sign))
+		md.Set(MdContextSignMethod, string(method))
+	}
 	MergeRequestHeaderFromMetadata(req, contextHeader, md)
 	req.Header.Set("content-type", "application/protobuf")
 	resp, err := httpClient.Do(req)
@@ -130,7 +140,10 @@ func RpcCall(ctx context.Context, host string, queryPath string, data proto.Mess
 	if err != nil {
 		return code, errors.SystemError.RpcCallErrorReadResponseBody.Wrap(err)
 	}
-	ct := resp.Header.Get("Content-Type")
+	ct := resp.Header.Get("content-type")
+	if ct == "" {
+		ct = resp.Header.Get("Content-Type")
+	}
 	if strings.Contains(ct, "json") {
 		if code == http.StatusOK {
 			err = json.Unmarshal(respData, out)

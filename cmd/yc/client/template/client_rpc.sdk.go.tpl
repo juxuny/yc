@@ -11,12 +11,14 @@ import (
 )
 
 type Client interface {
-{{range $item := .Methods}}	{{$item.MethodName}}(ctx context.Context, req *{{$item.Request}}, extensionMetadata ...metadata.MD) (resp *{{$item.Response}}, err error)
+{{range $item := .Methods}}{{if ne $item.Desc ""}}	// {{$item.Desc}}
+{{end}}	{{$item.MethodName}}(ctx context.Context, req *{{$item.Request}}, extensionMetadata ...metadata.MD) (resp *{{$item.Response}}, err error)
 {{end}}
 }
 
 type client struct {
-	Service      string
+	Service      		 string
+	signHandler  		 yc.RpcSignContentHandler
 	EntrypointDispatcher yc.EntrypointDispatcher
 }
 
@@ -35,7 +37,7 @@ func (t *client) {{$item.MethodName}}(ctx context.Context, req *{{$item.Request}
 	ctx = metadata.NewOutgoingContext(ctx, md)
 	resp = &{{$item.Response}}{}
 	var code int
-	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md)
+	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md, t.signHandler)
 	if err != nil {
 		return resp, err
 	}

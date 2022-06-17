@@ -8,6 +8,7 @@ import "dt/juxuny_yc_dt_base.proto";
 service Cos {
   // @group: devops
   // @ignore-auth
+  // @desc: health check
   rpc Health(HealthRequest) returns (HealthResponse) {}
 
   // @group: auth

@@ -17,6 +17,7 @@ type Client interface {
 	ListConfig(ctx context.Context, req *ListConfigRequest, extensionMetadata ...metadata.MD) (resp *ListConfigResponse, err error)
 	CloneConfig(ctx context.Context, req *CloneConfigRequest, extensionMetadata ...metadata.MD) (resp *CloneConfigResponse, err error)
 	UpdateStatusConfig(ctx context.Context, req *UpdateStatusConfigRequest, extensionMetadata ...metadata.MD) (resp *UpdateStatusConfigResponse, err error)
+	// health check
 	Health(ctx context.Context, req *HealthRequest, extensionMetadata ...metadata.MD) (resp *HealthResponse, err error)
 	SaveValue(ctx context.Context, req *SaveValueRequest, extensionMetadata ...metadata.MD) (resp *SaveValueResponse, err error)
 	DeleteValue(ctx context.Context, req *DeleteValueRequest, extensionMetadata ...metadata.MD) (resp *DeleteValueRequest, err error)
@@ -45,6 +46,7 @@ type Client interface {
 
 type client struct {
 	Service              string
+	signHandler          yc.RpcSignContentHandler
 	EntrypointDispatcher yc.EntrypointDispatcher
 }
 
@@ -62,7 +64,7 @@ func (t *client) Login(ctx context.Context, req *LoginRequest, extensionMetadata
 	ctx = metadata.NewOutgoingContext(ctx, md)
 	resp = &LoginResponse{}
 	var code int
-	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md)
+	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md, t.signHandler)
 	if err != nil {
 		return resp, err
 	}
@@ -77,7 +79,7 @@ func (t *client) SaveConfig(ctx context.Context, req *SaveConfigRequest, extensi
 	ctx = metadata.NewOutgoingContext(ctx, md)
 	resp = &SaveConfigResponse{}
 	var code int
-	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md)
+	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md, t.signHandler)
 	if err != nil {
 		return resp, err
 	}
@@ -92,7 +94,7 @@ func (t *client) DeleteConfig(ctx context.Context, req *DeleteConfigRequest, ext
 	ctx = metadata.NewOutgoingContext(ctx, md)
 	resp = &DeleteConfigResponse{}
 	var code int
-	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md)
+	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md, t.signHandler)
 	if err != nil {
 		return resp, err
 	}
@@ -107,7 +109,7 @@ func (t *client) ListConfig(ctx context.Context, req *ListConfigRequest, extensi
 	ctx = metadata.NewOutgoingContext(ctx, md)
 	resp = &ListConfigResponse{}
 	var code int
-	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md)
+	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md, t.signHandler)
 	if err != nil {
 		return resp, err
 	}
@@ -122,7 +124,7 @@ func (t *client) CloneConfig(ctx context.Context, req *CloneConfigRequest, exten
 	ctx = metadata.NewOutgoingContext(ctx, md)
 	resp = &CloneConfigResponse{}
 	var code int
-	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md)
+	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md, t.signHandler)
 	if err != nil {
 		return resp, err
 	}
@@ -137,7 +139,7 @@ func (t *client) UpdateStatusConfig(ctx context.Context, req *UpdateStatusConfig
 	ctx = metadata.NewOutgoingContext(ctx, md)
 	resp = &UpdateStatusConfigResponse{}
 	var code int
-	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md)
+	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md, t.signHandler)
 	if err != nil {
 		return resp, err
 	}
@@ -152,7 +154,7 @@ func (t *client) Health(ctx context.Context, req *HealthRequest, extensionMetada
 	ctx = metadata.NewOutgoingContext(ctx, md)
 	resp = &HealthResponse{}
 	var code int
-	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md)
+	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md, t.signHandler)
 	if err != nil {
 		return resp, err
 	}
@@ -167,7 +169,7 @@ func (t *client) SaveValue(ctx context.Context, req *SaveValueRequest, extension
 	ctx = metadata.NewOutgoingContext(ctx, md)
 	resp = &SaveValueResponse{}
 	var code int
-	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md)
+	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md, t.signHandler)
 	if err != nil {
 		return resp, err
 	}
@@ -182,7 +184,7 @@ func (t *client) DeleteValue(ctx context.Context, req *DeleteValueRequest, exten
 	ctx = metadata.NewOutgoingContext(ctx, md)
 	resp = &DeleteValueRequest{}
 	var code int
-	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md)
+	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md, t.signHandler)
 	if err != nil {
 		return resp, err
 	}
@@ -197,7 +199,7 @@ func (t *client) ListValue(ctx context.Context, req *ListValueRequest, extension
 	ctx = metadata.NewOutgoingContext(ctx, md)
 	resp = &ListValueResponse{}
 	var code int
-	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md)
+	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md, t.signHandler)
 	if err != nil {
 		return resp, err
 	}
@@ -212,7 +214,7 @@ func (t *client) DisableValue(ctx context.Context, req *DisableValueRequest, ext
 	ctx = metadata.NewOutgoingContext(ctx, md)
 	resp = &DisableValueResponse{}
 	var code int
-	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md)
+	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md, t.signHandler)
 	if err != nil {
 		return resp, err
 	}
@@ -227,7 +229,7 @@ func (t *client) ListAllValue(ctx context.Context, req *ListAllValueRequest, ext
 	ctx = metadata.NewOutgoingContext(ctx, md)
 	resp = &ListAllValueResponse{}
 	var code int
-	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md)
+	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md, t.signHandler)
 	if err != nil {
 		return resp, err
 	}
@@ -242,7 +244,7 @@ func (t *client) UpdateStatusValue(ctx context.Context, req *UpdateStatusValueRe
 	ctx = metadata.NewOutgoingContext(ctx, md)
 	resp = &UpdateStatusValueResponse{}
 	var code int
-	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md)
+	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md, t.signHandler)
 	if err != nil {
 		return resp, err
 	}
@@ -257,7 +259,7 @@ func (t *client) SaveNamespace(ctx context.Context, req *SaveNamespaceRequest, e
 	ctx = metadata.NewOutgoingContext(ctx, md)
 	resp = &SaveNamespaceResponse{}
 	var code int
-	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md)
+	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md, t.signHandler)
 	if err != nil {
 		return resp, err
 	}
@@ -272,7 +274,7 @@ func (t *client) ListNamespace(ctx context.Context, req *ListNamespaceRequest, e
 	ctx = metadata.NewOutgoingContext(ctx, md)
 	resp = &ListNamespaceResponse{}
 	var code int
-	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md)
+	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md, t.signHandler)
 	if err != nil {
 		return resp, err
 	}
@@ -287,7 +289,7 @@ func (t *client) DeleteNamespace(ctx context.Context, req *DeleteNamespaceReques
 	ctx = metadata.NewOutgoingContext(ctx, md)
 	resp = &DeleteNamespaceResponse{}
 	var code int
-	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md)
+	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md, t.signHandler)
 	if err != nil {
 		return resp, err
 	}
@@ -302,7 +304,7 @@ func (t *client) UpdateStatusNamespace(ctx context.Context, req *UpdateStatusNam
 	ctx = metadata.NewOutgoingContext(ctx, md)
 	resp = &UpdateStatusNamespaceResponse{}
 	var code int
-	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md)
+	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md, t.signHandler)
 	if err != nil {
 		return resp, err
 	}
@@ -317,7 +319,7 @@ func (t *client) SelectorNamespace(ctx context.Context, req *SelectorRequest, ex
 	ctx = metadata.NewOutgoingContext(ctx, md)
 	resp = &SelectorResponse{}
 	var code int
-	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md)
+	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md, t.signHandler)
 	if err != nil {
 		return resp, err
 	}
@@ -332,7 +334,7 @@ func (t *client) UserInfo(ctx context.Context, req *UserInfoRequest, extensionMe
 	ctx = metadata.NewOutgoingContext(ctx, md)
 	resp = &UserInfoResponse{}
 	var code int
-	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md)
+	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md, t.signHandler)
 	if err != nil {
 		return resp, err
 	}
@@ -347,7 +349,7 @@ func (t *client) UpdateInfo(ctx context.Context, req *UpdateInfoRequest, extensi
 	ctx = metadata.NewOutgoingContext(ctx, md)
 	resp = &UpdateInfoResponse{}
 	var code int
-	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md)
+	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md, t.signHandler)
 	if err != nil {
 		return resp, err
 	}
@@ -362,7 +364,7 @@ func (t *client) ModifyPassword(ctx context.Context, req *ModifyPasswordRequest,
 	ctx = metadata.NewOutgoingContext(ctx, md)
 	resp = &ModifyPasswordResponse{}
 	var code int
-	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md)
+	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md, t.signHandler)
 	if err != nil {
 		return resp, err
 	}
@@ -377,7 +379,7 @@ func (t *client) SaveOrCreateUser(ctx context.Context, req *SaveOrCreateUserRequ
 	ctx = metadata.NewOutgoingContext(ctx, md)
 	resp = &SaveOrCreateUserResponse{}
 	var code int
-	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md)
+	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md, t.signHandler)
 	if err != nil {
 		return resp, err
 	}
@@ -392,7 +394,7 @@ func (t *client) UserList(ctx context.Context, req *UserListRequest, extensionMe
 	ctx = metadata.NewOutgoingContext(ctx, md)
 	resp = &UserListResponse{}
 	var code int
-	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md)
+	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md, t.signHandler)
 	if err != nil {
 		return resp, err
 	}
@@ -407,7 +409,7 @@ func (t *client) UserUpdateStatus(ctx context.Context, req *UserUpdateStatusRequ
 	ctx = metadata.NewOutgoingContext(ctx, md)
 	resp = &UserUpdateStatusResponse{}
 	var code int
-	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md)
+	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md, t.signHandler)
 	if err != nil {
 		return resp, err
 	}
@@ -422,7 +424,7 @@ func (t *client) UserDelete(ctx context.Context, req *UserDeleteRequest, extensi
 	ctx = metadata.NewOutgoingContext(ctx, md)
 	resp = &UserDeleteResponse{}
 	var code int
-	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md)
+	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md, t.signHandler)
 	if err != nil {
 		return resp, err
 	}
@@ -437,7 +439,7 @@ func (t *client) AccessKeyList(ctx context.Context, req *AccessKeyListRequest, e
 	ctx = metadata.NewOutgoingContext(ctx, md)
 	resp = &AccessKeyListResponse{}
 	var code int
-	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md)
+	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md, t.signHandler)
 	if err != nil {
 		return resp, err
 	}
@@ -452,7 +454,7 @@ func (t *client) CreateAccessKey(ctx context.Context, req *CreateAccessKeyReques
 	ctx = metadata.NewOutgoingContext(ctx, md)
 	resp = &CreateAccessKeyResponse{}
 	var code int
-	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md)
+	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md, t.signHandler)
 	if err != nil {
 		return resp, err
 	}
@@ -467,7 +469,7 @@ func (t *client) UpdateStatusAccessKey(ctx context.Context, req *UpdateStatusAcc
 	ctx = metadata.NewOutgoingContext(ctx, md)
 	resp = &UpdateStatusAccessKeyResponse{}
 	var code int
-	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md)
+	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md, t.signHandler)
 	if err != nil {
 		return resp, err
 	}
@@ -482,7 +484,7 @@ func (t *client) DeleteAccessKey(ctx context.Context, req *DeleteAccessKeyReques
 	ctx = metadata.NewOutgoingContext(ctx, md)
 	resp = &DeleteAccessKeyResponse{}
 	var code int
-	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md)
+	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md, t.signHandler)
 	if err != nil {
 		return resp, err
 	}
@@ -497,7 +499,7 @@ func (t *client) SetRemarkAccessKey(ctx context.Context, req *SetAccessKeyRemark
 	ctx = metadata.NewOutgoingContext(ctx, md)
 	resp = &SetAccessKeyRemarkResponse{}
 	var code int
-	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md)
+	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md, t.signHandler)
 	if err != nil {
 		return resp, err
 	}

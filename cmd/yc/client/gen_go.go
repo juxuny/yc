@@ -59,6 +59,7 @@ func (t *GenCommand) genGoService(serviceEntity services.ServiceEntity, svc *par
 		}
 		method := services.MethodEntity{
 			HandlerInitEntity: handlerEntity,
+			Desc:              services.GetDescFromFieldCommentsOfProto(rpc.Comments),
 			Group:             groupName,
 			MethodName:        rpc.RPCName,
 			Request:           rpc.RPCRequest.MessageType,

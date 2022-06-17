@@ -27,3 +27,7 @@ func (t *RandomEntrypointDispatcher) SelectOne() string {
 	}
 	return t.entrypointCandidates[t.randInstance.Intn(len(t.entrypointCandidates))]
 }
+
+type RpcSignContentHandler interface {
+	Sum(data []byte) (method SignMethod, signResult []byte, err error)
+}

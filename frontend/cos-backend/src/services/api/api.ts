@@ -3,7 +3,7 @@ import {doRequest} from '@juxuny/yc-ts-data-type';
 import { prefix } from './index'
 
 export class cos {
-
+// health check
   static health = (body: typing.HealthRequest, options?: { [key: string]: any }) => doRequest<typing.HealthResponse>(prefix + '/cos/health', { method: 'POST', data: body, ...(options || {}) });
 
   static login = (body: typing.LoginRequest, options?: { [key: string]: any }) => doRequest<typing.LoginResponse>(prefix + '/cos/login', { method: 'POST', data: body, ...(options || {}) });
