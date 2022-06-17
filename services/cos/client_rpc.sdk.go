@@ -42,19 +42,21 @@ type Client interface {
 	UpdateStatusAccessKey(ctx context.Context, req *UpdateStatusAccessKeyRequest, extensionMetadata ...metadata.MD) (resp *UpdateStatusAccessKeyResponse, err error)
 	DeleteAccessKey(ctx context.Context, req *DeleteAccessKeyRequest, extensionMetadata ...metadata.MD) (resp *DeleteAccessKeyResponse, err error)
 	SetRemarkAccessKey(ctx context.Context, req *SetAccessKeyRemarkRequest, extensionMetadata ...metadata.MD) (resp *SetAccessKeyRemarkResponse, err error)
+
 }
 
 type client struct {
-	Service              string
-	signHandler          yc.RpcSignContentHandler
+	Service      		 string
+	signHandler  		 yc.RpcSignContentHandler
 	EntrypointDispatcher yc.EntrypointDispatcher
 }
 
 var DefaultClient Client
 
+
 func NewClientWithDispatcher(entrypointDispatcher yc.EntrypointDispatcher) Client {
 	return &client{
-		Service:              Name,
+		Service: Name,
 		EntrypointDispatcher: entrypointDispatcher,
 	}
 }
@@ -508,3 +510,4 @@ func (t *client) SetRemarkAccessKey(ctx context.Context, req *SetAccessKeyRemark
 	}
 	return
 }
+
