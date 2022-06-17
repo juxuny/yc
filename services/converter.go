@@ -3,13 +3,13 @@ package services
 import "strings"
 
 var reactTsDataTypeMapper = map[string]string {
-	"dt.ID": "string",
+	"dt.ID": "string | number",
 	"uint64": "number",
 	"uint32": "number",
 	"float": "number",
 	"double": "number",
-	"dt.NullInt64": "string",
-	"dt.NullInt32": "string",
+	"dt.NullInt64": "string | number",
+	"dt.NullInt32": "string | number",
 	"dt.NullBool": "string",
 	"dt.NullFloat64": "number",
 }

@@ -1,11 +1,11 @@
 import React, { useRef, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
-import { User } from '@/services/cos/user';
 import { useIntl } from 'umi';
 import { Button, message } from 'antd';
 import { FormattedMessage } from '@@/plugin-locale/localeExports';
 import { ProForm, ProCard, ProFormText } from '@ant-design/pro-components';
 import type { ProFormInstance } from '@ant-design/pro-components';
+import {cos} from "@/services/api";
 
 export default (): React.ReactNode => {
   const intl = useIntl();
@@ -16,7 +16,7 @@ export default (): React.ReactNode => {
     try {
       setLoading((v) => v + 1);
       await formRef.current?.validateFields();
-      const resp = await User.modifyPassword(update);
+      const resp = await cos.modifyPassword(update);
       if (resp && resp.code === 0) {
         message.success(intl.formatMessage({ id: 'pages.result.modifySuccess' }));
         formRef.current?.resetFields();

@@ -91,13 +91,13 @@ export type LoginResponse = {
 
 export type UserInfoRequest = {
 
-  userId?: string;
+  userId?: string | number;
 
 }
 
 export type UserInfoSimple = {
 
-  userId?: string;
+  userId?: string | number;
 
   name?: string;
 
@@ -109,7 +109,7 @@ export type UserInfoSimple = {
 
 export type UserInfoResponse = {
 
-  userId?: string;
+  userId?: string | number;
 
   nick?: string;
 
@@ -121,7 +121,7 @@ export type UserInfoResponse = {
 
 export type UpdateInfoRequest = {
 
-  userId?: string;
+  userId?: string | number;
 
   nick?: string;
 
@@ -133,7 +133,7 @@ export type UpdateInfoResponse = {
 
 export type ModifyPasswordRequest = {
 
-  userId?: string;
+  userId?: string | number;
 
   oldPassword?: string;
 
@@ -147,7 +147,7 @@ export type ModifyPasswordResponse = {
 
 export type NamespaceResp = {
 
-  id?: string;
+  id?: string | number;
 
   namespace?: string;
 
@@ -157,13 +157,13 @@ export type NamespaceResp = {
 
   isDisabled?: bool;
 
-  creatorId?: string;
+  creatorId?: string | number;
 
 }
 
 export type ConfigResp = {
 
-  id?: string;
+  id?: string | number;
 
   createTime?: int64;
 
@@ -175,15 +175,15 @@ export type ConfigResp = {
 
   isDisabled?: bool;
 
-  creatorId?: string;
+  creatorId?: string | number;
 
-  baseId?: string;
+  baseId?: string | number;
 
 }
 
 export type KeyValueResp = {
 
-  id?: string;
+  id?: string | number;
 
   createTime?: int64;
 
@@ -199,9 +199,9 @@ export type KeyValueResp = {
 
   valueType?: ValueType;
 
-  configId?: string;
+  configId?: string | number;
 
-  creatorId?: string;
+  creatorId?: string | number;
 
   isHot?: bool;
 
@@ -215,7 +215,7 @@ export type SaveOrCreateUserRequest = {
 
   accountType?: AccountType;
 
-  userId?: string;
+  userId?: string | number;
 
   nick?: string;
 
@@ -223,7 +223,7 @@ export type SaveOrCreateUserRequest = {
 
 export type SaveOrCreateUserResponse = {
 
-  userId?: string;
+  userId?: string | number;
 
   isNew?: bool;
 
@@ -231,7 +231,7 @@ export type SaveOrCreateUserResponse = {
 
 export type UserListItem = {
 
-  id?: string;
+  id?: string | number;
 
   identifier?: string;
 
@@ -269,7 +269,7 @@ export type SaveNamespaceRequest = {
 
   namespace?: string;
 
-  id?: string;
+  id?: string | number;
 
 }
 
@@ -289,7 +289,7 @@ export type ListNamespaceRequest = {
 
 export type ListNamespaceItem = {
 
-  id?: string;
+  id?: string | number;
 
   namespace?: string;
 
@@ -311,7 +311,7 @@ export type ListNamespaceResponse = {
 
 export type DeleteNamespaceRequest = {
 
-  id?: string;
+  id?: string | number;
 
 }
 
@@ -321,13 +321,13 @@ export type DeleteNamespaceResponse = {
 
 export type SaveConfigRequest = {
 
-  id?: string;
+  id?: string | number;
 
-  namespaceId?: string;
+  namespaceId?: string | number;
 
   configId?: string;
 
-  baseId?: string;
+  baseId?: string | number;
 
 }
 
@@ -337,7 +337,7 @@ export type SaveConfigResponse = {
 
 export type DeleteConfigRequest = {
 
-  id?: string;
+  id?: string | number;
 
 }
 
@@ -349,7 +349,7 @@ export type ListConfigRequest = {
 
   pagination?: dt.Pagination;
 
-  namespaceId?: string;
+  namespaceId?: string | number;
 
   searchKey?: string;
 
@@ -359,15 +359,15 @@ export type ListConfigRequest = {
 
 export type ListConfigItem = {
 
-  id?: string;
+  id?: string | number;
 
   createTime?: int64;
 
   updateTime?: int64;
 
-  baseId?: string;
+  baseId?: string | number;
 
-  namespaceId?: string;
+  namespaceId?: string | number;
 
   configId?: string;
 
@@ -387,7 +387,7 @@ export type ListConfigResponse = {
 
 export type CloneConfigRequest = {
 
-  id?: string;
+  id?: string | number;
 
   newConfigId?: string;
 
@@ -399,7 +399,7 @@ export type CloneConfigResponse = {
 
 export type SaveValueRequest = {
 
-  configId?: string;
+  configId?: string | number;
 
   configKey?: string;
 
@@ -419,7 +419,7 @@ export type ListValueRequest = {
 
   pagination?: dt.Pagination;
 
-  configId?: string;
+  configId?: string | number;
 
   searchKey?: string;
 
@@ -437,7 +437,7 @@ export type ListValueResponse = {
 
 export type DeleteValueRequest = {
 
-  id?: string;
+  id?: string | number;
 
   key?: string;
 
@@ -449,7 +449,7 @@ export type DeleteValueResponse = {
 
 export type DisableValueRequest = {
 
-  id?: string;
+  id?: string | number;
 
   isDisabled?: bool;
 
@@ -461,7 +461,7 @@ export type DisableValueResponse = {
 
 export type UpdateStatusValueRequest = {
 
-  id?: string;
+  id?: string | number;
 
   isDisabled?: bool;
 
@@ -473,7 +473,7 @@ export type UpdateStatusValueResponse = {
 
 export type ListAllValueRequest = {
 
-  configId?: string;
+  configId?: string | number;
 
   isDisabled?: string;
 
@@ -491,7 +491,7 @@ export type ListAllValueResponse = {
 
 export type UserUpdateStatusRequest = {
 
-  userId?: string;
+  userId?: string | number;
 
   isDisabled?: bool;
 
@@ -503,7 +503,7 @@ export type UserUpdateStatusResponse = {
 
 export type UserDeleteRequest = {
 
-  userId?: string;
+  userId?: string | number;
 
 }
 
@@ -513,7 +513,7 @@ export type UserDeleteResponse = {
 
 export type UpdateStatusNamespaceRequest = {
 
-  id?: string;
+  id?: string | number;
 
   isDisabled?: bool;
 
@@ -525,7 +525,7 @@ export type UpdateStatusNamespaceResponse = {
 
 export type UpdateStatusConfigRequest = {
 
-  id?: string;
+  id?: string | number;
 
   isDisabled?: bool;
 
@@ -557,7 +557,7 @@ export type SelectorResponse = {
 
 export type AccessKeyItem = {
 
-  id?: string;
+  id?: string | number;
 
   createTime?: int64;
 
@@ -567,7 +567,7 @@ export type AccessKeyItem = {
 
   deletedAt?: int64;
 
-  userId?: string;
+  userId?: string | number;
 
   accessKey?: string;
 
@@ -623,7 +623,7 @@ export type CreateAccessKeyResponse = {
 
 export type UpdateStatusAccessKeyRequest = {
 
-  id?: string;
+  id?: string | number;
 
   isDisabled?: bool;
 
@@ -635,7 +635,7 @@ export type UpdateStatusAccessKeyResponse = {
 
 export type DeleteAccessKeyRequest = {
 
-  id?: string;
+  id?: string | number;
 
 }
 
@@ -645,7 +645,7 @@ export type DeleteAccessKeyResponse = {
 
 export type SetAccessKeyRemarkRequest = {
 
-  id?: string;
+  id?: string | number;
 
   remark?: string;
 

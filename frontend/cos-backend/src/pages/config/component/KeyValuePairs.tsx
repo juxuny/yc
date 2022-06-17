@@ -3,41 +3,48 @@ import useMergedState from 'rc-util/es/hooks/useMergedState';
 import React, { useRef, useState } from 'react';
 import {FormattedMessage, useIntl} from '@@/plugin-locale/localeExports';
 import type { ProFormInstance } from '@ant-design/pro-components';
-import { KeyValue } from '@/services/cos/key_value';
 import type { ActionType } from '@ant-design/pro-components';
 import ProTable from "@ant-design/pro-table";
 import type {ProColumns} from '@ant-design/pro-table';
-import {PlusOutlined} from "@ant-design/icons";
-import KeyValueEditorModel  from "@/pages/config/component/KeyValueEidtorModal";
+import KeyValueEditorModel  from "@/pages/config/component/KeyValueEditorModal";
 import {Formatter} from "@/utils/formatter";
+import type {
+  KeyValueResp,
+  ListAllValueRequest,
+  ListValueRequest,
+  SaveConfigRequest,
+  SaveValueRequest
+} from "@/services/api/typing";
+import {cos} from "@/services/api";
+import type {QueryParams} from "@juxuny/yc-ts-data-type/typing";
 
 export type KeyValuePairsProps = {
-  reqData?: API.KeyValue.ListReq;
+  reqData?: ListValueRequest
 };
 
 const KeyValuePairs: React.FC<KeyValuePairsProps> = (props) => {
   const intl = useIntl();
-  const formRef = useRef<ProFormInstance<API.Config.SaveReq> | undefined>();
+  const formRef = useRef<ProFormInstance<SaveConfigRequest> | undefined>();
   const actionRef = useRef<ActionType>();
   const [editorVisible, setEditorVisible] = useState<boolean>(false);
-  const [selectedData, setSelectedData] = useState<API.KeyValue.SaveReq|undefined>();
-  const [reqData]  = useMergedState<API.KeyValue.ListAllReq>(
-    {} as API.KeyValue.ListAllReq,
+  const [selectedData, setSelectedData] = useState<SaveValueRequest|undefined>();
+  const [reqData]  = useMergedState<ListAllValueRequest>(
+    {} as ListAllValueRequest,
     {
       value: props.reqData
     }
   );
 
   const loadData = async (
-    params: API.QueryParams<API.KeyValue.ListReq>,
-  ): Promise<{ data: API.KeyValue.ListItem[]; success: boolean; total: number }> => {
+    params: QueryParams<ListAllValueRequest>,
+  ): Promise<{ data: KeyValueResp[]; success: boolean; total: number }> => {
     const { current, pageSize, ...args } = params;
     try {
       if (!reqData || !reqData.configId) {
         message.error(intl.formatMessage({ id: 'pages.config.key-value.missing.configId' }));
         return { data: [], success: false, total: 0 };
       }
-      const resp = await KeyValue.listAll({
+      const resp = await cos.listAllValue({
         ...args,
         configId: reqData.configId
       });
@@ -52,9 +59,9 @@ const KeyValuePairs: React.FC<KeyValuePairsProps> = (props) => {
     return { data: [], success: false, total: 0 };
   };
 
-  const updateStatus = async (record: API.KeyValue.ListItem, isDisabled: boolean) => {
+  const updateStatus = async (record: KeyValueResp, isDisabled: boolean) => {
     try {
-      const resp = await KeyValue.updateStatus({
+      const resp = await cos.updateStatusValue({
         id: record.id ,
         isDisabled: isDisabled,
       });
@@ -66,7 +73,7 @@ const KeyValuePairs: React.FC<KeyValuePairsProps> = (props) => {
     }
   };
 
-  const columns: ProColumns<API.KeyValue.ListItem>[] = [
+  const columns: ProColumns<KeyValueResp>[] = [
     {
       title: intl.formatMessage({ id: 'pages.column.id' }),
       dataIndex: 'id',
@@ -178,7 +185,7 @@ const KeyValuePairs: React.FC<KeyValuePairsProps> = (props) => {
                 configKey: record.configKey,
                 configValue: record.configValue,
                 isHot: record.isHot || false,
-              } as API.KeyValue.SaveReq);
+              } as SaveValueRequest);
               setEditorVisible(true);
             }}
           >
@@ -215,7 +222,6 @@ const KeyValuePairs: React.FC<KeyValuePairsProps> = (props) => {
         toolBarRender={() => [
           <Button
             key="button"
-            icon={<PlusOutlined />}
             type="primary"
             onClick={() => {
               setSelectedData({
@@ -223,7 +229,7 @@ const KeyValuePairs: React.FC<KeyValuePairsProps> = (props) => {
                 id: undefined,
                 configKey: '',
                 configValue: ''
-              } as API.KeyValue.SaveReq);
+              } as SaveValueRequest);
               setEditorVisible(true);
             }}
           >

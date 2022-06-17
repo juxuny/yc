@@ -5,12 +5,13 @@ import React, { useRef, useEffect, useState } from 'react';
 import { useIntl } from '@@/plugin-locale/localeExports';
 import { ProForm } from '@ant-design/pro-components';
 import type { ProFormInstance } from '@ant-design/pro-components';
-import { KeyValue } from '@/services/cos/key_value';
+import type {SaveValueRequest} from "@/services/api/typing";
+import {cos} from "@/services/api";
 
 export type KeyValueEditorProp = {
   visible: boolean;
   onChangeVisible: (v: boolean) => void;
-  oldData?: API.KeyValue.SaveReq;
+  oldData?: SaveValueRequest;
   onSuccess?: () => void;
 };
 
@@ -22,10 +23,10 @@ const layout = {
 const KeyValueEditorModal: React.FC<KeyValueEditorProp> = (props) => {
   const intl = useIntl();
   const { visible, onChangeVisible, onSuccess, oldData } = props;
-  const formRef = useRef<ProFormInstance<API.KeyValue.SaveReq> | undefined>();
+  const formRef = useRef<ProFormInstance<SaveValueRequest> | undefined>();
 
-  const [editingData, setEditingData] = useMergedState<API.KeyValue.SaveReq>(
-    {} as API.KeyValue.SaveReq,
+  const [editingData, setEditingData] = useMergedState<SaveValueRequest>(
+    {} as SaveValueRequest,
     {
       value: oldData,
     },
@@ -40,10 +41,9 @@ const KeyValueEditorModal: React.FC<KeyValueEditorProp> = (props) => {
   const onSubmit = async () => {
     try {
       setLoading(true);
-      const params = formRef.current?.getFieldsValue() || ({} as API.KeyValue.SaveReq);
-      const resp = await KeyValue.save({
+      const params = formRef.current?.getFieldsValue() || ({} as SaveValueRequest);
+      const resp = await cos.saveValue({
         ...params,
-        id: editingData.id,
         configId: editingData.configId
       });
       if (resp.code !== 0) {
@@ -74,7 +74,7 @@ const KeyValueEditorModal: React.FC<KeyValueEditorProp> = (props) => {
         </Button>,
       ]}
     >
-      <ProForm<API.KeyValue.SaveReq>
+      <ProForm<SaveValueRequest>
         {...layout}
         requiredMark={true}
         formRef={formRef}
@@ -86,10 +86,10 @@ const KeyValueEditorModal: React.FC<KeyValueEditorProp> = (props) => {
           name="configKey"
         >
           <Input
-            disabled={editingData.id !== undefined}
+            disabled={editingData.configId !== undefined}
             value={editingData.configKey}
-            onChange={({ target: { value }}) => {
-              setEditingData(Object.assign(editingData, { configKey: value }));
+            onChange={({ target: { value }}: {target: {value: string}}) => {
+              setEditingData({...editingData, configKey: value});
             }}
           />
         </Form.Item>
@@ -101,8 +101,8 @@ const KeyValueEditorModal: React.FC<KeyValueEditorProp> = (props) => {
           <Input.TextArea
             autoSize={{ minRows: 3, maxRows: 6 }}
             value={editingData.configValue}
-            onChange={({ target: { value } }) => {
-              setEditingData(Object.assign(editingData, { configValue: value }));
+            onChange={({ target: { value } }: {target: {value: string}}) => {
+              setEditingData({...editingData, configValue: value});
             }}
           />
         </Form.Item>

@@ -1,6 +1,4 @@
 import React, { useRef, useState } from 'react';
-import { PageContainer } from '@ant-design/pro-layout';
-import { Namespace } from '@/services/cos/namespace';
 import { useIntl, history } from 'umi';
 import { Button, Popconfirm, Space, Tag } from 'antd';
 import { FormattedMessage } from '@@/plugin-locale/localeExports';
@@ -9,25 +7,29 @@ import ProTable from '@ant-design/pro-table';
 import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import NamespaceEditorModal from '@/pages/config/component/NamespaceEditorModal';
 import { Formatter } from '@/utils/formatter';
+import type {ListNamespaceItem, ListNamespaceRequest, SaveNamespaceRequest} from "@/services/api/typing";
+import type {QueryParams} from "@juxuny/yc-ts-data-type/typing";
+import {cos} from "@/services/api";
+import {PageContainer} from "@ant-design/pro-layout";
 
 export default (): React.ReactNode => {
   const intl = useIntl();
   const actionRef = useRef<ActionType>();
   const [visible, setVisible] = useState<boolean>(false);
-  const [selectedData, setSelectedData] = useState<API.Namespace.SaveReq>();
+  const [selectedData, setSelectedData] = useState<SaveNamespaceRequest>();
   const loadData = async (
-    params: API.QueryParams<API.Namespace.ListReq>,
-  ): Promise<{ data: API.Namespace.ListItem[]; success: boolean; total: number }> => {
+    params: QueryParams<ListNamespaceRequest>,
+  ): Promise<{ data: ListNamespaceItem[]; success: boolean; total: number }> => {
     const { current, pageSize, ...args } = params;
     try {
-      const resp = await Namespace.list({
+      const resp = await cos.listNamespace({
         ...args,
-        pagination: { pageNum: current, pageSize: pageSize },
+        pagination: { pageNum: current || 1, pageSize: pageSize || 10 },
       });
       return {
         data: resp.data?.list || [],
         success: true,
-        total: resp.data?.pagination.total || 0,
+        total: resp.data?.pagination?.total || 0,
       };
     } catch (err) {
       console.error(err);
@@ -35,14 +37,14 @@ export default (): React.ReactNode => {
     return { data: [], success: false, total: 0 };
   };
 
-  const showEditor = (record: API.Namespace.ListItem) => {
+  const showEditor = (record: ListNamespaceItem) => {
     setSelectedData(record);
     setVisible(true);
   };
 
-  const updateStatus = async (record: API.Namespace.ListItem, isDisabled: boolean) => {
+  const updateStatus = async (record: ListNamespaceItem, isDisabled: boolean) => {
     try {
-      const resp = await Namespace.updateStatus({
+      const resp = await cos.updateStatusNamespace({
         id: record.id,
         isDisabled: isDisabled,
       });
@@ -54,9 +56,9 @@ export default (): React.ReactNode => {
     }
   };
 
-  const deleteNamespace = async (record: API.Namespace.ListItem) => {
+  const deleteNamespace = async (record: ListNamespaceItem) => {
     try {
-      const resp = await Namespace.deleteNamespace({
+      const resp = await cos.deleteNamespace({
         id: record.id,
       });
       if (resp && resp.code === 0) {
@@ -67,7 +69,7 @@ export default (): React.ReactNode => {
     }
   };
 
-  const columns: ProColumns<API.Namespace.ListItem>[] = [
+  const columns: ProColumns<ListNamespaceItem>[] = [
     {
       title: intl.formatMessage({ id: 'pages.config.namespace.column.id' }),
       dataIndex: 'id',
@@ -186,7 +188,7 @@ export default (): React.ReactNode => {
 
   return (
     <PageContainer>
-      <ProTable<API.Namespace.ListItem, API.Namespace.ListReq>
+      <ProTable<ListNamespaceItem, ListNamespaceRequest>
         request={loadData}
         actionRef={actionRef}
         columns={columns}
@@ -202,7 +204,7 @@ export default (): React.ReactNode => {
             icon={<PlusOutlined />}
             type="primary"
             onClick={() => {
-              showEditor({} as API.Namespace.ListItem);
+              showEditor({});
             }}
           >
             <FormattedMessage id="pages.action.create" />

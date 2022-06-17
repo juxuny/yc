@@ -1,48 +1,55 @@
 import React, { useRef, useState } from 'react';
-import { PageContainer } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
-import { PlusOutlined } from '@ant-design/icons';
 import { Button, Tag, Space, Popconfirm } from 'antd';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import { User } from '@/services/cos/user';
 import CreateOrEditUserModal from '@/pages/system/dialog/CreateOrEditUserModal';
 import { useIntl } from 'umi';
 import { FormattedMessage } from '@@/plugin-locale/localeExports';
+import {cos} from "@/services/api";
+import type {
+  SaveOrCreateUserRequest,
+  UserDeleteRequest,
+  UserListItem,
+  UserListRequest,
+  UserUpdateStatusRequest
+} from "@/services/api/typing";
+import type {QueryParams} from "@juxuny/yc-ts-data-type/typing";
+import {PageContainer} from "@ant-design/pro-layout";
 
 export default (): React.ReactNode => {
   const intl = useIntl();
   const actionRef = useRef<ActionType>();
   const loadData = async (
-    params: API.QueryParams<API.User.ListReq>,
-  ): Promise<{ data: API.User.ListItem[]; success: boolean; total: number }> => {
+    params: QueryParams<UserListRequest>,
+  ): Promise<{ data: UserListItem[]; success: boolean; total: number }> => {
     const { current, pageSize, ...args } = params;
-    const resp = await User.userList({
+    const resp = await cos.userList({
       ...args,
-      pagination: { pageNum: current, pageSize: pageSize },
+      pagination: { pageNum: current || 1, pageSize: pageSize || 10},
     });
     return {
       data: resp.data?.list || [],
       success: true,
-      total: resp.data?.pagination.total || 0,
+      total: resp.data?.pagination?.total || 0,
     };
   };
 
   const [editVisible, setEditVisible] = useState(false);
-  const [selectedUserData, setSelectedUserData] = useState<API.User.SaveReq | undefined>(undefined);
+  const [selectedUserData, setSelectedUserData] = useState<SaveOrCreateUserRequest | undefined>(undefined);
 
-  const showEditor = (userData: API.User.SaveReq, visible: boolean) => {
+  const showEditor = (userData: SaveOrCreateUserRequest, visible: boolean) => {
     setEditVisible(visible);
     console.log(userData);
     setSelectedUserData(userData);
   };
 
-  const updateStatus = async (userData: API.User.ListItem, isDisabled: boolean) => {
-    const req = {
+  const updateStatus = async (userData: UserListItem, isDisabled: boolean) => {
+    const req: UserUpdateStatusRequest = {
       userId: userData.id || '',
       isDisabled: isDisabled || false,
     };
     try {
-      const resp = await User.updateStatus(req);
+      const resp = await cos.userUpdateStatus(req);
       if (resp && resp.code === 0) {
         actionRef.current?.reload();
       }
@@ -51,12 +58,12 @@ export default (): React.ReactNode => {
     }
   };
 
-  const userDelete = async (userData: API.User.ListItem) => {
-    const req = {
+  const userDelete = async (userData: UserListItem) => {
+    const req: UserDeleteRequest = {
       userId: userData.id || '',
     };
     try {
-      const resp = await User.delete(req);
+      const resp = await cos.userDelete(req);
       if (resp && resp.code === 0) {
         actionRef.current?.reload();
       }
@@ -65,7 +72,7 @@ export default (): React.ReactNode => {
     }
   };
 
-  const columns: ProColumns<API.User.ListItem>[] = [
+  const columns: ProColumns<UserListItem>[] = [
     {
       title: intl.formatMessage({ id: 'pages.system.user-management.column.id' }),
       dataIndex: 'id',
@@ -194,7 +201,7 @@ export default (): React.ReactNode => {
 
   return (
     <PageContainer>
-      <ProTable<API.User.ListItem, API.User.ListReq>
+      <ProTable<UserListItem, UserListRequest>
         request={loadData}
         actionRef={actionRef}
         columns={columns}
@@ -207,7 +214,6 @@ export default (): React.ReactNode => {
         toolBarRender={() => [
           <Button
             key="button"
-            icon={<PlusOutlined />}
             type="primary"
             onClick={() => {
               showEditor(

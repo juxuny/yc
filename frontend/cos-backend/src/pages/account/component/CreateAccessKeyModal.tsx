@@ -4,7 +4,8 @@ import React, { useRef, useEffect, useState } from 'react';
 import { useIntl } from '@@/plugin-locale/localeExports';
 import { ProForm } from '@ant-design/pro-components';
 import type { ProFormInstance } from '@ant-design/pro-components';
-import { User } from '@/services/cos/user';
+import type {CreateAccessKeyRequest} from "@/services/api/typing";
+import {cos} from "@/services/api";
 
 
 export type CreateResult = {
@@ -15,7 +16,7 @@ export type CreateResult = {
 export type CreateAccessKeyProps = {
   visible?: boolean;
   onChangeVisible: (v: boolean) => void;
-  data?: API.User.CreateAccessKeyReq;
+  data?: CreateAccessKeyRequest;
   onSuccess?: (result: CreateResult) => void;
 };
 
@@ -27,10 +28,10 @@ const layout = {
 const CreateAccessKeyModal: React.FC<CreateAccessKeyProps> = (props) => {
   const intl = useIntl();
   const { visible, onChangeVisible, onSuccess, data} = props;
-  const formRef = useRef<ProFormInstance<API.User.CreateAccessKeyReq> | null>();
+  const formRef = useRef<ProFormInstance<CreateAccessKeyRequest> | null>();
 
-  const [currentData, setCurrentData] = useMergedState<API.User.CreateAccessKeyReq>(
-    {} as API.User.CreateAccessKeyReq,
+  const [currentData, setCurrentData] = useMergedState<CreateAccessKeyRequest>(
+    {},
     {
       value: data,
     },
@@ -45,8 +46,8 @@ const CreateAccessKeyModal: React.FC<CreateAccessKeyProps> = (props) => {
   const onSubmit = async () => {
     try {
       setLoading(true);
-      const params = formRef.current?.getFieldsValue() || ({} as API.User.CreateAccessKeyReq);
-      const resp = await User.createAccessKey(params);
+      const params = formRef.current?.getFieldsValue() || {};
+      const resp = await cos.createAccessKey(params);
       if (resp && resp.code === 0) {
         if (onChangeVisible) onChangeVisible(false);
         if (onSuccess) onSuccess({
@@ -78,7 +79,7 @@ const CreateAccessKeyModal: React.FC<CreateAccessKeyProps> = (props) => {
         </Button>,
       ]}
     >
-      <ProForm<API.User.CreateAccessKeyReq>
+      <ProForm<CreateAccessKeyRequest>
         {...layout}
         requiredMark={true}
         formRef={formRef}
@@ -91,8 +92,8 @@ const CreateAccessKeyModal: React.FC<CreateAccessKeyProps> = (props) => {
         >
           <Input
             value={currentData.remark}
-            onChange={({ target: { value } }) => {
-              setCurrentData(Object.assign(currentData, { remark: value }));
+            onChange={({ target: { value } }: {target: {value: string}}) => {
+              setCurrentData({...currentData, remark: value});
             }}
           />
         </Form.Item>

@@ -4,12 +4,13 @@ import React, { useRef, useEffect, useState } from 'react';
 import { useIntl } from '@@/plugin-locale/localeExports';
 import { ProForm } from '@ant-design/pro-components';
 import type { ProFormInstance } from '@ant-design/pro-components';
-import { User } from '@/services/cos/user';
+import type {SaveOrCreateUserRequest} from "@/services/api/typing";
+import {cos} from "@/services/api";
 
 export type CreateOrEditUserProps = {
   visible?: boolean;
   onChangeVisible: (v: boolean) => void;
-  oldData?: API.User.SaveReq;
+  oldData?: SaveOrCreateUserRequest,
   trigger?: JSX.Element | undefined;
   onSuccess?: () => void;
 };
@@ -22,9 +23,9 @@ const layout = {
 const CreateOrEditUserModal: React.FC<CreateOrEditUserProps> = (props) => {
   const intl = useIntl();
   const { visible, onChangeVisible, onSuccess } = props;
-  const formRef = useRef<ProFormInstance<API.User.SaveReq> | null>();
+  const formRef = useRef<ProFormInstance<SaveOrCreateUserRequest> | null>();
 
-  const [userInfo, setUserInfo] = useMergedState<API.User.SaveReq>(
+  const [userInfo, setUserInfo] = useMergedState<SaveOrCreateUserRequest>(
     { userId: '', identifier: '', nick: '', credential: '' },
     {
       value: props.oldData,
@@ -40,10 +41,10 @@ const CreateOrEditUserModal: React.FC<CreateOrEditUserProps> = (props) => {
   const onSubmit = async () => {
     try {
       setLoading(true);
-      const params = formRef.current?.getFieldsValue() || ({} as API.User.SaveReq);
+      const params = formRef.current?.getFieldsValue() || ({} as SaveOrCreateUserRequest);
       params.accountType = props.oldData?.accountType || 1;
       params.userId = props.oldData?.userId;
-      const resp = await User.saveOrCreateUser(params);
+      const resp = await cos.saveOrCreateUser(params);
       if (resp.code !== 0) {
         message.error(resp.msg);
       } else {
@@ -73,7 +74,7 @@ const CreateOrEditUserModal: React.FC<CreateOrEditUserProps> = (props) => {
         </Button>,
       ]}
     >
-      <ProForm<API.User.SaveReq>
+      <ProForm<SaveOrCreateUserRequest>
         {...layout}
         requiredMark={true}
         formRef={formRef}

@@ -4,26 +4,28 @@ import ProTable from '@ant-design/pro-table';
 import {PlusOutlined} from '@ant-design/icons';
 import {Button, Space, Popconfirm} from 'antd';
 import type {ProColumns, ActionType} from '@ant-design/pro-table';
-import {User} from '@/services/cos/user';
-import CreateAccessKeyModal, {CreateResult} from '@/pages/account/component/CreateAccessKeyModal';
+import CreateAccessKeyModal from '@/pages/account/component/CreateAccessKeyModal';
+import type {CreateResult} from '@/pages/account/component/CreateAccessKeyModal';
 import {useIntl} from 'umi';
 import CreateResultModal from '@/pages/account/component/CreateResultModal';
 import {FormattedMessage} from '@@/plugin-locale/localeExports';
 import {ColumnBuilder} from "@/utils/column_builder";
 import {Formatter} from "@/utils/formatter";
 import RemarkPopoverEditor from "@/pages/account/component/RemarkPopoverEditor";
+import { cos } from '@/services/api';
+import type { AccessKeyListRequest, AccessKeyItem, DeleteAccessKeyRequest, UpdateStatusAccessKeyRequest} from '@/services/api/typing';
 
 export default (): React.ReactNode => {
   const intl = useIntl();
   const actionRef = useRef<ActionType>();
   const loadData = async (
-    params: API.QueryParams<API.User.AccessKeyListReq>,
-  ): Promise<{ data: API.User.AccessKeyListItem[]; success: boolean; total: number }> => {
+    params: API.QueryParams<AccessKeyListRequest>,
+  ): Promise<{ data: AccessKeyItem[]; success: boolean; total: number }> => {
     const {current, pageSize, ...args} = params;
-    const resp = await User.accessKeyList({
+    const resp = await cos.accessKeyList({
       ...args,
-      pagination: {pageNum: current, pageSize: pageSize},
-    });
+      pagination: {pageNum: current || 1, pageSize: pageSize || 10},
+    } as AccessKeyListRequest);
     return {
       data: resp.data?.list || [],
       success: true,
@@ -41,13 +43,13 @@ export default (): React.ReactNode => {
     setSelectedUserData(userData);
   };
 
-  const updateStatus = async (userData: API.User.AccessKeyListItem, isDisabled: boolean) => {
-    const req = {
+  const updateStatus = async (userData: AccessKeyItem, isDisabled: boolean) => {
+    const req: UpdateStatusAccessKeyRequest = {
       id: userData.id,
       isDisabled: isDisabled || false,
     };
     try {
-      const resp = await User.updateStatusAccessKey(req);
+      const resp = await cos.updateStatusAccessKey(req);
       if (resp && resp.code === 0) {
         actionRef.current?.reload();
       }
@@ -56,12 +58,12 @@ export default (): React.ReactNode => {
     }
   };
 
-  const deleteAccessKey = async (userData: API.User.AccessKeyListItem) => {
-    const req = {
+  const deleteAccessKey = async (userData: AccessKeyItem) => {
+    const req: DeleteAccessKeyRequest = {
       id: userData.id,
     };
     try {
-      const resp = await User.deleteAccessKey(req);
+      const resp = await cos.deleteAccessKey(req);
       if (resp && resp.code === 0) {
         actionRef.current?.reload();
       }
@@ -70,9 +72,9 @@ export default (): React.ReactNode => {
     }
   };
 
-  const columnBuilder = new ColumnBuilder<API.User.AccessKeyListItem>();
+  const columnBuilder = new ColumnBuilder<AccessKeyItem>();
 
-  const columns: ProColumns<API.User.AccessKeyListItem>[] = [
+  const columns: ProColumns<AccessKeyItem>[] = [
     columnBuilder.id(),
     {
       title: intl.formatMessage({id: 'pages.account.access-key.column.accessKey'}),
@@ -84,7 +86,7 @@ export default (): React.ReactNode => {
       dataIndex: 'remark',
       hideInSearch: true,
       render: (node, record) => <RemarkPopoverEditor data={record}
-                                                     showPopup={visibleAccessKeyId === record.id.toString()}
+                                                     showPopup={visibleAccessKeyId === record.id}
                                                      onChangeVisible={setVisibleAccessKeyId}
                                                      onSuccess={() => actionRef.current?.reload()}/>,
     },
@@ -155,7 +157,7 @@ export default (): React.ReactNode => {
 
   return (
     <PageContainer>
-      <ProTable<API.User.AccessKeyListItem, API.User.AccessKeyListReq>
+      <ProTable<AccessKeyItem, AccessKeyListRequest>
         request={loadData}
         actionRef={actionRef}
         columns={columns}

@@ -4,7 +4,7 @@ import React from 'react';
 import type { ProColumns } from '@ant-design/pro-table';
 import {FormattedMessage} from "@@/plugin-locale/localeExports";
 
-export class ColumnBuilder<Type extends { isDisabled: boolean }> {
+export class ColumnBuilder<Type extends { isDisabled?: boolean }> {
   id = (): ProColumns<Type> => {
     const intl = useIntl();
     return {

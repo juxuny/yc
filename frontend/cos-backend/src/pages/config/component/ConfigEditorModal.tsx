@@ -4,13 +4,13 @@ import React, { useRef, useEffect, useState } from 'react';
 import { useIntl } from '@@/plugin-locale/localeExports';
 import { ProForm } from '@ant-design/pro-components';
 import type { ProFormInstance } from '@ant-design/pro-components';
-import { Config } from '@/services/cos/config';
+import type {SaveConfigRequest} from "@/services/api/typing";
+import {cos} from "@/services/api";
 
 export type ConfigEditorProp = {
   visible?: boolean;
   onChangeVisible: (v: boolean) => void;
-  oldData?: API.Config.SaveReq;
-  trigger?: JSX.Element | undefined;
+  oldData?: SaveConfigRequest,
   onSuccess?: () => void;
   isClone: boolean;
 };
@@ -23,26 +23,21 @@ const layout = {
 const ConfigEditorModal: React.FC<ConfigEditorProp> = (props) => {
   const intl = useIntl();
   const { visible, onChangeVisible, onSuccess, isClone, oldData } = props;
-  const formRef = useRef<ProFormInstance<API.Config.SaveReq> | undefined>();
+  const formRef = useRef<ProFormInstance<SaveConfigRequest> | undefined>();
 
-  const [editingData, setEditingData] = useMergedState<API.Config.SaveReq>(
-    {} as API.Config.SaveReq,
-    {
-      value: oldData,
-    },
-  );
-
+  const [editingData, setEditingData] = useMergedState<SaveConfigRequest>({} as SaveConfigRequest, { value: oldData });
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
+    console.log(editingData);
     formRef.current?.setFieldsValue(editingData);
   });
 
   const onSubmitSave = async () => {
     try {
       setLoading(true);
-      const params = formRef.current?.getFieldsValue() || ({} as API.Config.SaveReq);
-      const resp = await Config.save({
+      const params = formRef.current?.getFieldsValue() || {};
+      const resp = await cos.saveConfig({
         ...params,
         baseId: props.oldData?.baseId,
         namespaceId: props.oldData?.namespaceId,
@@ -65,8 +60,8 @@ const ConfigEditorModal: React.FC<ConfigEditorProp> = (props) => {
   const onSubmitClone = async () => {
     try {
       setLoading(true);
-      const params = formRef.current?.getFieldsValue() || ({} as API.Config.SaveReq);
-      const resp = await Config.clone({
+      const params = formRef.current?.getFieldsValue() || {};
+      const resp = await cos.cloneConfig({
         id: oldData?.id || 0,
         newConfigId: params.configId
       });
@@ -100,7 +95,7 @@ const ConfigEditorModal: React.FC<ConfigEditorProp> = (props) => {
         </Button>,
       ]}
     >
-      <ProForm<API.Config.SaveReq>
+      <ProForm<SaveConfigRequest>
         {...layout}
         requiredMark={true}
         formRef={formRef}
@@ -113,8 +108,8 @@ const ConfigEditorModal: React.FC<ConfigEditorProp> = (props) => {
         >
           <Input
             value={editingData.configId}
-            onChange={({ target: { value } }) => {
-              setEditingData(Object.assign(editingData, { configId: value }));
+            onChange={({ target: { value }}) => {
+              setEditingData(Object.assign(editingData, {configId: value}));
             }}
           />
         </Form.Item>

@@ -102,6 +102,9 @@ func toPlacementValue(v reflect.Value) interface{} {
 			}
 		}
 	case reflect.Ptr:
+		if v.IsNil() {
+			return nil
+		}
 		vn := v.Type().String()
 		if vn == "*dt.ID" {
 			data := v.Interface().(*dt.ID)

@@ -5,11 +5,12 @@ import useMergedState from 'rc-util/es/hooks/useMergedState';
 import {EditOutlined} from "@ant-design/icons";
 import {FormattedMessage} from "@@/plugin-locale/localeExports";
 import {useForm} from "antd/es/form/Form";
-import { User } from '@/services/cos/user';
+import type {SetAccessKeyRemarkRequest} from "@/services/api/typing";
+import {cos} from "@/services/api";
 
 export type RemarkPopoverEditorProp = {
   showPopup: boolean;
-  data: API.User.SetRemarkAccessKeyReq;
+  data: SetAccessKeyRemarkRequest
   onSuccess: (remark: string) => void;
   onChangeVisible: (accessKeyId: number | string | undefined) => void;
 }
@@ -19,7 +20,7 @@ export const RemarkPopoverEditor: React.FC<RemarkPopoverEditorProp> = (props) =>
   const intl = useIntl();
   const [formRef] = useForm<API.User.SetRemarkAccessKeyReq>();
   const [loading, setLoading] = useState<number>(0);
-  const [formValue, setFormValue] = useMergedState<API.User.SetRemarkAccessKeyReq>({} as API.User.SetRemarkAccessKeyReq, {
+  const [formValue, setFormValue] = useMergedState<SetAccessKeyRemarkRequest>({} as SetAccessKeyRemarkRequest, {
     value: data
   });
 
@@ -30,13 +31,13 @@ export const RemarkPopoverEditor: React.FC<RemarkPopoverEditorProp> = (props) =>
   const onSubmit = async () => {
     try {
       setLoading(v => v + 1);
-      const resp = await User.setRemarkAccessKey({
+      const resp = await cos.setRemarkAccessKey({
         id: data.id,
         remark: formValue.remark
       });
       if (resp && resp.code === 0) {
         onChangeVisible(undefined);
-        onSuccess(formValue.remark);
+        onSuccess(formValue.remark || '');
       }
     } catch (e) {
       console.error(e);

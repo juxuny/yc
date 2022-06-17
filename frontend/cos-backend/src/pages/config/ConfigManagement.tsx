@@ -1,18 +1,24 @@
 import React, {useRef, useState, useEffect} from 'react';
-import { PageContainer } from '@ant-design/pro-layout';
-import { Config } from '@/services/cos/config';
 import { useIntl } from 'umi';
 import {Button, Popconfirm, Space, Tag, message, Drawer} from 'antd';
 import type { FormInstance } from 'antd';
 import { FormattedMessage } from '@@/plugin-locale/localeExports';
-import { PlusOutlined } from '@ant-design/icons';
 import ProTable from '@ant-design/pro-table';
 import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import ConfigEditorModal from '@/pages/config/component/ConfigEditorModal';
 import { Formatter } from '@/utils/formatter';
-import { Namespace } from '@/services/cos/namespace';
 import { history } from 'umi';
 import KeyValuePairs from "@/pages/config/component/KeyValuePairs";
+import {cos} from "@/services/api";
+import {
+  ListConfigItem,
+  ListConfigRequest,
+  ListValueRequest,
+  SaveConfigRequest,
+  UpdateStatusConfigRequest
+} from "@/services/api/typing";
+import type {QueryParams} from "@juxuny/yc-ts-data-type/typing";
+import {PageContainer} from "@ant-design/pro-layout";
 
 const calculateDrawerWidth = () => {
   return window.innerWidth * 0.8;
@@ -21,16 +27,16 @@ const calculateDrawerWidth = () => {
 export default (): React.ReactNode => {
   const intl = useIntl();
   const actionRef = useRef<ActionType>();
-  const formRef = useRef<FormInstance<API.Config.ListReq> | undefined>();
+  const formRef = useRef<FormInstance<ListConfigRequest> | undefined>();
   const [editorVisible, setEditorVisible] = useState<boolean>(false);
   const [drawerVisible, setDrawerVisible] = useState<boolean>(false);
-  const [selectedData, setSelectedData] = useState<API.Config.SaveReq>();
+  const [selectedData, setSelectedData] = useState<SaveConfigRequest>();
   const [drawerWidth, setDrawerWidth] = useState<number>(calculateDrawerWidth);
-  const [keyValueListReq, setKeyValueListReq] = useState<API.KeyValue.ListReq | undefined>(undefined);
+  const [keyValueListReq, setKeyValueListReq] = useState<ListValueRequest | undefined>(undefined);
   const [isCloneEditor, setIsCloneEditor] = useState<boolean>(false);
   const loadData = async (
-    params: API.QueryParams<API.Config.ListReq>,
-  ): Promise<{ data: API.Config.ListItem[]; success: boolean; total: number }> => {
+    params: QueryParams<ListConfigRequest>,
+  ): Promise<{ data: ListConfigItem[]; success: boolean; total: number }> => {
     const { current, pageSize, ...args } = params;
     const selectedNamespaceId = formRef.current?.getFieldsValue().namespaceId;
     if (selectedNamespaceId === undefined || selectedNamespaceId === 'undefined') {
@@ -38,15 +44,15 @@ export default (): React.ReactNode => {
       return { data: [], success: false, total: 0 };
     }
     try {
-      const resp = await Config.list({
+      const resp = await cos.listConfig({
         ...args,
-        pagination: { pageNum: current, pageSize: pageSize },
+        pagination: { pageNum: current || 1, pageSize: pageSize || 10},
         namespaceId: selectedNamespaceId,
       });
       return {
         data: resp.data?.list || [],
         success: true,
-        total: resp.data?.pagination.total || 0,
+        total: resp.data?.pagination?.total || 0,
       };
     } catch (err) {
       console.error(err);
@@ -83,10 +89,10 @@ export default (): React.ReactNode => {
       configId: configId,
       searchKey: '',
       pagination: { pageNum: 1, pageSize: 10 }
-    } as API.KeyValue.ListReq);
+    } as ListValueRequest);
   }
 
-  const showEditor = (record: API.Config.SaveReq, isClone: boolean) => {
+  const showEditor = (record: SaveConfigRequest, isClone: boolean) => {
     const selectedNamespaceId = formRef.current?.getFieldsValue().namespaceId;
     setIsCloneEditor(isClone);
     setSelectedData({
@@ -98,9 +104,9 @@ export default (): React.ReactNode => {
     setEditorVisible(true);
   };
 
-  const updateStatus = async (record: API.Config.ListItem, isDisabled: boolean) => {
+  const updateStatus = async (record: UpdateStatusConfigRequest, isDisabled: boolean) => {
     try {
-      const resp = await Config.updateStatus({
+      const resp = await cos.updateStatusConfig({
         id: record.id ,
         isDisabled: isDisabled,
       });
@@ -112,9 +118,9 @@ export default (): React.ReactNode => {
     }
   };
 
-  const deleteConfig = async (record: API.Config.ListItem) => {
+  const deleteConfig = async (record: ListConfigItem) => {
     try {
-      const resp = await Config.deleteOne({
+      const resp = await cos.deleteConfig({
         id: record.id,
       });
       if (resp && resp.code === 0) {
@@ -125,7 +131,7 @@ export default (): React.ReactNode => {
     }
   };
 
-  const columns: ProColumns<API.Config.ListItem>[] = [
+  const columns: ProColumns<ListConfigItem>[] = [
     {
       title: intl.formatMessage({ id: 'pages.config.namespace.column.id' }),
       dataIndex: 'id',
@@ -136,7 +142,7 @@ export default (): React.ReactNode => {
       dataIndex: 'configId',
       hideInSearch: true,
       render: (node, record) => {
-        return <a onClick={() => showKeyValueDrawer(record.id)}>
+        return <a onClick={() => showKeyValueDrawer(record.id ? record.id.toString() : '')}>
           { record.configId }
         </a>
       }
@@ -153,7 +159,7 @@ export default (): React.ReactNode => {
       valueType: 'select',
       request: async () => {
         try {
-          const resp = await Namespace.selector();
+          const resp = await cos.selectorNamespace({});
           if (resp && resp.code === 0) {
             return resp.data?.list || [];
           }
@@ -284,7 +290,7 @@ export default (): React.ReactNode => {
 
   return (
     <PageContainer>
-      <ProTable<API.Config.ListItem, API.Config.ListReq>
+      <ProTable<ListConfigItem, ListConfigRequest>
         formRef={formRef}
         request={loadData}
         actionRef={actionRef}
@@ -298,10 +304,9 @@ export default (): React.ReactNode => {
         toolBarRender={() => [
           <Button
             key={'edit'}
-            icon={<PlusOutlined />}
             type="primary"
             onClick={() => {
-              showEditor({} as API.Config.SaveReq, false);
+              showEditor({} as SaveConfigRequest, false);
             }}
           >
             <FormattedMessage id="pages.action.create" />

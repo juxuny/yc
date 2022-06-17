@@ -4,12 +4,13 @@ import React, { useRef, useEffect, useState } from 'react';
 import { useIntl } from '@@/plugin-locale/localeExports';
 import { ProForm } from '@ant-design/pro-components';
 import type { ProFormInstance } from '@ant-design/pro-components';
-import { Namespace } from '@/services/cos/namespace';
+import type {SaveNamespaceRequest} from "@/services/api/typing";
+import {cos} from "@/services/api";
 
 export type NamespaceEditorProp = {
   visible?: boolean;
   onChangeVisible: (v: boolean) => void;
-  oldData?: API.Namespace.SaveReq;
+  oldData?: SaveNamespaceRequest;
   trigger?: JSX.Element | undefined;
   onSuccess?: () => void;
 };
@@ -22,26 +23,25 @@ const layout = {
 const NamespaceEditorModal: React.FC<NamespaceEditorProp> = (props) => {
   const intl = useIntl();
   const { visible, onChangeVisible, onSuccess } = props;
-  const formRef = useRef<ProFormInstance<API.Namespace.SaveReq> | undefined>();
+  const formRef = useRef<ProFormInstance<SaveNamespaceRequest> | undefined>();
 
-  const [namespaceData, setNamespaceData] = useMergedState<API.Namespace.SaveReq>(
-    {} as API.Namespace.SaveReq,
+  const [namespaceData, setNamespaceData] = useMergedState<SaveNamespaceRequest>(
+    {} as SaveNamespaceRequest,
     {
       value: props.oldData,
     },
   );
-
   const [loading, setLoading] = useState<boolean>(false);
-
   useEffect(() => {
+    console.log(namespaceData);
     formRef.current?.setFieldsValue(namespaceData);
   });
 
   const onSubmit = async () => {
     try {
       setLoading(true);
-      const params = formRef.current?.getFieldsValue() || ({} as API.Namespace.SaveReq);
-      const resp = await Namespace.save({
+      const params = formRef.current?.getFieldsValue() || ({} as SaveNamespaceRequest);
+      const resp = await cos.saveNamespace({
         ...params,
         id: props.oldData?.id || undefined,
       });
@@ -75,7 +75,7 @@ const NamespaceEditorModal: React.FC<NamespaceEditorProp> = (props) => {
         </Button>,
       ]}
     >
-      <ProForm<API.Namespace.SaveReq>
+      <ProForm<SaveNamespaceRequest>
         {...layout}
         requiredMark={true}
         formRef={formRef}
@@ -88,8 +88,9 @@ const NamespaceEditorModal: React.FC<NamespaceEditorProp> = (props) => {
         >
           <Input
             value={namespaceData.namespace}
-            onChange={({ target: { value } }) => {
-              setNamespaceData(Object.assign(namespaceData, { namespace: value }));
+            onChange={({target: {value}}: {target: {value: string}}) => {
+              console.log(namespaceData);
+              setNamespaceData({...namespaceData, namespace: value});
             }}
           />
         </Form.Item>

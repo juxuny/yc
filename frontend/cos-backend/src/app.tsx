@@ -6,7 +6,7 @@ import RightContent from '@/components/RightContent';
 import Footer from '@/components/Footer';
 import { BookOutlined, LinkOutlined } from '@ant-design/icons';
 import { cos } from '@/services/api';
-import type * as typing from '@/services/api/typing';
+import type {UserInfoResponse} from "@/services/api/typing";
 import {convertToQueryParams, timestampInMinute} from '@/utils/func';
 
 const isDev = process.env.NODE_ENV === 'development';
@@ -22,8 +22,8 @@ export const initialStateConfig = {
  * */
 export async function getInitialState(): Promise<{
   settings?: Partial<LayoutSettings>;
-  currentUser?: typing.UserInfoResponse;
-  fetchUserInfo?: () => Promise<typing.UserInfoResponse | undefined>;
+  currentUser?: UserInfoResponse;
+  fetchUserInfo?: () => Promise<UserInfoResponse | undefined>;
 }> {
   const fetchUserInfo = async () => {
     try {
