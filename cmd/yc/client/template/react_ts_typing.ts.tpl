@@ -1,4 +1,4 @@
-import type * as dt from '@/services/dt';
+import type * as dt from '@juxuny/yc-ts-data-type/typing';
 
 {{range $enum := .Enums}}export type {{$enum.EnumName}} = {{$enum.ValueSet}};
 

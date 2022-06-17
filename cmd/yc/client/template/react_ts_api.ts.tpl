@@ -1,5 +1,5 @@
 import type * as typing from './typing';
-import {doRequest} from '../dt';
+import {doRequest} from '@juxuny/yc-ts-data-type';
 import { prefix } from './index'
 
 export class cos {

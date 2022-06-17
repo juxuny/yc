@@ -1,4 +1,4 @@
-import type * as dt from '@/services/dt';
+import type * as dt from '@juxuny/yc-ts-data-type/typing';
 
 export type ModifyPasswordType = 0 | 1 | 2;
 
