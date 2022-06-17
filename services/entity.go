@@ -48,7 +48,7 @@ func NewServiceEntity(serviceName string) ServiceEntity {
 
 type ValidatorEntity struct {
 	ServiceEntity
-	Messages []Message
+	Messages []ValidatorMessage
 }
 
 type ValidatorFormula struct {
@@ -56,16 +56,16 @@ type ValidatorFormula struct {
 	RefValue string
 }
 
-type MessageField struct {
+type ValidatorMessageField struct {
 	Name      string
 	Formulas  []ValidatorFormula
 	ParamName string
 	Error     string
 }
 
-type Message struct {
+type ValidatorMessage struct {
 	Name   string
-	Fields []MessageField
+	Fields []ValidatorMessageField
 	Desc   string
 }
 
@@ -132,4 +132,13 @@ type ModelEntity struct {
 type ClientSdkEntity struct {
 	Methods []MethodEntity
 	ServiceEntity
+}
+
+type CloneMessage struct {
+	Name string
+}
+
+type CloneEntity struct {
+	ServiceEntity
+	Messages []CloneMessage
 }

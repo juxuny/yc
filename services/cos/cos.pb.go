@@ -72,10 +72,13 @@ func (ModifyPasswordType) EnumDescriptor() ([]byte, []int) {
 	return file_cos_proto_rawDescGZIP(), []int{0}
 }
 
+// @desc: 账号类型
 type AccountType int32
 
 const (
-	AccountType_AccountTypeUnknown  AccountType = 0
+	// @desc: 未知
+	AccountType_AccountTypeUnknown AccountType = 0
+	// @desc: 密码登录的账号
 	AccountType_AccountTypePassword AccountType = 1
 )
 
@@ -316,12 +319,15 @@ func (x *HealthResponse) GetCurrentTime() string {
 	return ""
 }
 
+// @desc: 登录请求
 type LoginRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// @desc: 用户名
 	UserName string `protobuf:"bytes,1,opt,name=userName,proto3" json:"userName,omitempty"`
+	// @desc: 登录密码
 	Password string `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
 	// @v: in= 1
 	// @msg: 无效登录类型: {{.AccountType|num}}

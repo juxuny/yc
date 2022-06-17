@@ -140,6 +140,7 @@ func (t *UpdateCommand) genExtend(service services.ServiceEntity) {
 		}
 	}
 	t.genValidator(service, messages)
+	t.genExt(service, messages)
 	t.genService(service, svc)
 }
 
@@ -325,7 +326,7 @@ func (t *UpdateCommand) genValidator(service services.ServiceEntity, msgs []*par
 	}
 	for _, m := range msgs {
 		//log.Println(m.MessageName)
-		fields := make([]services.MessageField, 0)
+		fields := make([]services.ValidatorMessageField, 0)
 		if !strings.HasSuffix(m.MessageName, "Request") && !strings.HasSuffix(m.MessageName, "Req") {
 			continue
 		}
@@ -369,7 +370,7 @@ func (t *UpdateCommand) genValidator(service services.ServiceEntity, msgs []*par
 				}
 			}
 			if len(formulas) > 0 {
-				fields = append(fields, services.MessageField{
+				fields = append(fields, services.ValidatorMessageField{
 					Name:      utils.ToUpperFirst(utils.ToHump(f.FieldName)),
 					Formulas:  formulas,
 					ParamName: utils.ToLowerFirst(utils.ToHump(f.FieldName)),
@@ -377,7 +378,7 @@ func (t *UpdateCommand) genValidator(service services.ServiceEntity, msgs []*par
 				})
 			}
 		}
-		messageItem := services.Message{
+		messageItem := services.ValidatorMessage{
 			Name:   m.MessageName,
 			Fields: fields,
 		}
@@ -385,6 +386,22 @@ func (t *UpdateCommand) genValidator(service services.ServiceEntity, msgs []*par
 	}
 
 	if err := template.RunEmbedFile(templateFs, validatorFileName, path.Join(t.WorkDir, service.ProtoFileName+".pb.validator.go"), validatorEntities); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func (t *UpdateCommand) genExt(service services.ServiceEntity, messages []*parser.Message) {
+	cloneEntity := services.CloneEntity{
+		ServiceEntity: service,
+		Messages:      []services.CloneMessage{},
+	}
+	for _, m := range messages {
+		cloneEntity.Messages = append(cloneEntity.Messages, services.CloneMessage{
+			Name: m.MessageName,
+		})
+	}
+	output := path.Join(t.WorkDir, service.ProtoFileName+"_ext.pb.go")
+	if err := template.RunEmbedFile(templateFs, extFileName, output, cloneEntity); err != nil {
 		log.Fatal(err)
 	}
 }

@@ -3,9 +3,50 @@ package dt
 import (
 	"fmt"
 	"github.com/juxuny/yc/errors"
+	"google.golang.org/protobuf/proto"
 	"strconv"
 	"strings"
 )
+
+func (m *ID) Clone() *ID {
+	return proto.Clone(m).(*ID)
+}
+
+func (m *NullInt64) Clone() *NullInt64 {
+	return proto.Clone(m).(*NullInt64)
+}
+
+func (m *NullInt32) Clone() *NullInt32 {
+	return proto.Clone(m).(*NullInt32)
+}
+
+func (m *NullBool) Clone() *NullBool {
+	return proto.Clone(m).(*NullBool)
+}
+
+func (m *NullFloat32) Clone() *NullFloat32 {
+	return proto.Clone(m).(*NullFloat32)
+}
+
+func (m *NullFloat64) Clone() *NullFloat64 {
+	return proto.Clone(m).(*NullFloat64)
+}
+
+func (m *NullString) Clone() *NullString {
+	return proto.Clone(m).(*NullString)
+}
+
+func (m *Pagination) Clone() *Pagination {
+	return proto.Clone(m).(*Pagination)
+}
+
+func (m *PaginationResp) Clone() *PaginationResp {
+	return proto.Clone(m).(*PaginationResp)
+}
+
+func (m *Error) Clone() *Error {
+	return proto.Clone(m).(*Error)
+}
 
 func (m *ID) NewPointer() *ID {
 	return NewIDPointer(m.Uint64)

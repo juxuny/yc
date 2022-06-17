@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/juxuny/yc"
+	"github.com/juxuny/yc/dt"
 	"github.com/juxuny/yc/errors"
 	"github.com/juxuny/yc/log"
 	"github.com/juxuny/yc/orm"
@@ -11,6 +12,7 @@ import (
 	"github.com/juxuny/yc/services/cos/db"
 	"github.com/juxuny/yc/services/cos/impl"
 	"github.com/juxuny/yc/utils"
+	"google.golang.org/protobuf/proto"
 	"strings"
 )
 
@@ -108,6 +110,9 @@ func (t *handler) ListValue(ctx context.Context, req *cos.ListValueRequest) (res
 		return nil, err
 	}
 	resp.List = items.MapToKeyValueRespList()
+	for i := range resp.List {
+		resp.List[i].ConfigId = proto.Clone(req.ConfigId).(*dt.ID)
+	}
 	return resp, nil
 }
 
@@ -181,6 +186,9 @@ func (t *handler) ListAllValue(ctx context.Context, req *cos.ListAllValueRequest
 		})
 	}
 	resp.List = items.MapToKeyValueRespList()
+	for i := range resp.List {
+		resp.List[i].ConfigId = req.ConfigId.Clone()
+	}
 	return resp, nil
 }
 
