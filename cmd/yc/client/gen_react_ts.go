@@ -45,7 +45,7 @@ func (t *GenCommand) genReactTs() {
 	if len(svc) > 1 {
 		log.Fatal("only support one service in each *.proto")
 	}
-	t.genReactTsIndex()
+	t.genReactTsIndex(service)
 	t.genReactTsTyping(service, messages, enums)
 
 	for _, item := range svc[0].ServiceBody {
@@ -57,10 +57,10 @@ func (t *GenCommand) genReactTs() {
 	t.genReactTsMethods(service, methods)
 }
 
-func (t *GenCommand) genReactTsIndex() {
+func (t *GenCommand) genReactTsIndex(service services.ServiceEntity) {
 	outputFile := path.Join(t.ReactTs, "index.ts")
 	log.Println("gen index.ts: ", outputFile)
-	if err := template.RunEmbedFile(templateFs, reactTsIndexFileName, outputFile, nil); err != nil {
+	if err := template.RunEmbedFile(templateFs, reactTsIndexFileName, outputFile, service); err != nil {
 		log.Fatal(err)
 	}
 }
@@ -150,12 +150,12 @@ func (t *GenCommand) genReactTsTyping(service services.ServiceEntity, messages [
 func (t *GenCommand) genReactTsMethods(service services.ServiceEntity, methods []*parser.RPC) {
 	apiEntity := services.ReactTsApiEntity{
 		ServiceEntity: service,
-		Methods: []services.ReactTsMethod{},
+		Methods:       []services.ReactTsMethod{},
 	}
 	for _, item := range methods {
 		apiEntity.Methods = append(apiEntity.Methods, services.ReactTsMethod{
 			ServiceEntity: service,
-			Api: service.ServiceName + "/" + strings.ReplaceAll(utils.ToUnderLine(item.RPCName), "_", "-"),
+			Api:           service.ServiceName + "/" + strings.ReplaceAll(utils.ToUnderLine(item.RPCName), "_", "-"),
 			MethodName:    item.RPCName,
 			Request:       item.RPCRequest.MessageType,
 			Response:      item.RPCResponse.MessageType,

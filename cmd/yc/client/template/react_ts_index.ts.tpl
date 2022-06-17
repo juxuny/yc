@@ -1,4 +1,4 @@
-import { cos } from './api';
+import { {{.PackageAlias}} } from './api';
 
 export let prefix = "/api";
 
@@ -7,5 +7,5 @@ export const updateApiPrefix = (apiPrefix: string) => {
 }
 
 export {
-  cos
+  {{.PackageAlias}}
 }

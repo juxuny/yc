@@ -1,5 +1,5 @@
 import type * as typing from './typing';
-import {doRequest} from '@/services/dt';
+import {doRequest} from '../dt';
 import { prefix } from './index'
 
 export class cos {
