@@ -15,7 +15,7 @@ import (
 )
 
 func (t *handler) UserInfo(ctx context.Context, req *cos.UserInfoRequest) (resp *cos.UserInfoResponse, err error) {
-	currentId, err := yc.GetUserId(ctx)
+	currentId, err := yc.GetIncomingUserId(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +34,7 @@ func (t *handler) UserInfo(ctx context.Context, req *cos.UserInfoRequest) (resp 
 }
 
 func (t *handler) UpdateInfo(ctx context.Context, req *cos.UpdateInfoRequest) (resp *cos.UpdateInfoResponse, err error) {
-	currentId, err := yc.GetUserId(ctx)
+	currentId, err := yc.GetIncomingUserId(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func (t *handler) UpdateInfo(ctx context.Context, req *cos.UpdateInfoRequest) (r
 }
 
 func (t *handler) ModifyPassword(ctx context.Context, req *cos.ModifyPasswordRequest) (resp *cos.ModifyPasswordResponse, err error) {
-	currentId, err := yc.GetUserId(ctx)
+	currentId, err := yc.GetIncomingUserId(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +91,7 @@ func (t *handler) ModifyPassword(ctx context.Context, req *cos.ModifyPasswordReq
 }
 
 func (t *handler) SaveOrCreateUser(ctx context.Context, req *cos.SaveOrCreateUserRequest) (resp *cos.SaveOrCreateUserResponse, err error) {
-	userId, _ := yc.GetUserId(ctx)
+	userId, _ := yc.GetIncomingUserId(ctx)
 	if req.UserId != nil && req.GetUserId().Valid && req.GetUserId().Uint64 > 0 {
 		userInfo, found, err := db.TableAccount.FindOneById(ctx, req.UserId)
 		if err != nil {
@@ -154,7 +154,7 @@ func (t *handler) SaveOrCreateUser(ctx context.Context, req *cos.SaveOrCreateUse
 }
 
 func (t *handler) UserList(ctx context.Context, req *cos.UserListRequest) (resp *cos.UserListResponse, err error) {
-	userId, err := yc.GetUserId(ctx)
+	userId, err := yc.GetIncomingUserId(ctx)
 	if err != nil {
 		log.Error(err)
 		return nil, err
@@ -189,7 +189,7 @@ func (t *handler) UserList(ctx context.Context, req *cos.UserListRequest) (resp 
 }
 
 func (t *handler) UserUpdateStatus(ctx context.Context, req *cos.UserUpdateStatusRequest) (resp *cos.UserUpdateStatusResponse, err error) {
-	userId, _ := yc.GetUserId(ctx)
+	userId, _ := yc.GetIncomingUserId(ctx)
 	modelAccount, found, err := db.TableAccount.FindOneById(ctx, req.UserId)
 	if err != nil {
 		log.Error(err)
@@ -213,7 +213,7 @@ func (t *handler) UserUpdateStatus(ctx context.Context, req *cos.UserUpdateStatu
 }
 
 func (t *handler) UserDelete(ctx context.Context, req *cos.UserDeleteRequest) (resp *cos.UserDeleteResponse, err error) {
-	userId, _ := yc.GetUserId(ctx)
+	userId, _ := yc.GetIncomingUserId(ctx)
 	modelAccount, found, err := db.TableAccount.FindOneById(ctx, req.UserId)
 	if err != nil {
 		log.Error(err)
@@ -234,7 +234,7 @@ func (t *handler) UserDelete(ctx context.Context, req *cos.UserDeleteRequest) (r
 }
 
 func (t *handler) AccessKeyList(ctx context.Context, req *cos.AccessKeyListRequest) (resp *cos.AccessKeyListResponse, err error) {
-	userId, _ := yc.GetUserId(ctx)
+	userId, _ := yc.GetIncomingUserId(ctx)
 	where := orm.NewAndWhereWrapper().Eq(db.TableAccessKey.UserId, userId).Eq(db.TableAccessKey.IsDisabled, req.IsDisabled)
 	if strings.TrimSpace(req.SearchKey) != "" {
 		where.Like(db.TableAccessKey.Remark, fmt.Sprintf("%%%s%%", req.SearchKey))
@@ -267,7 +267,7 @@ func (t *handler) CreateAccessKey(ctx context.Context, req *cos.CreateAccessKeyR
 		AccessKey: "",
 		Remark:    req.Remark,
 	}
-	userId, _ := yc.GetUserId(ctx)
+	userId, _ := yc.GetIncomingUserId(ctx)
 	err = yc.Retry(func() (isEnd bool, err error) {
 		resp.AccessKey = utils.StringHelper.RandString(64)
 		resp.Secret = utils.StringHelper.RandString(64)

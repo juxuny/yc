@@ -20,9 +20,11 @@ import (
 const (
 	MdContextCallerService = "x-rpc-caller-service"
 	MdContextCallerLevel   = "x-rpc-caller-level"
+	MdContextAccessKey     = "x-rpc-access-key"
 	MdContextToken         = "x-rpc-token"
 	MdContextSign          = "x-rpc-sign"
 	MdContextSignMethod    = "x-rpc-sign-method"
+	MdContextUserId        = "x-rpc-user-id"
 )
 
 func GetCallerLevelFromMd(md metadata.MD) (level int, err error) {
@@ -69,19 +71,53 @@ func ParseJwt(ctx context.Context) (*jwt.Claims, error) {
 	return claim, nil
 }
 
-func GetUserId(ctx context.Context) (userId *dt.ID, err error) {
-	claims, err := ParseJwt(ctx)
-	if err != nil {
-		log.Error(err)
-		return dt.InvalidIDPointer(), err
-	}
-	return claims.UserId, nil
-}
-
-func GetHeader(ctx context.Context, extra ...metadata.MD) metadata.MD {
+func GetAccessKey(ctx context.Context) (accessKey string, found bool) {
 	md, found := metadata.FromIncomingContext(ctx)
 	if !found {
-		return make(metadata.MD)
+		return "", found
+	}
+	v := md.Get(MdContextAccessKey)
+	if len(v) == 0 {
+		return "", false
+	}
+	return v[0], true
+}
+
+func GetIncomingUserId(ctx context.Context) (userId *dt.ID, err error) {
+	md := GetIncomingHeader(ctx)
+	userIdString := md.Get(MdContextUserId)
+	if len(userIdString) == 0 {
+		return nil, errors.SystemError.RpcCallErrorNoUserId
+	}
+	uid, err := strconv.ParseUint(userIdString[0], 10, 64)
+	if err != nil {
+		return nil, errors.SystemError.RpcCallErrorNoUserId.Wrap(err)
+	}
+	return dt.NewIDPointer(uid), nil
+}
+
+func SetIncomingUserId(ctx context.Context, userId *dt.ID) (next context.Context) {
+	if userId == nil || !userId.Valid {
+		return ctx
+	}
+	md := GetIncomingHeader(ctx, metadata.New(map[string]string{
+		MdContextUserId: userId.NumberAsString(),
+	}))
+	return metadata.NewIncomingContext(ctx, md)
+}
+
+func GetIncomingHeader(ctx context.Context, extra ...metadata.MD) metadata.MD {
+	md, found := metadata.FromIncomingContext(ctx)
+	if !found {
+		return MergeMetadata(metadata.MD{}, extra...)
+	}
+	return MergeMetadata(md, extra...)
+}
+
+func GetOutgoingHeader(ctx context.Context, extra ...metadata.MD) metadata.MD {
+	md, found := metadata.FromOutgoingContext(ctx)
+	if !found {
+		return MergeMetadata(metadata.MD{}, extra...)
 	}
 	return MergeMetadata(md, extra...)
 }
@@ -120,19 +156,20 @@ func RpcCall(ctx context.Context, host string, queryPath string, data proto.Mess
 	if err != nil {
 		return 0, errors.SystemError.RpcCallErrorNetwork.Wrap(err)
 	}
-	contextHeader := GetHeader(ctx)
+	contextHeader := GetIncomingHeader(ctx)
 	if signHandler != nil {
 		method, sign, err := signHandler.Sum(body)
 		if err != nil {
 			return 0, err
 		}
-		md.Set(MdContextSign, string(sign))
+		md.Set(MdContextSign, sign)
 		md.Set(MdContextSignMethod, string(method))
 	}
 	MergeRequestHeaderFromMetadata(req, contextHeader, md)
 	req.Header.Set("content-type", "application/protobuf")
 	resp, err := httpClient.Do(req)
 	if err != nil {
+		log.Error(err)
 		return 0, errors.SystemError.RpcCallErrorBuildRequest.Wrap(err)
 	}
 	code = resp.StatusCode

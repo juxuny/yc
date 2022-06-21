@@ -14,12 +14,12 @@ func WriteString(w http.ResponseWriter, data string, code ...int) {
 	} else {
 		w.WriteHeader(http.StatusOK)
 	}
-	w.Header().Set("Content-Type", "text/plain")
+	w.Header().Set(HeaderContentType, "text/plain")
 	_, _ = w.Write([]byte(data))
 }
 
 func WriteJson(w http.ResponseWriter, data interface{}, code ...int) {
-	w.Header().Set("Content-Type", "application/json;utf8")
+	w.Header().Set(HeaderContentType, "application/json;utf8")
 	if len(code) > 0 {
 		w.WriteHeader(code[0])
 	} else {
@@ -38,7 +38,7 @@ func WriteSuccessData(w http.ResponseWriter, data interface{}) {
 }
 
 func WriteProtobuf(w http.ResponseWriter, data proto.Message, code ...int) {
-	w.Header().Set("Content-Type", "application/protobuf")
+	w.Header().Set(HeaderContentType, "application/protobuf")
 	if len(code) > 0 {
 		w.WriteHeader(code[0])
 	} else {
@@ -54,6 +54,19 @@ func WriteProtobuf(w http.ResponseWriter, data proto.Message, code ...int) {
 	}
 }
 
-func WriteProtobufError(w http.ResponseWriter, err *dt.Error, code ...int) {
-
+func WriteProtobufError(w http.ResponseWriter, errContent *dt.Error, code ...int) {
+	w.Header().Set(HeaderContentType, "application/protobuf")
+	if len(code) > 0 {
+		w.WriteHeader(code[0])
+	} else {
+		w.WriteHeader(http.StatusBadRequest)
+	}
+	respBody, err := proto.Marshal(errContent)
+	if err != nil {
+		log.Error(err)
+	}
+	_, err = w.Write(respBody)
+	if err != nil {
+		log.Error(err)
+	}
 }

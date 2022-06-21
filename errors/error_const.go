@@ -51,6 +51,8 @@ var SystemError = struct {
 	InvalidProtobufData              Error `code:"-10047" msg:"invalid protobuf data"`
 	InvalidContentType               Error `code:"-10048" msg:"invalid content-type"`
 	HttpError                        Error `code:"-10049" msg:"HTTP error"`
+	RpcCallErrorNoUserId             Error `code:"-10050" msg:"rpc call error: no userId"`
+	RpcCallErrorInvalidUserId        Error `code:"-10051" msg:"rpc call error: invalid userId"`
 }{}
 
 func init() {

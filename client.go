@@ -29,5 +29,5 @@ func (t *RandomEntrypointDispatcher) SelectOne() string {
 }
 
 type RpcSignContentHandler interface {
-	Sum(data []byte) (method SignMethod, signResult []byte, err error)
+	Sum(data []byte) (method SignMethod, signResult string, err error)
 }

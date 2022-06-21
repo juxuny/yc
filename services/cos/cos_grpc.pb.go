@@ -24,6 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 type CosClient interface {
 	// @group: devops
 	// @ignore-auth
+	// @desc: health check
 	Health(ctx context.Context, in *HealthRequest, opts ...grpc.CallOption) (*HealthResponse, error)
 	// @group: auth
 	// @ignore-auth
@@ -370,6 +371,7 @@ func (c *cosClient) UpdateStatusValue(ctx context.Context, in *UpdateStatusValue
 type CosServer interface {
 	// @group: devops
 	// @ignore-auth
+	// @desc: health check
 	Health(context.Context, *HealthRequest) (*HealthResponse, error)
 	// @group: auth
 	// @ignore-auth

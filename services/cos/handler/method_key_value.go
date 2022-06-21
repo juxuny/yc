@@ -17,7 +17,7 @@ import (
 )
 
 func (t *handler) SaveValue(ctx context.Context, req *cos.SaveValueRequest) (resp *cos.SaveValueResponse, err error) {
-	currentId, err := yc.GetUserId(ctx)
+	currentId, err := yc.GetIncomingUserId(ctx)
 	if err != nil {
 		log.Error(err)
 		return nil, err
@@ -56,7 +56,7 @@ func (t *handler) SaveValue(ctx context.Context, req *cos.SaveValueRequest) (res
 }
 
 func (t *handler) DeleteValue(ctx context.Context, req *cos.DeleteValueRequest) (resp *cos.DeleteValueRequest, err error) {
-	userId, err := yc.GetUserId(ctx)
+	userId, err := yc.GetIncomingUserId(ctx)
 	if err != nil {
 		log.Error(err)
 		return nil, err
@@ -81,7 +81,7 @@ func (t *handler) DeleteValue(ctx context.Context, req *cos.DeleteValueRequest) 
 }
 
 func (t *handler) ListValue(ctx context.Context, req *cos.ListValueRequest) (resp *cos.ListValueResponse, err error) {
-	userId, err := yc.GetUserId(ctx)
+	userId, err := yc.GetIncomingUserId(ctx)
 	if err != nil {
 		log.Error(err)
 		return nil, err
@@ -121,7 +121,7 @@ func (t *handler) DisableValue(ctx context.Context, req *cos.DisableValueRequest
 }
 
 func (t *handler) ListAllValue(ctx context.Context, req *cos.ListAllValueRequest) (resp *cos.ListAllValueResponse, err error) {
-	userId, err := yc.GetUserId(ctx)
+	userId, err := yc.GetIncomingUserId(ctx)
 	if err != nil {
 		log.Error(err)
 		return nil, err
@@ -193,7 +193,7 @@ func (t *handler) ListAllValue(ctx context.Context, req *cos.ListAllValueRequest
 }
 
 func (t *handler) UpdateStatusValue(ctx context.Context, req *cos.UpdateStatusValueRequest) (resp *cos.UpdateStatusValueResponse, err error) {
-	userId, _ := yc.GetUserId(ctx)
+	userId, _ := yc.GetIncomingUserId(ctx)
 	if req.Id == nil || !req.Id.Valid {
 		return nil, cos.Error.MissingArguments.Wrap(fmt.Errorf("missing: id"))
 	}

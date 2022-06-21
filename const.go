@@ -7,6 +7,7 @@ const (
 	SignMethodSha1   = SignMethod("sha1")
 	SignMethodSha128 = SignMethod("sha128")
 	SignMethodSha256 = SignMethod("sha256")
+	SignMethodSha512 = SignMethod("sha512")
 )
 
 func IsValidSignMethod(signMethod SignMethod) bool {

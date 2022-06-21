@@ -2,46 +2,15 @@ package handler
 
 import (
 	"context"
-	"github.com/juxuny/yc/errors"
-	"github.com/juxuny/yc/log"
+	"github.com/juxuny/yc/middle"
 	cos "github.com/juxuny/yc/services/cos"
-	"github.com/juxuny/yc/trace"
-	"runtime/debug"
 )
 
 func (t *wrapper) Login(ctx context.Context, req *cos.LoginRequest) (resp *cos.LoginResponse, err error) {
-	var isEnd bool
-	trace.WithContext(ctx)
-	defer trace.Clean()
-	defer func() {
-		if recoverError := recover(); recoverError != nil {
-			err = errors.SystemError.InternalError
-			debug.PrintStack()
-			handleRecover(ctx, recoverError)
-			return
-		}
-	}()
-	isEnd, err = t.beforeHandler.Run(ctx)
-	if err != nil {
+	if err := t.runMiddle(ctx, true, req, middle.NewApiHandler(func(ctx context.Context) {
+		resp, err = t.handler.Login(ctx, req)
+	})); err != nil {
 		return nil, err
 	}
-	if isEnd {
-		return nil, nil
-	}
-	defer func() {
-		_, err := t.afterHandler.Run(ctx)
-		if err != nil {
-			log.Error(err)
-		}
-	}()
-	if err := req.Validate(); err != nil {
-		log.Error(err)
-		return nil, err
-	}
-	defer func() {
-		if err != nil {
-			log.Error(err)
-		}
-	}()
-	return t.handler.Login(ctx, req)
+	return
 }

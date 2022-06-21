@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"strings"
 )
 
 func (t *GenCommand) genGo() {
@@ -61,6 +62,7 @@ func (t *GenCommand) genGoService(serviceEntity services.ServiceEntity, svc *par
 			HandlerInitEntity: handlerEntity,
 			Desc:              services.GetDescFromFieldCommentsOfProto(rpc.Comments),
 			Group:             groupName,
+			Api:               serviceEntity.ServiceName + "/" + strings.ReplaceAll(utils.ToUnderLine(rpc.RPCName), "_", "-"),
 			MethodName:        rpc.RPCName,
 			Request:           rpc.RPCRequest.MessageType,
 			Response:          rpc.RPCResponse.MessageType,

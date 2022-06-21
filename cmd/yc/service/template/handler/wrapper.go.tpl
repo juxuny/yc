@@ -27,6 +27,25 @@ func NewWrapper() *wrapper {
 	}
 }
 
+func (t *wrapper) runMiddle(ctx context.Context, auth bool, requestValidator router.ValidatorHandler, apiHandler middle.Handler) (err error) {
+	trace.WithContext(ctx)
+	defer trace.Clean()
+	defer func() {
+		if recoverError := recover(); recoverError != nil {
+			err = errors.SystemError.InternalError
+			debug.PrintStack()
+			handleRecover(ctx, recoverError)
+		}
+	} ()
+	groups := middle.NewGroup()
+	if auth {
+		groups.Add(t.authHandler)
+	}
+	groups.Add(t.beforeHandler, middle.NewValidatorHandler(requestValidator), apiHandler, t.afterHandler)
+	_, _, err = groups.Run(ctx)
+	return nil
+}
+
 type levelValidator struct {}
 
 func (t *levelValidator) Run(ctx context.Context) (isEnd bool, err error) {

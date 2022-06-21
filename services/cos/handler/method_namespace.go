@@ -12,7 +12,7 @@ import (
 )
 
 func (t *handler) SaveNamespace(ctx context.Context, req *cos.SaveNamespaceRequest) (resp *cos.SaveNamespaceResponse, err error) {
-	currentId, err := yc.GetUserId(ctx)
+	currentId, err := yc.GetIncomingUserId(ctx)
 	if err != nil {
 		log.Error(err)
 		return nil, err
@@ -56,7 +56,7 @@ func (t *handler) SaveNamespace(ctx context.Context, req *cos.SaveNamespaceReque
 }
 
 func (t *handler) ListNamespace(ctx context.Context, req *cos.ListNamespaceRequest) (resp *cos.ListNamespaceResponse, err error) {
-	currentId, err := yc.GetUserId(ctx)
+	currentId, err := yc.GetIncomingUserId(ctx)
 	if err != nil {
 		log.Error(err)
 		return nil, err
@@ -90,7 +90,7 @@ func (t *handler) ListNamespace(ctx context.Context, req *cos.ListNamespaceReque
 }
 
 func (t *handler) DeleteNamespace(ctx context.Context, req *cos.DeleteNamespaceRequest) (resp *cos.DeleteNamespaceResponse, err error) {
-	currentId, err := yc.GetUserId(ctx)
+	currentId, err := yc.GetIncomingUserId(ctx)
 	if err != nil {
 		log.Error(err)
 		return nil, err
@@ -111,7 +111,7 @@ func (t *handler) DeleteNamespace(ctx context.Context, req *cos.DeleteNamespaceR
 }
 
 func (t *handler) UpdateStatusNamespace(ctx context.Context, req *cos.UpdateStatusNamespaceRequest) (resp *cos.UpdateStatusNamespaceResponse, err error) {
-	userId, _ := yc.GetUserId(ctx)
+	userId, _ := yc.GetIncomingUserId(ctx)
 	modelNamespace, found, err := db.TableNamespace.FindOneById(ctx, req.Id)
 	if err != nil {
 		log.Error(err)
@@ -135,7 +135,7 @@ func (t *handler) UpdateStatusNamespace(ctx context.Context, req *cos.UpdateStat
 }
 
 func (t *handler) SelectorNamespace(ctx context.Context, req *cos.SelectorRequest) (resp *cos.SelectorResponse, err error) {
-	userId, _ := yc.GetUserId(ctx)
+	userId, _ := yc.GetIncomingUserId(ctx)
 	where := orm.NewAndWhereWrapper().Eq(db.TableNamespace.CreatorId, userId)
 	if req.IsDisabled != nil && req.IsDisabled.Valid {
 		where.Eq(db.TableNamespace.IsDisabled, req.IsDisabled)

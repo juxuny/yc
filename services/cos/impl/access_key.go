@@ -10,7 +10,7 @@ import (
 )
 
 func CheckIfAllowToAccessAccessKey(ctx context.Context, id *dt.ID) error {
-	userId, _ := yc.GetUserId(ctx)
+	userId, _ := yc.GetIncomingUserId(ctx)
 	modelAccessKey, found, err := db.TableAccessKey.FindOneById(ctx, id)
 	if err != nil {
 		log.Error(err)

@@ -10,6 +10,12 @@ import (
 	"net/http"
 )
 
+var globalPrefix = "/api"
+
+func SetPrefix(prefix string) {
+	globalPrefix = prefix
+}
+
 type Client interface {
 {{range $item := .Methods}}{{if ne $item.Desc ""}}	// {{$item.Desc}}
 {{end}}	{{$item.MethodName}}(ctx context.Context, req *{{$item.Request}}, extensionMetadata ...metadata.MD) (resp *{{$item.Response}}, err error)
@@ -31,13 +37,21 @@ func NewClientWithDispatcher(entrypointDispatcher yc.EntrypointDispatcher) Clien
 		EntrypointDispatcher: entrypointDispatcher,
 	}
 }
+
+func Config(entrypointDispatcher yc.EntrypointDispatcher, signHandler yc.RpcSignContentHandler) {
+	DefaultClient = &client {
+		Service:              Name,
+		EntrypointDispatcher: entrypointDispatcher,
+		signHandler:          signHandler,
+	}
+}
 {{range $item := .Methods}}
 func (t *client) {{$item.MethodName}}(ctx context.Context, req *{{$item.Request}}, extensionMetadata ...metadata.MD) (resp *{{$item.Response}}, err error) {
-	md := yc.GetHeader(ctx, extensionMetadata...)
+	md := yc.GetOutgoingHeader(ctx, extensionMetadata...)
 	ctx = metadata.NewOutgoingContext(ctx, md)
 	resp = &{{$item.Response}}{}
 	var code int
-	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), "/api/"+t.Service+"/health", req, resp, md, t.signHandler)
+	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), globalPrefix + "/{{$item.Api}}", req, resp, md, t.signHandler)
 	if err != nil {
 		return resp, err
 	}

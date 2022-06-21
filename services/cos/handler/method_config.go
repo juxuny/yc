@@ -12,7 +12,7 @@ import (
 )
 
 func (t *handler) SaveConfig(ctx context.Context, req *cos.SaveConfigRequest) (resp *cos.SaveConfigResponse, err error) {
-	currentId, err := yc.GetUserId(ctx)
+	currentId, err := yc.GetIncomingUserId(ctx)
 	if err != nil {
 		log.Error(err)
 		return nil, err
@@ -90,7 +90,7 @@ func (t *handler) DeleteConfig(ctx context.Context, req *cos.DeleteConfigRequest
 	if req.Id == nil || !req.Id.Valid {
 		return nil, cos.Error.MissingArguments.Wrap(fmt.Errorf("missing: id"))
 	}
-	currentId, err := yc.GetUserId(ctx)
+	currentId, err := yc.GetIncomingUserId(ctx)
 	if err != nil {
 		log.Error(err)
 		return nil, err
@@ -109,7 +109,7 @@ func (t *handler) DeleteConfig(ctx context.Context, req *cos.DeleteConfigRequest
 }
 
 func (t *handler) ListConfig(ctx context.Context, req *cos.ListConfigRequest) (resp *cos.ListConfigResponse, err error) {
-	currentId, err := yc.GetUserId(ctx)
+	currentId, err := yc.GetIncomingUserId(ctx)
 	if err != nil {
 		log.Error(err)
 		return nil, err
@@ -144,7 +144,7 @@ func (t *handler) ListConfig(ctx context.Context, req *cos.ListConfigRequest) (r
 }
 
 func (t *handler) CloneConfig(ctx context.Context, req *cos.CloneConfigRequest) (resp *cos.CloneConfigResponse, err error) {
-	userId, _ := yc.GetUserId(ctx)
+	userId, _ := yc.GetIncomingUserId(ctx)
 	modelConfig, found, err := db.TableConfig.FindOneById(ctx, req.Id)
 	if err != nil {
 		log.Error(err)
@@ -196,7 +196,7 @@ func (t *handler) CloneConfig(ctx context.Context, req *cos.CloneConfigRequest) 
 }
 
 func (t *handler) UpdateStatusConfig(ctx context.Context, req *cos.UpdateStatusConfigRequest) (resp *cos.UpdateStatusConfigResponse, err error) {
-	userId, _ := yc.GetUserId(ctx)
+	userId, _ := yc.GetIncomingUserId(ctx)
 	modelConfig, found, err := db.TableConfig.FindOneById(ctx, req.Id)
 	if err != nil {
 		log.Error(err)

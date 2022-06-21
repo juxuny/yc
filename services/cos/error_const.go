@@ -33,6 +33,7 @@ var Error = struct {
 	NoPermissionAccessNamespace   errors.Error `code:"10043" msg:"no permission access namespace"`
 	AccessKeyNotFound             errors.Error `code:"10044" msg:"access_key not found"`
 	NoPermissionToAccessAccessKey errors.Error `code:"10045" msg:"no permission access"`
+	AccessKeyDisabled             errors.Error `code:"10046" msg:"access key disabled"`
 }{}
 
 func init() {
