@@ -85,6 +85,8 @@ type CosClient interface {
 	ListAllValue(ctx context.Context, in *ListAllValueRequest, opts ...grpc.CallOption) (*ListAllValueResponse, error)
 	// @group: key_value
 	UpdateStatusValue(ctx context.Context, in *UpdateStatusValueRequest, opts ...grpc.CallOption) (*UpdateStatusValueResponse, error)
+	// @group: key_value
+	ListAllValueByConfigId(ctx context.Context, in *ListAllValueByConfigIdRequest, opts ...grpc.CallOption) (*ListAllValueByConfigIdResponse, error)
 }
 
 type cosClient struct {
@@ -365,6 +367,15 @@ func (c *cosClient) UpdateStatusValue(ctx context.Context, in *UpdateStatusValue
 	return out, nil
 }
 
+func (c *cosClient) ListAllValueByConfigId(ctx context.Context, in *ListAllValueByConfigIdRequest, opts ...grpc.CallOption) (*ListAllValueByConfigIdResponse, error) {
+	out := new(ListAllValueByConfigIdResponse)
+	err := c.cc.Invoke(ctx, "/cos.Cos/ListAllValueByConfigId", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CosServer is the server API for Cos service.
 // All implementations must embed UnimplementedCosServer
 // for forward compatibility
@@ -432,6 +443,8 @@ type CosServer interface {
 	ListAllValue(context.Context, *ListAllValueRequest) (*ListAllValueResponse, error)
 	// @group: key_value
 	UpdateStatusValue(context.Context, *UpdateStatusValueRequest) (*UpdateStatusValueResponse, error)
+	// @group: key_value
+	ListAllValueByConfigId(context.Context, *ListAllValueByConfigIdRequest) (*ListAllValueByConfigIdResponse, error)
 	mustEmbedUnimplementedCosServer()
 }
 
@@ -528,6 +541,9 @@ func (UnimplementedCosServer) ListAllValue(context.Context, *ListAllValueRequest
 }
 func (UnimplementedCosServer) UpdateStatusValue(context.Context, *UpdateStatusValueRequest) (*UpdateStatusValueResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateStatusValue not implemented")
+}
+func (UnimplementedCosServer) ListAllValueByConfigId(context.Context, *ListAllValueByConfigIdRequest) (*ListAllValueByConfigIdResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListAllValueByConfigId not implemented")
 }
 func (UnimplementedCosServer) mustEmbedUnimplementedCosServer() {}
 
@@ -1082,6 +1098,24 @@ func _Cos_UpdateStatusValue_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Cos_ListAllValueByConfigId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListAllValueByConfigIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CosServer).ListAllValueByConfigId(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/cos.Cos/ListAllValueByConfigId",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CosServer).ListAllValueByConfigId(ctx, req.(*ListAllValueByConfigIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Cos_ServiceDesc is the grpc.ServiceDesc for Cos service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1208,6 +1242,10 @@ var Cos_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateStatusValue",
 			Handler:    _Cos_UpdateStatusValue_Handler,
+		},
+		{
+			MethodName: "ListAllValueByConfigId",
+			Handler:    _Cos_ListAllValueByConfigId_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

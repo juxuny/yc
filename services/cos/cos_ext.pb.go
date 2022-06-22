@@ -302,3 +302,11 @@ func (m *SetAccessKeyRemarkRequest) Clone() *SetAccessKeyRemarkRequest {
 func (m *SetAccessKeyRemarkResponse) Clone() *SetAccessKeyRemarkResponse {
 	return proto.Clone(m).(*SetAccessKeyRemarkResponse)
 }
+
+func (m *ListAllValueByConfigIdRequest) Clone() *ListAllValueByConfigIdRequest {
+	return proto.Clone(m).(*ListAllValueByConfigIdRequest)
+}
+
+func (m *ListAllValueByConfigIdResponse) Clone() *ListAllValueByConfigIdResponse {
+	return proto.Clone(m).(*ListAllValueByConfigIdResponse)
+}

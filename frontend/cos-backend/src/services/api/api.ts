@@ -64,4 +64,6 @@ export class cos {
 
   static updateStatusValue = (body: typing.UpdateStatusValueRequest, options?: { [key: string]: any }) => doRequest<typing.UpdateStatusValueResponse>(prefix + '/cos/update-status-value', { method: 'POST', data: body, ...(options || {}) });
 
+  static listAllValueByConfigId = (body: typing.ListAllValueByConfigIdRequest, options?: { [key: string]: any }) => doRequest<typing.ListAllValueByConfigIdResponse>(prefix + '/cos/list-all-value-by-config-id', { method: 'POST', data: body, ...(options || {}) });
+
 }

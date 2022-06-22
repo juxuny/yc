@@ -56,8 +56,8 @@ func (t *getCommand) BeforeRun(cmd *cobra.Command) {
 func (t *getCommand) Run() {
 	cos.Config(t, t)
 	ctx := context.Background()
-	resp, err := cos.DefaultClient.ListAllValue(ctx, &cos.ListAllValueRequest{
-		ConfigId:   dt.NewIDPointer(24),
+	resp, err := cos.DefaultClient.ListAllValueByConfigId(ctx, &cos.ListAllValueByConfigIdRequest{
+		ConfigId:   t.ConfigId,
 		IsDisabled: &dt.NullBool{Valid: true, Bool: false},
 	}, metadata.New(map[string]string{
 		yc.MdContextAccessKey: t.AccessKey,

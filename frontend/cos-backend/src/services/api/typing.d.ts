@@ -655,3 +655,21 @@ export type SetAccessKeyRemarkResponse = {
 
 }
 
+export type ListAllValueByConfigIdRequest = {
+
+  configId?: string;
+
+  isDisabled?: string;
+
+  searchKey?: string;
+
+  isHot?: string;
+
+}
+
+export type ListAllValueByConfigIdResponse = {
+
+  list?: KeyValueResp[];
+
+}
+

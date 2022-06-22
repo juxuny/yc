@@ -74,6 +74,8 @@ service Cos {
   rpc ListAllValue(ListAllValueRequest) returns (ListAllValueResponse) {}
   // @group: key_value
   rpc UpdateStatusValue(UpdateStatusValueRequest) returns(UpdateStatusValueResponse) {}
+  // @group: key_value
+  rpc ListAllValueByConfigId(ListAllValueByConfigIdRequest) returns (ListAllValueByConfigIdResponse) {}
 }
 
 message HealthRequest {}
@@ -616,3 +618,15 @@ message SetAccessKeyRemarkRequest {
 }
 
 message SetAccessKeyRemarkResponse {}
+
+message ListAllValueByConfigIdRequest {
+  // @v: required
+  string configId = 1;
+  dt.NullBool isDisabled = 2;
+  string searchKey = 3;
+  dt.NullBool isHot = 4;
+}
+
+message ListAllValueByConfigIdResponse {
+  repeated KeyValueResp list = 1;
+}

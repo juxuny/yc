@@ -215,3 +215,35 @@ func (t *handler) UpdateStatusValue(ctx context.Context, req *cos.UpdateStatusVa
 	}
 	return &cos.UpdateStatusValueResponse{}, nil
 }
+
+func (t *handler) ListAllValueByConfigId(ctx context.Context, req *cos.ListAllValueByConfigIdRequest) (resp *cos.ListAllValueByConfigIdResponse, err error) {
+	resp, err = &cos.ListAllValueByConfigIdResponse{}, nil
+	userId, err := yc.GetIncomingUserId(ctx)
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+	modelConfig, found, err := db.TableConfig.FindOneByConfigId(ctx, req.ConfigId)
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+	if !found {
+		return nil, cos.Error.ConfigNotFound.WithField(db.TableConfig.ConfigId.LowerFirstHump(), req.ConfigId)
+	}
+	if modelConfig.CreatorId == nil || !modelConfig.CreatorId.Equal(userId) {
+		return nil, cos.Error.NoPermissionToAssessConfig.WithField(db.TableConfig.ConfigId.LowerFirstHump(), req.ConfigId)
+	}
+	values, err := t.ListAllValue(ctx, &cos.ListAllValueRequest{
+		ConfigId:   modelConfig.Id.Clone(),
+		IsDisabled: req.IsDisabled,
+		IsHot:      req.IsHot,
+		SearchKey:  req.SearchKey,
+	})
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+	resp.List = values.List
+	return
+}

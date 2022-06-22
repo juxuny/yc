@@ -59,3 +59,11 @@ func (t *wrapper) UpdateStatusValue(ctx context.Context, req *cos.UpdateStatusVa
 	}
 	return
 }
+func (t *wrapper) ListAllValueByConfigId(ctx context.Context, req *cos.ListAllValueByConfigIdRequest) (resp *cos.ListAllValueByConfigIdResponse, err error) {
+	if err := t.runMiddle(ctx, true, req, middle.NewApiHandler(func(ctx context.Context) {
+		resp, err = t.handler.ListAllValueByConfigId(ctx, req)
+	})); err != nil {
+		return nil, err
+	}
+	return
+}

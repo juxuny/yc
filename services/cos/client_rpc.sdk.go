@@ -31,6 +31,7 @@ type Client interface {
 	DisableValue(ctx context.Context, req *DisableValueRequest, extensionMetadata ...metadata.MD) (resp *DisableValueResponse, err error)
 	ListAllValue(ctx context.Context, req *ListAllValueRequest, extensionMetadata ...metadata.MD) (resp *ListAllValueResponse, err error)
 	UpdateStatusValue(ctx context.Context, req *UpdateStatusValueRequest, extensionMetadata ...metadata.MD) (resp *UpdateStatusValueResponse, err error)
+	ListAllValueByConfigId(ctx context.Context, req *ListAllValueByConfigIdRequest, extensionMetadata ...metadata.MD) (resp *ListAllValueByConfigIdResponse, err error)
 	SaveNamespace(ctx context.Context, req *SaveNamespaceRequest, extensionMetadata ...metadata.MD) (resp *SaveNamespaceResponse, err error)
 	ListNamespace(ctx context.Context, req *ListNamespaceRequest, extensionMetadata ...metadata.MD) (resp *ListNamespaceResponse, err error)
 	DeleteNamespace(ctx context.Context, req *DeleteNamespaceRequest, extensionMetadata ...metadata.MD) (resp *DeleteNamespaceResponse, err error)
@@ -259,6 +260,21 @@ func (t *client) UpdateStatusValue(ctx context.Context, req *UpdateStatusValueRe
 	resp = &UpdateStatusValueResponse{}
 	var code int
 	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), globalPrefix+"/cos/update-status-value", req, resp, md, t.signHandler)
+	if err != nil {
+		return resp, err
+	}
+	if code != http.StatusOK {
+		return resp, errors.SystemError.HttpError.Wrap(fmt.Errorf("http status = %v", code))
+	}
+	return
+}
+
+func (t *client) ListAllValueByConfigId(ctx context.Context, req *ListAllValueByConfigIdRequest, extensionMetadata ...metadata.MD) (resp *ListAllValueByConfigIdResponse, err error) {
+	md := yc.GetOutgoingHeader(ctx, extensionMetadata...)
+	ctx = metadata.NewOutgoingContext(ctx, md)
+	resp = &ListAllValueByConfigIdResponse{}
+	var code int
+	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), globalPrefix+"/cos/list-all-value-by-config-id", req, resp, md, t.signHandler)
 	if err != nil {
 		return resp, err
 	}

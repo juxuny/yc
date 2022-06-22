@@ -6,31 +6,32 @@ import (
 )
 
 const (
-	ValidatorTemplateLoginRequestAccountType            = "无效登录类型: {{.AccountType|num}}"
-	ValidatorTemplateUpdateInfoRequestNick              = "missing nick name"
-	ValidatorTemplateModifyPasswordRequestOldPassword   = "invalid old password: {{.OldPassword}}"
-	ValidatorTemplateModifyPasswordRequestNewPassword   = "invalid new password: {{.NewPassword}}"
-	ValidatorTemplateSaveOrCreateUserRequestAccountType = "invalid accountType: {{.AccountType|num}}"
-	ValidatorTemplateSaveOrCreateUserRequestNick        = ""
-	ValidatorTemplateUserListRequestPagination          = ""
-	ValidatorTemplateSaveNamespaceRequestNamespace      = "invalid namespace: {{.Namespace}}"
-	ValidatorTemplateDeleteNamespaceRequestId           = "invalid id"
-	ValidatorTemplateSaveConfigRequestConfigId          = ""
-	ValidatorTemplateListConfigRequestNamespaceId       = ""
-	ValidatorTemplateCloneConfigRequestId               = ""
-	ValidatorTemplateCloneConfigRequestNewConfigId      = "invalid configId: {{.NewConfigId}}"
-	ValidatorTemplateSaveValueRequestConfigKey          = ""
-	ValidatorTemplateSaveValueRequestConfigValue        = ""
-	ValidatorTemplateDeleteValueRequestKey              = "missing config key name"
-	ValidatorTemplateUpdateStatusValueRequestId         = ""
-	ValidatorTemplateUserUpdateStatusRequestUserId      = ""
-	ValidatorTemplateUserDeleteRequestUserId            = ""
-	ValidatorTemplateUpdateStatusNamespaceRequestId     = ""
-	ValidatorTemplateUpdateStatusConfigRequestId        = ""
-	ValidatorTemplateAccessKeyListRequestPagination     = ""
-	ValidatorTemplateCreateAccessKeyRequestRemark       = ""
-	ValidatorTemplateSetAccessKeyRemarkRequestId        = ""
-	ValidatorTemplateSetAccessKeyRemarkRequestRemark    = "invalid remark {{.Remark}}"
+	ValidatorTemplateLoginRequestAccountType               = "无效登录类型: {{.AccountType|num}}"
+	ValidatorTemplateUpdateInfoRequestNick                 = "missing nick name"
+	ValidatorTemplateModifyPasswordRequestOldPassword      = "invalid old password: {{.OldPassword}}"
+	ValidatorTemplateModifyPasswordRequestNewPassword      = "invalid new password: {{.NewPassword}}"
+	ValidatorTemplateSaveOrCreateUserRequestAccountType    = "invalid accountType: {{.AccountType|num}}"
+	ValidatorTemplateSaveOrCreateUserRequestNick           = ""
+	ValidatorTemplateUserListRequestPagination             = ""
+	ValidatorTemplateSaveNamespaceRequestNamespace         = "invalid namespace: {{.Namespace}}"
+	ValidatorTemplateDeleteNamespaceRequestId              = "invalid id"
+	ValidatorTemplateSaveConfigRequestConfigId             = ""
+	ValidatorTemplateListConfigRequestNamespaceId          = ""
+	ValidatorTemplateCloneConfigRequestId                  = ""
+	ValidatorTemplateCloneConfigRequestNewConfigId         = "invalid configId: {{.NewConfigId}}"
+	ValidatorTemplateSaveValueRequestConfigKey             = ""
+	ValidatorTemplateSaveValueRequestConfigValue           = ""
+	ValidatorTemplateDeleteValueRequestKey                 = "missing config key name"
+	ValidatorTemplateUpdateStatusValueRequestId            = ""
+	ValidatorTemplateUserUpdateStatusRequestUserId         = ""
+	ValidatorTemplateUserDeleteRequestUserId               = ""
+	ValidatorTemplateUpdateStatusNamespaceRequestId        = ""
+	ValidatorTemplateUpdateStatusConfigRequestId           = ""
+	ValidatorTemplateAccessKeyListRequestPagination        = ""
+	ValidatorTemplateCreateAccessKeyRequestRemark          = ""
+	ValidatorTemplateSetAccessKeyRemarkRequestId           = ""
+	ValidatorTemplateSetAccessKeyRemarkRequestRemark       = "invalid remark {{.Remark}}"
+	ValidatorTemplateListAllValueByConfigIdRequestConfigId = ""
 )
 
 var templateList = []string{
@@ -59,6 +60,7 @@ var templateList = []string{
 	ValidatorTemplateCreateAccessKeyRequestRemark,
 	ValidatorTemplateSetAccessKeyRemarkRequestId,
 	ValidatorTemplateSetAccessKeyRemarkRequestRemark,
+	ValidatorTemplateListAllValueByConfigIdRequestConfigId,
 }
 
 func init() {
@@ -243,6 +245,12 @@ func (m *SetAccessKeyRemarkRequest) Validate() error {
 		return err
 	}
 	if err := validator.Run(m.Remark, validator.CreateAction("length.min", `1`, ValidatorTemplateSetAccessKeyRemarkRequestRemark), m, "remark"); err != nil {
+		return err
+	}
+	return nil
+}
+func (m *ListAllValueByConfigIdRequest) Validate() error {
+	if err := validator.Run(m.ConfigId, validator.CreateAction("required", ``, ValidatorTemplateListAllValueByConfigIdRequestConfigId), m, "configId"); err != nil {
 		return err
 	}
 	return nil
