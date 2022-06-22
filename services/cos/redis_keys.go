@@ -1,8 +1,7 @@
-package config
+package cos
 
 import (
 	"github.com/juxuny/yc/redis"
-	"github.com/juxuny/yc/services/cos"
 )
 
 type keyValue struct {
@@ -10,8 +9,8 @@ type keyValue struct {
 	NotifyChannel redis.Key
 }
 
-var KeyValue keyValue
+var RedisKey keyValue
 
 func init() {
-	redis.InitKeyStruct(&KeyValue, false, cos.Name)
+	redis.InitKeyStruct(&RedisKey, false, Name)
 }
