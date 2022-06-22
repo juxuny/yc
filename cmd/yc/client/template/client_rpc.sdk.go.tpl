@@ -19,8 +19,7 @@ func SetPrefix(prefix string) {
 type Client interface {
 {{range $item := .Methods}}{{if ne $item.Desc ""}}	// {{$item.Desc}}
 {{end}}	{{$item.MethodName}}(ctx context.Context, req *{{$item.Request}}, extensionMetadata ...metadata.MD) (resp *{{$item.Response}}, err error)
-{{end}}
-}
+{{end}}}
 
 type client struct {
 	Service      		 string
