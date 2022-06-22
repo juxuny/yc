@@ -75,6 +75,7 @@ service Cos {
   // @group: key_value
   rpc UpdateStatusValue(UpdateStatusValueRequest) returns(UpdateStatusValueResponse) {}
   // @group: key_value
+  // @internal
   rpc ListAllValueByConfigId(ListAllValueByConfigIdRequest) returns (ListAllValueByConfigIdResponse) {}
 }
 

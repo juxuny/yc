@@ -12,9 +12,10 @@ import (
 )
 
 type GenCommand struct {
-	Go      string
-	ReactTs string
-	WorkDir string
+	Go       string
+	ReactTs  string
+	WorkDir  string
+	Internal bool
 }
 
 func (t *GenCommand) Prepare(cmd *cobra.Command) {
@@ -24,6 +25,7 @@ func (t *GenCommand) InitFlag(cmd *cobra.Command) {
 	cmd.PersistentFlags().StringVar(&t.Go, "go", "", "go sdk output directory")
 	cmd.PersistentFlags().StringVar(&t.ReactTs, "react-ts", "", "react ts sdk output directory")
 	cmd.PersistentFlags().StringVarP(&t.WorkDir, "work-dir", "w", ".", "working directory")
+	cmd.PersistentFlags().BoolVar(&t.Internal, "internal", false, "auto gen internal RPC method")
 }
 
 func (t *GenCommand) BeforeRun(cmd *cobra.Command) {

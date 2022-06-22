@@ -115,6 +115,10 @@ func (stringHelper) TrimSubSequenceRight(input, sub string) string {
 	return StringHelper.Reverse(reverseInput)
 }
 
+func (stringHelper) TrimSubsequence(input, sub string) string {
+	return StringHelper.TrimSubSequenceRight(StringHelper.TrimSubSequenceLeft(input, sub), sub)
+}
+
 func (stringHelper) ContainsAllKey(s string, keys []string) bool {
 	count := 0
 	for _, k := range keys {

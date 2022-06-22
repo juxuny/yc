@@ -68,3 +68,35 @@ func CheckIfRequired(comments []*parser.Comment) bool {
 	lines := getLinesContainTag(comments, "@required")
 	return len(lines) > 0
 }
+
+func GetContentByProtoTag(protoTag ProtoTag, comments []*parser.Comment) []string {
+	ret := make([]string, 0)
+	for _, c := range comments {
+		lines := c.Lines()
+		for _, line := range lines {
+			line = strings.TrimSpace(line)
+			if strings.HasPrefix(line, protoTag.String()) {
+				ret = append(ret, strings.TrimLeft(utils.StringHelper.TrimSubSequenceLeft(line, protoTag.String()), ": "))
+			}
+		}
+	}
+	return ret
+}
+
+func GetContentByProtoTagFistOne(protoTag ProtoTag, comments []*parser.Comment) string {
+	for _, c := range comments {
+		lines := c.Lines()
+		for _, line := range lines {
+			line = strings.TrimSpace(line)
+			if strings.HasPrefix(line, protoTag.String()) {
+				return strings.Trim(utils.StringHelper.TrimSubSequenceLeft(line, protoTag.String()), ": ")
+			}
+		}
+	}
+	return ""
+}
+
+func CheckIfContainProtoTag(protoTag ProtoTag, comments []*parser.Comment) bool {
+	ret := GetContentByProtoTag(protoTag, comments)
+	return len(ret) > 0
+}

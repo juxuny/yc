@@ -30,7 +30,6 @@ type client struct {
 
 var DefaultClient Client
 
-
 func NewClientWithDispatcher(entrypointDispatcher yc.EntrypointDispatcher) Client {
 	return &client{
 		Service: Name,
@@ -51,7 +50,7 @@ func (t *client) {{$item.MethodName}}(ctx context.Context, req *{{$item.Request}
 	ctx = metadata.NewOutgoingContext(ctx, md)
 	resp = &{{$item.Response}}{}
 	var code int
-	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), globalPrefix + "/{{$item.Api}}", req, resp, md, t.signHandler)
+	code, err = yc.RpcCall(ctx, t.EntrypointDispatcher.SelectOne(), globalPrefix+"/{{$item.Api}}", req, resp, md, t.signHandler)
 	if err != nil {
 		return resp, err
 	}

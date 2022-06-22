@@ -86,6 +86,7 @@ type CosClient interface {
 	// @group: key_value
 	UpdateStatusValue(ctx context.Context, in *UpdateStatusValueRequest, opts ...grpc.CallOption) (*UpdateStatusValueResponse, error)
 	// @group: key_value
+	// @internal
 	ListAllValueByConfigId(ctx context.Context, in *ListAllValueByConfigIdRequest, opts ...grpc.CallOption) (*ListAllValueByConfigIdResponse, error)
 }
 
@@ -444,6 +445,7 @@ type CosServer interface {
 	// @group: key_value
 	UpdateStatusValue(context.Context, *UpdateStatusValueRequest) (*UpdateStatusValueResponse, error)
 	// @group: key_value
+	// @internal
 	ListAllValueByConfigId(context.Context, *ListAllValueByConfigIdRequest) (*ListAllValueByConfigIdResponse, error)
 	mustEmbedUnimplementedCosServer()
 }

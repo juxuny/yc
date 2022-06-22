@@ -54,9 +54,13 @@ func (t *GenCommand) genGoService(serviceEntity services.ServiceEntity, svc *par
 	methodsMap := make(map[string][]services.MethodEntity)
 	for _, m := range svc.ServiceBody {
 		rpc := m.(*parser.RPC)
-		groupName, ok := services.GetGroupNameFromRpcCommentsOfProto(rpc.Comments)
-		if !ok {
+		groupName := services.GetContentByProtoTagFistOne(services.ProtoTagGroup, rpc.Comments)
+		if groupName == "" {
 			groupName = "default"
+		}
+		if !t.Internal && services.CheckIfContainProtoTag(services.ProtoTagInternal, rpc.Comments) {
+			log.Println("ignore internal rpc:", rpc.RPCName)
+			continue
 		}
 		method := services.MethodEntity{
 			HandlerInitEntity: handlerEntity,

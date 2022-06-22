@@ -153,6 +153,10 @@ func (t *GenCommand) genReactTsMethods(service services.ServiceEntity, methods [
 		Methods:       []services.ReactTsMethod{},
 	}
 	for _, item := range methods {
+		if !t.Internal && services.CheckIfContainProtoTag(services.ProtoTagInternal, item.Comments) {
+			log.Println("ignore internal rpc: ", item.RPCName)
+			continue
+		}
 		apiEntity.Methods = append(apiEntity.Methods, services.ReactTsMethod{
 			ServiceEntity: service,
 			Api:           service.ServiceName + "/" + strings.ReplaceAll(utils.ToUnderLine(item.RPCName), "_", "-"),
