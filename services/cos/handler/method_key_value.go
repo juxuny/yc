@@ -8,7 +8,9 @@ import (
 	"github.com/juxuny/yc/errors"
 	"github.com/juxuny/yc/log"
 	"github.com/juxuny/yc/orm"
+	"github.com/juxuny/yc/redis"
 	cos "github.com/juxuny/yc/services/cos"
+	"github.com/juxuny/yc/services/cos/config"
 	"github.com/juxuny/yc/services/cos/db"
 	"github.com/juxuny/yc/services/cos/impl"
 	"github.com/juxuny/yc/utils"
@@ -212,6 +214,17 @@ func (t *handler) UpdateStatusValue(ctx context.Context, req *cos.UpdateStatusVa
 	if err != nil {
 		log.Error(err)
 		return nil, err
+	}
+	modelConfig, found, err := db.TableConfig.FindOneById(ctx, modelKeyValue.ConfigId)
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+	if !found {
+		return nil, cos.Error.ConfigNotFound
+	}
+	if err := redis.Client().Publish(ctx, config.KeyValue.NotifyChannel.Suffix(modelConfig.ConfigId), modelKeyValue); err != nil {
+		log.Error(err)
 	}
 	return &cos.UpdateStatusValueResponse{}, nil
 }

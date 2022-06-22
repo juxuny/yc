@@ -7,7 +7,7 @@ import (
 )
 
 func (t *wrapper) Login(ctx context.Context, req *cos.LoginRequest) (resp *cos.LoginResponse, err error) {
-	if err := t.runMiddle(ctx, true, req, middle.NewApiHandler(func(ctx context.Context) {
+	if err := t.runMiddle(ctx, false, req, middle.NewApiHandler(func(ctx context.Context) {
 		resp, err = t.handler.Login(ctx, req)
 	})); err != nil {
 		return nil, err

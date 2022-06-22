@@ -155,3 +155,7 @@ func (stringHelper) ReverseSlice(input []string) {
 		input[i], input[len(input)-i-1] = input[len(input)-i-1], input[i]
 	}
 }
+
+func (stringHelper) ToUnderLine(in string) string {
+	return ToUnderLine(in)
+}

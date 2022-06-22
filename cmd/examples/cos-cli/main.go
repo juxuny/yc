@@ -11,6 +11,7 @@ var (
 )
 
 func main() {
+	rootCmd.AddCommand(cmd.NewCommandBuilder("watch", &watchCommand{}).Build())
 	rootCmd.AddCommand(cmd.NewCommandBuilder("get", &getCommand{}).Build())
 	if err := rootCmd.Execute(); err != nil {
 		log.Fatal(err)

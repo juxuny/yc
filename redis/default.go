@@ -38,6 +38,9 @@ type ClientInterface interface {
 	HIncByFloat64(ctx context.Context, key Key, field Key, value float64) error
 
 	Expire(ctx context.Context, key Key, expiration time.Duration) error
+
+	Publish(ctx context.Context, key Key, v interface{}) error
+	Subscription(ctx context.Context, key Key, onMessage func(msg string))
 }
 
 var defaultInstance ClientInterface

@@ -5,6 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-redis/redis/v8"
+	"github.com/juxuny/yc/log"
+	"github.com/juxuny/yc/utils"
+	"runtime/debug"
 	"strconv"
 	"strings"
 	"time"
@@ -12,6 +15,32 @@ import (
 
 type client struct {
 	redisClient *redis.Client
+}
+
+func (t *client) Publish(ctx context.Context, key Key, msg interface{}) error {
+	if msg == nil {
+		log.Debug("msg is nil")
+		return nil
+	}
+	return t.redisClient.Publish(ctx, key.String(), utils.ToJson(msg)).Err()
+}
+
+func (t *client) Subscription(ctx context.Context, key Key, onMessage func(msg string)) {
+	pub := t.redisClient.Subscribe(ctx, key.String())
+	defer func() {
+		_ = pub.Close()
+	}()
+	for msg := range pub.Channel() {
+		func() {
+			defer func() {
+				if err := recover(); err != nil {
+					log.Error(err)
+					debug.PrintStack()
+				}
+			}()
+			onMessage(msg.Payload)
+		}()
+	}
 }
 
 func (t *client) IncByFloat64(ctx context.Context, key Key, value float64) error {
