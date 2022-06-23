@@ -3,20 +3,47 @@ package main
 
 import (
 	"context"
+	"github.com/juxuny/yc/cmd"
 	"github.com/juxuny/yc/log"
 	"github.com/juxuny/yc/services/cos/server/http"
 	"github.com/juxuny/yc/services/cos/server/rpc"
 	"github.com/juxuny/yc/trace"
+	"github.com/spf13/cobra"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 )
 
-func main() {
+type serveCommand struct {
+	EnabledHttp bool
+	EnabledRpc  bool
+}
+
+func (t *serveCommand) Prepare(cmd *cobra.Command) {
+}
+
+func (t *serveCommand) InitFlag(cmd *cobra.Command) {
+	cmd.PersistentFlags().BoolVar(&t.EnabledHttp, "http", true, "enable http service")
+	cmd.PersistentFlags().BoolVar(&t.EnabledRpc, "rpc", false, "enable grpc service")
+}
+
+func (t *serveCommand) BeforeRun(cmd *cobra.Command) {
+	if !t.EnabledHttp && !t.EnabledRpc {
+		log.Error("missing arguments: --http or --rpc")
+		os.Exit(-1)
+	}
+}
+
+func (t *serveCommand) Run() {
 	ctx, serverCanceler := context.WithCancel(context.Background())
-	go rpc.Start(ctx)
-	go http.Start(ctx)
+	defer serverCanceler()
+	if t.EnabledHttp {
+		go http.Start(ctx)
+	}
+	if t.EnabledRpc {
+		go rpc.Start(ctx)
+	}
 	// Wait for interrupt signal to gracefully shutdown the server with
 	// a timeout of 5 seconds.
 	quit := make(chan os.Signal)
@@ -42,5 +69,15 @@ func main() {
 		log.Info("server shutdown gracefully")
 	case <-ctx.Done():
 		log.Info("timeout of 15 seconds.")
+	}
+}
+
+var rootCommand = &cobra.Command{}
+
+func main() {
+	rootCommand.AddCommand(cmd.NewCommandBuilder("serve", &serveCommand{}).Build())
+	if err := rootCommand.Execute(); err != nil {
+		log.Error(err)
+		os.Exit(-1)
 	}
 }
