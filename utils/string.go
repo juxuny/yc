@@ -159,3 +159,14 @@ func (stringHelper) ReverseSlice(input []string) {
 func (stringHelper) ToUnderLine(in string) string {
 	return ToUnderLine(in)
 }
+
+func (stringHelper) DropLetters(in string) string {
+	ret := make([]byte, 0)
+	for _, b := range []byte(in) {
+		if ('A' <= b && b <= 'Z') || ('a' <= b && b <= 'z') {
+			continue
+		}
+		ret = append(ret, b)
+	}
+	return string(ret)
+}
