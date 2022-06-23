@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"github.com/juxuny/yc"
 	"github.com/juxuny/yc/cmd"
 	"github.com/juxuny/yc/services"
 	"github.com/juxuny/yc/utils"
@@ -52,7 +53,7 @@ func (t *UpdateCommand) Run() {
 		log.Fatal("not found proto file in working directory")
 	}
 	log.Println("service name: ", serviceName)
-	service := services.NewServiceEntity(serviceName)
+	service := services.NewServiceEntity(serviceName, yc.Version)
 
 	// init env config
 	if err := t.initEnvConfig(service); err != nil {

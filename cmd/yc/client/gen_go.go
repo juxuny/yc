@@ -1,6 +1,7 @@
 package client
 
 import (
+	"github.com/juxuny/yc"
 	"github.com/juxuny/yc/services"
 	"github.com/juxuny/yc/utils"
 	"github.com/juxuny/yc/utils/template"
@@ -15,7 +16,7 @@ import (
 func (t *GenCommand) genGo() {
 	serviceName := t.getServiceName()
 	log.Println("generating go sdk:", serviceName)
-	service := services.NewServiceEntity(serviceName)
+	service := services.NewServiceEntity(serviceName, yc.Version)
 	reader, err := os.Open(path.Join(t.WorkDir, service.ProtoFileName+".proto"))
 	if err != nil {
 		log.Fatal("parse proto failed: ", err)

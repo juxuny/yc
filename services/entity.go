@@ -32,9 +32,10 @@ type ServiceEntity struct {
 	ServiceDir    string
 	ProtoFileName string
 	PackageAlias  string
+	Version       string
 }
 
-func NewServiceEntity(serviceName string) ServiceEntity {
+func NewServiceEntity(serviceName string, version string) ServiceEntity {
 	ret := ServiceEntity{
 		ServiceDir:    strings.ReplaceAll(utils.ToUnderLine(serviceName), "_", "-"),
 		ServiceName:   serviceName,
@@ -42,6 +43,7 @@ func NewServiceEntity(serviceName string) ServiceEntity {
 		ProtoFileName: utils.ToUnderLine(serviceName),
 		ServiceStruct: utils.ToHump(serviceName),
 		PackageAlias:  utils.ToLowerFirst(utils.ToHump(serviceName)),
+		Version:       version,
 	}
 	return ret
 }

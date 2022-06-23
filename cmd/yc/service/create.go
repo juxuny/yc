@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/juxuny/yc"
 	"github.com/juxuny/yc/cmd"
 	"github.com/juxuny/yc/services"
 	"github.com/juxuny/yc/utils"
@@ -38,7 +39,7 @@ func (t *CreateCommand) Run() {
 			t.WorkDir = w
 		}
 	}
-	service := services.NewServiceEntity(t.Name)
+	service := services.NewServiceEntity(t.Name, yc.Version)
 	serviceDir := path.Join(t.WorkDir, service.ServiceDir)
 	if utils.IsFileOrDirExists(serviceDir) {
 		log.Fatalf("service '%s' is exists", service.ServiceDir)
