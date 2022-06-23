@@ -116,21 +116,82 @@ func (t ModelNamespaceList) MapToListNamespaceItemList() []*cos.ListNamespaceIte
 }
 
 type tableNamespace struct {
-	Id         orm.FieldName
-	Namespace  orm.FieldName
-	CreateTime orm.FieldName
-	UpdateTime orm.FieldName
-	DeletedAt  orm.FieldName
-	IsDisabled orm.FieldName
-	CreatorId  orm.FieldName
+	suffix          []string
+	checkCloneTable bool
+	Id              orm.FieldName
+	Namespace       orm.FieldName
+	CreateTime      orm.FieldName
+	UpdateTime      orm.FieldName
+	DeletedAt       orm.FieldName
+	IsDisabled      orm.FieldName
+	CreatorId       orm.FieldName
 }
 
-func (tableNamespace) TableName() string {
+func (t tableNamespace) EnableHashTableNameAndCheckClone(suffix ...string) tableNamespace {
+	return tableNamespace{
+		suffix:          suffix,
+		checkCloneTable: true,
+		Id:              t.Id,
+		Namespace:       t.Namespace,
+		CreateTime:      t.CreateTime,
+		UpdateTime:      t.UpdateTime,
+		DeletedAt:       t.DeletedAt,
+		IsDisabled:      t.IsDisabled,
+		CreatorId:       t.CreatorId,
+	}
+}
+
+func (t tableNamespace) EnableHash(suffix ...string) tableNamespace {
+	return tableNamespace{
+		suffix:          suffix,
+		checkCloneTable: false,
+		Id:              t.Id,
+		Namespace:       t.Namespace,
+		CreateTime:      t.CreateTime,
+		UpdateTime:      t.UpdateTime,
+		DeletedAt:       t.DeletedAt,
+		IsDisabled:      t.IsDisabled,
+		CreatorId:       t.CreatorId,
+	}
+}
+
+func (t tableNamespace) BaseTableName() orm.TableName {
 	return cos.Name + "_" + "namespace"
 }
 
-func (tableNamespace) FindOneById(ctx context.Context, id *dt.ID, orderBy ...orm.Order) (data ModelNamespace, found bool, err error) {
-	w := orm.NewQueryWrapper(data).Limit(1)
+func (t tableNamespace) TableName() orm.TableName {
+	ret := orm.TableName("namespace").Prefix(cos.Name)
+	for _, s := range t.suffix {
+		ret = ret.Suffix(s)
+	}
+	return ret
+}
+
+func (t tableNamespace) checkAndCloneTable(ctx context.Context) error {
+	if t.checkCloneTable {
+		tableNameList, err := orm.ShowTables(ctx, cos.Name)
+		if err != nil {
+			log.Error(err)
+			return err
+		}
+		if !tableNameList.Contain(t.BaseTableName()) {
+			return errors.SystemError.DatabaseCloneErrorNotFoundTemplate.WithField("tableName", t.BaseTableName().String())
+		}
+		if !tableNameList.Contain(t.TableName()) {
+			w := orm.NewCloneWrapper(t.BaseTableName(), t.TableName())
+			_, err := orm.Clone(ctx, cos.Name, w)
+			return err
+		}
+	}
+	return nil
+}
+
+func (t tableNamespace) FindOneById(ctx context.Context, id *dt.ID, orderBy ...orm.Order) (data ModelNamespace, found bool, err error) {
+	err = t.checkAndCloneTable(ctx)
+	if err != nil {
+		return
+	}
+	w := orm.NewQueryWrapper(data).Limit(1).TableName(t.TableName())
 	w.Eq(TableNamespace.Id, id)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableNamespace.DeletedAt, 0).IsNull(TableNamespace.DeletedAt))
 	w.Order(orderBy...)
@@ -145,8 +206,12 @@ func (tableNamespace) FindOneById(ctx context.Context, id *dt.ID, orderBy ...orm
 	return data, true, nil
 }
 
-func (tableNamespace) FindOneByNamespace(ctx context.Context, namespace string, orderBy ...orm.Order) (data ModelNamespace, found bool, err error) {
-	w := orm.NewQueryWrapper(data).Limit(1)
+func (t tableNamespace) FindOneByNamespace(ctx context.Context, namespace string, orderBy ...orm.Order) (data ModelNamespace, found bool, err error) {
+	err = t.checkAndCloneTable(ctx)
+	if err != nil {
+		return
+	}
+	w := orm.NewQueryWrapper(data).Limit(1).TableName(t.TableName())
 	w.Eq(TableNamespace.Namespace, namespace)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableNamespace.DeletedAt, 0).IsNull(TableNamespace.DeletedAt))
 	w.Order(orderBy...)
@@ -161,8 +226,12 @@ func (tableNamespace) FindOneByNamespace(ctx context.Context, namespace string, 
 	return data, true, nil
 }
 
-func (tableNamespace) FindOneByCreatorId(ctx context.Context, creatorId *dt.ID, orderBy ...orm.Order) (data ModelNamespace, found bool, err error) {
-	w := orm.NewQueryWrapper(data).Limit(1)
+func (t tableNamespace) FindOneByCreatorId(ctx context.Context, creatorId *dt.ID, orderBy ...orm.Order) (data ModelNamespace, found bool, err error) {
+	err = t.checkAndCloneTable(ctx)
+	if err != nil {
+		return
+	}
+	w := orm.NewQueryWrapper(data).Limit(1).TableName(t.TableName())
 	w.Eq(TableNamespace.CreatorId, creatorId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableNamespace.DeletedAt, 0).IsNull(TableNamespace.DeletedAt))
 	w.Order(orderBy...)

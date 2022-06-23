@@ -84,15 +84,65 @@ func (t {{$modelName}}List) MapTo{{$ref.ModelName}}List() []*{{$packageAlias}}.{
 }{{end}}
 
 type {{.TableName|lowerFirst}} struct {
+	suffix          []string
+    checkCloneTable bool
 {{range $field := .Fields}}	{{.FieldName|upperFirst}} orm.FieldName
 {{end}}}
 
-func ({{.TableName|lowerFirst}}) TableName() string {
+func (t {{.TableName|lowerFirst}}) EnableHashTableNameAndCheckClone(suffix ...string) {{.TableName|lowerFirst}} {
+	return {{.TableName|lowerFirst}}{
+	suffix:          suffix,
+	checkCloneTable: true,
+{{range $field := .Fields}}	{{.FieldName|upperFirst}}: t.{{.FieldName|upperFirst}},
+{{end}}}
+}
+
+func (t {{.TableName|lowerFirst}}) EnableHash(suffix ...string) {{.TableName|lowerFirst}} {
+	return {{.TableName|lowerFirst}}{
+	suffix:          suffix,
+	checkCloneTable: false,
+{{range $field := .Fields}}	{{.FieldName|upperFirst}}: t.{{.FieldName|upperFirst}},
+{{end}}}
+}
+
+func (t {{.TableName|lowerFirst}}) BaseTableName() orm.TableName {
 	return cos.Name + "_" + "{{.TableNameWithoutServicePrefix}}"
 }
+
+func (t {{.TableName|lowerFirst}}) TableName() orm.TableName {
+	ret := orm.TableName("{{.TableNameWithoutServicePrefix}}").Prefix(cos.Name)
+	for _, s := range t.suffix {
+		ret = ret.Suffix(s)
+	}
+	return ret
+}
+
+func (t {{.TableName|lowerFirst}}) checkAndCloneTable(ctx context.Context) error {
+	if t.checkCloneTable {
+		tableNameList, err := orm.ShowTables(ctx, cos.Name)
+		if err != nil {
+			log.Error(err)
+		return err
+	}
+	if !tableNameList.Contain(t.BaseTableName()) {
+		return errors.SystemError.DatabaseCloneErrorNotFoundTemplate.WithField("tableName", t.BaseTableName().String())
+	}
+	if !tableNameList.Contain(t.TableName()) {
+		w := orm.NewCloneWrapper(t.BaseTableName(), t.TableName())
+		_, err := orm.Clone(ctx, cos.Name, w)
+			return err
+		}
+	}
+	return nil
+}
+
 {{range $field := .Fields}}{{if $field.HasIndex}}
-func ({{.TableName|lowerFirst}}) FindOneBy{{$field.FieldName|upperFirst}}(ctx context.Context, {{$field.FieldName|lowerFirst}} {{$field.ModelDataType}}, orderBy ...orm.Order) (data {{$field.ModelName}}, found bool, err error) {
-	w := orm.NewQueryWrapper(data).Limit(1)
+func (t {{.TableName|lowerFirst}}) FindOneBy{{$field.FieldName|upperFirst}}(ctx context.Context, {{$field.FieldName|lowerFirst}} {{$field.ModelDataType}}, orderBy ...orm.Order) (data {{$field.ModelName}}, found bool, err error) {
+    err = t.checkAndCloneTable(ctx)
+	if err != nil {
+		return
+	}
+	w := orm.NewQueryWrapper(data).Limit(1).TableName(t.TableName())
 	w.Eq({{$field.TableName}}.{{$field.FieldName|upperFirst}}, {{$field.FieldName|lowerFirst}}){{if $field.HasDeletedAt}}
 	w.Nested(orm.NewOrWhereWrapper().Eq({{$field.TableName}}.DeletedAt, 0).IsNull({{$field.TableName}}.DeletedAt)){{end}}
 	w.Order(orderBy...)

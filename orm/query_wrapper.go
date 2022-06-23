@@ -38,6 +38,7 @@ type Join struct {
 }
 
 type QueryWrapper interface {
+	TableName(tb TableName) QueryWrapper
 	Model(v interface{}) QueryWrapper
 	WhereWrapper
 	OrderDesc(fields ...FieldName) QueryWrapper
@@ -54,12 +55,18 @@ type QueryWrapper interface {
 
 type queryWrapper struct {
 	WhereWrapper
+	tableName         TableName
 	model             Model
 	offset, limit     int64
 	orderStatement    string
 	selectFields      []FieldName
 	selectValueHolder []interface{}
 	joinList          []Join
+}
+
+func (t *queryWrapper) TableName(tb TableName) QueryWrapper {
+	t.tableName = tb
+	return t
 }
 
 func (t *queryWrapper) Order(orderBy ...Order) QueryWrapper {
@@ -162,7 +169,11 @@ func (t *queryWrapper) Build() (statement string, values []interface{}, err erro
 	}
 	statement += selectStatement
 	// from
-	statement += " FROM " + t.model.TableName.Wrap().String()
+	if t.tableName != "" {
+		statement += " FROM " + t.tableName.Wrap().String()
+	} else {
+		statement += " FROM " + t.model.TableName.Wrap().String()
+	}
 	joinStatement := ""
 	if len(t.joinList) > 0 {
 		for _, j := range t.joinList {

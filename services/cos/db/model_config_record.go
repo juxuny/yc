@@ -68,19 +68,76 @@ func (t ModelConfigRecordList) MergeSort(list ModelConfigRecordList, less func(a
 }
 
 type tableConfigRecord struct {
-	Id         orm.FieldName
-	ConfigId   orm.FieldName
-	CreateTime orm.FieldName
-	SeqNo      orm.FieldName
-	RecordType orm.FieldName
+	suffix          []string
+	checkCloneTable bool
+	Id              orm.FieldName
+	ConfigId        orm.FieldName
+	CreateTime      orm.FieldName
+	SeqNo           orm.FieldName
+	RecordType      orm.FieldName
 }
 
-func (tableConfigRecord) TableName() string {
+func (t tableConfigRecord) EnableHashTableNameAndCheckClone(suffix ...string) tableConfigRecord {
+	return tableConfigRecord{
+		suffix:          suffix,
+		checkCloneTable: true,
+		Id:              t.Id,
+		ConfigId:        t.ConfigId,
+		CreateTime:      t.CreateTime,
+		SeqNo:           t.SeqNo,
+		RecordType:      t.RecordType,
+	}
+}
+
+func (t tableConfigRecord) EnableHash(suffix ...string) tableConfigRecord {
+	return tableConfigRecord{
+		suffix:          suffix,
+		checkCloneTable: false,
+		Id:              t.Id,
+		ConfigId:        t.ConfigId,
+		CreateTime:      t.CreateTime,
+		SeqNo:           t.SeqNo,
+		RecordType:      t.RecordType,
+	}
+}
+
+func (t tableConfigRecord) BaseTableName() orm.TableName {
 	return cos.Name + "_" + "config_record"
 }
 
-func (tableConfigRecord) FindOneById(ctx context.Context, id *dt.ID, orderBy ...orm.Order) (data ModelConfigRecord, found bool, err error) {
-	w := orm.NewQueryWrapper(data).Limit(1)
+func (t tableConfigRecord) TableName() orm.TableName {
+	ret := orm.TableName("config_record").Prefix(cos.Name)
+	for _, s := range t.suffix {
+		ret = ret.Suffix(s)
+	}
+	return ret
+}
+
+func (t tableConfigRecord) checkAndCloneTable(ctx context.Context) error {
+	if t.checkCloneTable {
+		tableNameList, err := orm.ShowTables(ctx, cos.Name)
+		if err != nil {
+			log.Error(err)
+			return err
+		}
+		if !tableNameList.Contain(t.BaseTableName()) {
+			return errors.SystemError.DatabaseCloneErrorNotFoundTemplate.WithField("tableName", t.BaseTableName().String())
+		}
+		if !tableNameList.Contain(t.TableName()) {
+			w := orm.NewCloneWrapper(t.BaseTableName(), t.TableName())
+			_, err := orm.Clone(ctx, cos.Name, w)
+			return err
+		}
+	}
+	return nil
+}
+
+func (t tableConfigRecord) FindOneById(ctx context.Context, id *dt.ID, orderBy ...orm.Order) (data ModelConfigRecord, found bool, err error) {
+	err = t.checkAndCloneTable(ctx)
+	if err != nil {
+		return
+	}
+	w := orm.NewQueryWrapper(data).Limit(1).TableName(t.TableName())
 	w.Eq(TableConfigRecord.Id, id)
 	w.Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &data)
@@ -94,8 +151,12 @@ func (tableConfigRecord) FindOneById(ctx context.Context, id *dt.ID, orderBy ...
 	return data, true, nil
 }
 
-func (tableConfigRecord) FindOneByConfigId(ctx context.Context, configId *dt.ID, orderBy ...orm.Order) (data ModelConfigRecord, found bool, err error) {
-	w := orm.NewQueryWrapper(data).Limit(1)
+func (t tableConfigRecord) FindOneByConfigId(ctx context.Context, configId *dt.ID, orderBy ...orm.Order) (data ModelConfigRecord, found bool, err error) {
+	err = t.checkAndCloneTable(ctx)
+	if err != nil {
+		return
+	}
+	w := orm.NewQueryWrapper(data).Limit(1).TableName(t.TableName())
 	w.Eq(TableConfigRecord.ConfigId, configId)
 	w.Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &data)
@@ -109,8 +170,12 @@ func (tableConfigRecord) FindOneByConfigId(ctx context.Context, configId *dt.ID,
 	return data, true, nil
 }
 
-func (tableConfigRecord) FindOneByRecordType(ctx context.Context, recordType cos.ConfigRecordType, orderBy ...orm.Order) (data ModelConfigRecord, found bool, err error) {
-	w := orm.NewQueryWrapper(data).Limit(1)
+func (t tableConfigRecord) FindOneByRecordType(ctx context.Context, recordType cos.ConfigRecordType, orderBy ...orm.Order) (data ModelConfigRecord, found bool, err error) {
+	err = t.checkAndCloneTable(ctx)
+	if err != nil {
+		return
+	}
+	w := orm.NewQueryWrapper(data).Limit(1).TableName(t.TableName())
 	w.Eq(TableConfigRecord.RecordType, recordType)
 	w.Order(orderBy...)
 	err = orm.Select(ctx, cos.Name, w, &data)

@@ -108,26 +108,97 @@ func (t ModelConfigList) MapToListConfigItemList() []*cos.ListConfigItem {
 }
 
 type tableConfig struct {
-	Id             orm.FieldName
-	CreateTime     orm.FieldName
-	UpdateTime     orm.FieldName
-	DeletedAt      orm.FieldName
-	ConfigId       orm.FieldName
-	IsDisabled     orm.FieldName
-	CreatorId      orm.FieldName
-	BaseId         orm.FieldName
-	NamespaceId    orm.FieldName
-	LastSeqNo      orm.FieldName
-	LastRecordType orm.FieldName
-	LinkCount      orm.FieldName
+	suffix          []string
+	checkCloneTable bool
+	Id              orm.FieldName
+	CreateTime      orm.FieldName
+	UpdateTime      orm.FieldName
+	DeletedAt       orm.FieldName
+	ConfigId        orm.FieldName
+	IsDisabled      orm.FieldName
+	CreatorId       orm.FieldName
+	BaseId          orm.FieldName
+	NamespaceId     orm.FieldName
+	LastSeqNo       orm.FieldName
+	LastRecordType  orm.FieldName
+	LinkCount       orm.FieldName
 }
 
-func (tableConfig) TableName() string {
+func (t tableConfig) EnableHashTableNameAndCheckClone(suffix ...string) tableConfig {
+	return tableConfig{
+		suffix:          suffix,
+		checkCloneTable: true,
+		Id:              t.Id,
+		CreateTime:      t.CreateTime,
+		UpdateTime:      t.UpdateTime,
+		DeletedAt:       t.DeletedAt,
+		ConfigId:        t.ConfigId,
+		IsDisabled:      t.IsDisabled,
+		CreatorId:       t.CreatorId,
+		BaseId:          t.BaseId,
+		NamespaceId:     t.NamespaceId,
+		LastSeqNo:       t.LastSeqNo,
+		LastRecordType:  t.LastRecordType,
+		LinkCount:       t.LinkCount,
+	}
+}
+
+func (t tableConfig) EnableHash(suffix ...string) tableConfig {
+	return tableConfig{
+		suffix:          suffix,
+		checkCloneTable: false,
+		Id:              t.Id,
+		CreateTime:      t.CreateTime,
+		UpdateTime:      t.UpdateTime,
+		DeletedAt:       t.DeletedAt,
+		ConfigId:        t.ConfigId,
+		IsDisabled:      t.IsDisabled,
+		CreatorId:       t.CreatorId,
+		BaseId:          t.BaseId,
+		NamespaceId:     t.NamespaceId,
+		LastSeqNo:       t.LastSeqNo,
+		LastRecordType:  t.LastRecordType,
+		LinkCount:       t.LinkCount,
+	}
+}
+
+func (t tableConfig) BaseTableName() orm.TableName {
 	return cos.Name + "_" + "config"
 }
 
-func (tableConfig) FindOneById(ctx context.Context, id *dt.ID, orderBy ...orm.Order) (data ModelConfig, found bool, err error) {
-	w := orm.NewQueryWrapper(data).Limit(1)
+func (t tableConfig) TableName() orm.TableName {
+	ret := orm.TableName("config").Prefix(cos.Name)
+	for _, s := range t.suffix {
+		ret = ret.Suffix(s)
+	}
+	return ret
+}
+
+func (t tableConfig) checkAndCloneTable(ctx context.Context) error {
+	if t.checkCloneTable {
+		tableNameList, err := orm.ShowTables(ctx, cos.Name)
+		if err != nil {
+			log.Error(err)
+			return err
+		}
+		if !tableNameList.Contain(t.BaseTableName()) {
+			return errors.SystemError.DatabaseCloneErrorNotFoundTemplate.WithField("tableName", t.BaseTableName().String())
+		}
+		if !tableNameList.Contain(t.TableName()) {
+			w := orm.NewCloneWrapper(t.BaseTableName(), t.TableName())
+			_, err := orm.Clone(ctx, cos.Name, w)
+			return err
+		}
+	}
+	return nil
+}
+
+func (t tableConfig) FindOneById(ctx context.Context, id *dt.ID, orderBy ...orm.Order) (data ModelConfig, found bool, err error) {
+	err = t.checkAndCloneTable(ctx)
+	if err != nil {
+		return
+	}
+	w := orm.NewQueryWrapper(data).Limit(1).TableName(t.TableName())
 	w.Eq(TableConfig.Id, id)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableConfig.DeletedAt, 0).IsNull(TableConfig.DeletedAt))
 	w.Order(orderBy...)
@@ -142,8 +213,12 @@ func (tableConfig) FindOneById(ctx context.Context, id *dt.ID, orderBy ...orm.Or
 	return data, true, nil
 }
 
-func (tableConfig) FindOneByConfigId(ctx context.Context, configId string, orderBy ...orm.Order) (data ModelConfig, found bool, err error) {
-	w := orm.NewQueryWrapper(data).Limit(1)
+func (t tableConfig) FindOneByConfigId(ctx context.Context, configId string, orderBy ...orm.Order) (data ModelConfig, found bool, err error) {
+	err = t.checkAndCloneTable(ctx)
+	if err != nil {
+		return
+	}
+	w := orm.NewQueryWrapper(data).Limit(1).TableName(t.TableName())
 	w.Eq(TableConfig.ConfigId, configId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableConfig.DeletedAt, 0).IsNull(TableConfig.DeletedAt))
 	w.Order(orderBy...)
@@ -158,8 +233,12 @@ func (tableConfig) FindOneByConfigId(ctx context.Context, configId string, order
 	return data, true, nil
 }
 
-func (tableConfig) FindOneByCreatorId(ctx context.Context, creatorId *dt.ID, orderBy ...orm.Order) (data ModelConfig, found bool, err error) {
-	w := orm.NewQueryWrapper(data).Limit(1)
+func (t tableConfig) FindOneByCreatorId(ctx context.Context, creatorId *dt.ID, orderBy ...orm.Order) (data ModelConfig, found bool, err error) {
+	err = t.checkAndCloneTable(ctx)
+	if err != nil {
+		return
+	}
+	w := orm.NewQueryWrapper(data).Limit(1).TableName(t.TableName())
 	w.Eq(TableConfig.CreatorId, creatorId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableConfig.DeletedAt, 0).IsNull(TableConfig.DeletedAt))
 	w.Order(orderBy...)
@@ -174,8 +253,12 @@ func (tableConfig) FindOneByCreatorId(ctx context.Context, creatorId *dt.ID, ord
 	return data, true, nil
 }
 
-func (tableConfig) FindOneByBaseId(ctx context.Context, baseId *dt.ID, orderBy ...orm.Order) (data ModelConfig, found bool, err error) {
-	w := orm.NewQueryWrapper(data).Limit(1)
+func (t tableConfig) FindOneByBaseId(ctx context.Context, baseId *dt.ID, orderBy ...orm.Order) (data ModelConfig, found bool, err error) {
+	err = t.checkAndCloneTable(ctx)
+	if err != nil {
+		return
+	}
+	w := orm.NewQueryWrapper(data).Limit(1).TableName(t.TableName())
 	w.Eq(TableConfig.BaseId, baseId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableConfig.DeletedAt, 0).IsNull(TableConfig.DeletedAt))
 	w.Order(orderBy...)
@@ -190,8 +273,12 @@ func (tableConfig) FindOneByBaseId(ctx context.Context, baseId *dt.ID, orderBy .
 	return data, true, nil
 }
 
-func (tableConfig) FindOneByNamespaceId(ctx context.Context, namespaceId *dt.ID, orderBy ...orm.Order) (data ModelConfig, found bool, err error) {
-	w := orm.NewQueryWrapper(data).Limit(1)
+func (t tableConfig) FindOneByNamespaceId(ctx context.Context, namespaceId *dt.ID, orderBy ...orm.Order) (data ModelConfig, found bool, err error) {
+	err = t.checkAndCloneTable(ctx)
+	if err != nil {
+		return
+	}
+	w := orm.NewQueryWrapper(data).Limit(1).TableName(t.TableName())
 	w.Eq(TableConfig.NamespaceId, namespaceId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableConfig.DeletedAt, 0).IsNull(TableConfig.DeletedAt))
 	w.Order(orderBy...)

@@ -121,24 +121,91 @@ func (t ModelAccountList) MapToUserListItemList() []*cos.UserListItem {
 }
 
 type tableAccount struct {
-	Id          orm.FieldName
-	Identifier  orm.FieldName
-	Credential  orm.FieldName
-	AccountType orm.FieldName
-	CreateTime  orm.FieldName
-	UpdateTime  orm.FieldName
-	DeletedAt   orm.FieldName
-	IsDisabled  orm.FieldName
-	CreatorId   orm.FieldName
-	Nick        orm.FieldName
+	suffix          []string
+	checkCloneTable bool
+	Id              orm.FieldName
+	Identifier      orm.FieldName
+	Credential      orm.FieldName
+	AccountType     orm.FieldName
+	CreateTime      orm.FieldName
+	UpdateTime      orm.FieldName
+	DeletedAt       orm.FieldName
+	IsDisabled      orm.FieldName
+	CreatorId       orm.FieldName
+	Nick            orm.FieldName
 }
 
-func (tableAccount) TableName() string {
+func (t tableAccount) EnableHashTableNameAndCheckClone(suffix ...string) tableAccount {
+	return tableAccount{
+		suffix:          suffix,
+		checkCloneTable: true,
+		Id:              t.Id,
+		Identifier:      t.Identifier,
+		Credential:      t.Credential,
+		AccountType:     t.AccountType,
+		CreateTime:      t.CreateTime,
+		UpdateTime:      t.UpdateTime,
+		DeletedAt:       t.DeletedAt,
+		IsDisabled:      t.IsDisabled,
+		CreatorId:       t.CreatorId,
+		Nick:            t.Nick,
+	}
+}
+
+func (t tableAccount) EnableHash(suffix ...string) tableAccount {
+	return tableAccount{
+		suffix:          suffix,
+		checkCloneTable: false,
+		Id:              t.Id,
+		Identifier:      t.Identifier,
+		Credential:      t.Credential,
+		AccountType:     t.AccountType,
+		CreateTime:      t.CreateTime,
+		UpdateTime:      t.UpdateTime,
+		DeletedAt:       t.DeletedAt,
+		IsDisabled:      t.IsDisabled,
+		CreatorId:       t.CreatorId,
+		Nick:            t.Nick,
+	}
+}
+
+func (t tableAccount) BaseTableName() orm.TableName {
 	return cos.Name + "_" + "account"
 }
 
-func (tableAccount) FindOneById(ctx context.Context, id *dt.ID, orderBy ...orm.Order) (data ModelAccount, found bool, err error) {
-	w := orm.NewQueryWrapper(data).Limit(1)
+func (t tableAccount) TableName() orm.TableName {
+	ret := orm.TableName("account").Prefix(cos.Name)
+	for _, s := range t.suffix {
+		ret = ret.Suffix(s)
+	}
+	return ret
+}
+
+func (t tableAccount) checkAndCloneTable(ctx context.Context) error {
+	if t.checkCloneTable {
+		tableNameList, err := orm.ShowTables(ctx, cos.Name)
+		if err != nil {
+			log.Error(err)
+			return err
+		}
+		if !tableNameList.Contain(t.BaseTableName()) {
+			return errors.SystemError.DatabaseCloneErrorNotFoundTemplate.WithField("tableName", t.BaseTableName().String())
+		}
+		if !tableNameList.Contain(t.TableName()) {
+			w := orm.NewCloneWrapper(t.BaseTableName(), t.TableName())
+			_, err := orm.Clone(ctx, cos.Name, w)
+			return err
+		}
+	}
+	return nil
+}
+
+func (t tableAccount) FindOneById(ctx context.Context, id *dt.ID, orderBy ...orm.Order) (data ModelAccount, found bool, err error) {
+	err = t.checkAndCloneTable(ctx)
+	if err != nil {
+		return
+	}
+	w := orm.NewQueryWrapper(data).Limit(1).TableName(t.TableName())
 	w.Eq(TableAccount.Id, id)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableAccount.DeletedAt, 0).IsNull(TableAccount.DeletedAt))
 	w.Order(orderBy...)
@@ -153,8 +220,12 @@ func (tableAccount) FindOneById(ctx context.Context, id *dt.ID, orderBy ...orm.O
 	return data, true, nil
 }
 
-func (tableAccount) FindOneByIdentifier(ctx context.Context, identifier string, orderBy ...orm.Order) (data ModelAccount, found bool, err error) {
-	w := orm.NewQueryWrapper(data).Limit(1)
+func (t tableAccount) FindOneByIdentifier(ctx context.Context, identifier string, orderBy ...orm.Order) (data ModelAccount, found bool, err error) {
+	err = t.checkAndCloneTable(ctx)
+	if err != nil {
+		return
+	}
+	w := orm.NewQueryWrapper(data).Limit(1).TableName(t.TableName())
 	w.Eq(TableAccount.Identifier, identifier)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableAccount.DeletedAt, 0).IsNull(TableAccount.DeletedAt))
 	w.Order(orderBy...)
@@ -169,8 +240,12 @@ func (tableAccount) FindOneByIdentifier(ctx context.Context, identifier string, 
 	return data, true, nil
 }
 
-func (tableAccount) FindOneByAccountType(ctx context.Context, accountType cos.AccountType, orderBy ...orm.Order) (data ModelAccount, found bool, err error) {
-	w := orm.NewQueryWrapper(data).Limit(1)
+func (t tableAccount) FindOneByAccountType(ctx context.Context, accountType cos.AccountType, orderBy ...orm.Order) (data ModelAccount, found bool, err error) {
+	err = t.checkAndCloneTable(ctx)
+	if err != nil {
+		return
+	}
+	w := orm.NewQueryWrapper(data).Limit(1).TableName(t.TableName())
 	w.Eq(TableAccount.AccountType, accountType)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableAccount.DeletedAt, 0).IsNull(TableAccount.DeletedAt))
 	w.Order(orderBy...)
@@ -185,8 +260,12 @@ func (tableAccount) FindOneByAccountType(ctx context.Context, accountType cos.Ac
 	return data, true, nil
 }
 
-func (tableAccount) FindOneByCreatorId(ctx context.Context, creatorId *dt.ID, orderBy ...orm.Order) (data ModelAccount, found bool, err error) {
-	w := orm.NewQueryWrapper(data).Limit(1)
+func (t tableAccount) FindOneByCreatorId(ctx context.Context, creatorId *dt.ID, orderBy ...orm.Order) (data ModelAccount, found bool, err error) {
+	err = t.checkAndCloneTable(ctx)
+	if err != nil {
+		return
+	}
+	w := orm.NewQueryWrapper(data).Limit(1).TableName(t.TableName())
 	w.Eq(TableAccount.CreatorId, creatorId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableAccount.DeletedAt, 0).IsNull(TableAccount.DeletedAt))
 	w.Order(orderBy...)

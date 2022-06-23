@@ -83,6 +83,17 @@ func (t TableName) Alias(name string) string {
 	return t.String() + " " + name
 }
 
+type TableNameList []TableName
+
+func (t TableNameList) Contain(tb TableName) bool {
+	for _, item := range t {
+		if item == tb {
+			return true
+		}
+	}
+	return false
+}
+
 type FieldName string
 
 func (t FieldName) String() string {

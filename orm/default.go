@@ -3,6 +3,7 @@ package orm
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"github.com/juxuny/yc/errors"
 	"github.com/juxuny/yc/log"
 	"reflect"
@@ -117,4 +118,35 @@ func Delete(ctx context.Context, configName string, w DeleteWrapper) (result sql
 		return result, errors.SystemError.DatabaseExecError.Wrap(err)
 	}
 	return
+}
+
+func Clone(ctx context.Context, configName string, w CloneWrapper) (result sql.Result, err error) {
+	statement, values, err := w.Build()
+	if err != nil {
+		return result, err
+	}
+	result, err = connectManagerInstance.Exec(ctx, configName, statement, values...)
+	if err != nil {
+		return result, errors.SystemError.DatabaseExecError.Wrap(err)
+	}
+	return
+}
+
+func ShowTables(ctx context.Context, configName string) (tableNameList TableNameList, err error) {
+	statement := fmt.Sprintf("SHOW TABLES")
+	result, err := connectManagerInstance.Query(ctx, configName, statement)
+	if err != nil {
+		return nil, errors.SystemError.DatabaseQueryError.Wrap(err)
+	}
+	defer func() {
+		_ = result.Close()
+	}()
+	for result.Next() {
+		var tb string
+		if err := result.Scan(&tb); err != nil {
+			return nil, errors.SystemError.DatabaseScanError.Wrap(err)
+		}
+		tableNameList = append(tableNameList, TableName(tb))
+	}
+	return tableNameList, nil
 }

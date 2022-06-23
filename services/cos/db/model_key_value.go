@@ -111,26 +111,97 @@ func (t ModelKeyValueList) MapToKeyValueRespList() []*cos.KeyValueResp {
 }
 
 type tableKeyValue struct {
-	Id          orm.FieldName
-	CreateTime  orm.FieldName
-	UpdateTime  orm.FieldName
-	DeletedAt   orm.FieldName
-	IsDisabled  orm.FieldName
-	ConfigKey   orm.FieldName
-	ConfigValue orm.FieldName
-	ValueType   orm.FieldName
-	ConfigId    orm.FieldName
-	CreatorId   orm.FieldName
-	IsHot       orm.FieldName
-	SeqNo       orm.FieldName
+	suffix          []string
+	checkCloneTable bool
+	Id              orm.FieldName
+	CreateTime      orm.FieldName
+	UpdateTime      orm.FieldName
+	DeletedAt       orm.FieldName
+	IsDisabled      orm.FieldName
+	ConfigKey       orm.FieldName
+	ConfigValue     orm.FieldName
+	ValueType       orm.FieldName
+	ConfigId        orm.FieldName
+	CreatorId       orm.FieldName
+	IsHot           orm.FieldName
+	SeqNo           orm.FieldName
 }
 
-func (tableKeyValue) TableName() string {
+func (t tableKeyValue) EnableHashTableNameAndCheckClone(suffix ...string) tableKeyValue {
+	return tableKeyValue{
+		suffix:          suffix,
+		checkCloneTable: true,
+		Id:              t.Id,
+		CreateTime:      t.CreateTime,
+		UpdateTime:      t.UpdateTime,
+		DeletedAt:       t.DeletedAt,
+		IsDisabled:      t.IsDisabled,
+		ConfigKey:       t.ConfigKey,
+		ConfigValue:     t.ConfigValue,
+		ValueType:       t.ValueType,
+		ConfigId:        t.ConfigId,
+		CreatorId:       t.CreatorId,
+		IsHot:           t.IsHot,
+		SeqNo:           t.SeqNo,
+	}
+}
+
+func (t tableKeyValue) EnableHash(suffix ...string) tableKeyValue {
+	return tableKeyValue{
+		suffix:          suffix,
+		checkCloneTable: false,
+		Id:              t.Id,
+		CreateTime:      t.CreateTime,
+		UpdateTime:      t.UpdateTime,
+		DeletedAt:       t.DeletedAt,
+		IsDisabled:      t.IsDisabled,
+		ConfigKey:       t.ConfigKey,
+		ConfigValue:     t.ConfigValue,
+		ValueType:       t.ValueType,
+		ConfigId:        t.ConfigId,
+		CreatorId:       t.CreatorId,
+		IsHot:           t.IsHot,
+		SeqNo:           t.SeqNo,
+	}
+}
+
+func (t tableKeyValue) BaseTableName() orm.TableName {
 	return cos.Name + "_" + "key_value"
 }
 
-func (tableKeyValue) FindOneById(ctx context.Context, id *dt.ID, orderBy ...orm.Order) (data ModelKeyValue, found bool, err error) {
-	w := orm.NewQueryWrapper(data).Limit(1)
+func (t tableKeyValue) TableName() orm.TableName {
+	ret := orm.TableName("key_value").Prefix(cos.Name)
+	for _, s := range t.suffix {
+		ret = ret.Suffix(s)
+	}
+	return ret
+}
+
+func (t tableKeyValue) checkAndCloneTable(ctx context.Context) error {
+	if t.checkCloneTable {
+		tableNameList, err := orm.ShowTables(ctx, cos.Name)
+		if err != nil {
+			log.Error(err)
+			return err
+		}
+		if !tableNameList.Contain(t.BaseTableName()) {
+			return errors.SystemError.DatabaseCloneErrorNotFoundTemplate.WithField("tableName", t.BaseTableName().String())
+		}
+		if !tableNameList.Contain(t.TableName()) {
+			w := orm.NewCloneWrapper(t.BaseTableName(), t.TableName())
+			_, err := orm.Clone(ctx, cos.Name, w)
+			return err
+		}
+	}
+	return nil
+}
+
+func (t tableKeyValue) FindOneById(ctx context.Context, id *dt.ID, orderBy ...orm.Order) (data ModelKeyValue, found bool, err error) {
+	err = t.checkAndCloneTable(ctx)
+	if err != nil {
+		return
+	}
+	w := orm.NewQueryWrapper(data).Limit(1).TableName(t.TableName())
 	w.Eq(TableKeyValue.Id, id)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableKeyValue.DeletedAt, 0).IsNull(TableKeyValue.DeletedAt))
 	w.Order(orderBy...)
@@ -145,8 +216,12 @@ func (tableKeyValue) FindOneById(ctx context.Context, id *dt.ID, orderBy ...orm.
 	return data, true, nil
 }
 
-func (tableKeyValue) FindOneByConfigKey(ctx context.Context, configKey string, orderBy ...orm.Order) (data ModelKeyValue, found bool, err error) {
-	w := orm.NewQueryWrapper(data).Limit(1)
+func (t tableKeyValue) FindOneByConfigKey(ctx context.Context, configKey string, orderBy ...orm.Order) (data ModelKeyValue, found bool, err error) {
+	err = t.checkAndCloneTable(ctx)
+	if err != nil {
+		return
+	}
+	w := orm.NewQueryWrapper(data).Limit(1).TableName(t.TableName())
 	w.Eq(TableKeyValue.ConfigKey, configKey)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableKeyValue.DeletedAt, 0).IsNull(TableKeyValue.DeletedAt))
 	w.Order(orderBy...)
@@ -161,8 +236,12 @@ func (tableKeyValue) FindOneByConfigKey(ctx context.Context, configKey string, o
 	return data, true, nil
 }
 
-func (tableKeyValue) FindOneByConfigId(ctx context.Context, configId *dt.ID, orderBy ...orm.Order) (data ModelKeyValue, found bool, err error) {
-	w := orm.NewQueryWrapper(data).Limit(1)
+func (t tableKeyValue) FindOneByConfigId(ctx context.Context, configId *dt.ID, orderBy ...orm.Order) (data ModelKeyValue, found bool, err error) {
+	err = t.checkAndCloneTable(ctx)
+	if err != nil {
+		return
+	}
+	w := orm.NewQueryWrapper(data).Limit(1).TableName(t.TableName())
 	w.Eq(TableKeyValue.ConfigId, configId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableKeyValue.DeletedAt, 0).IsNull(TableKeyValue.DeletedAt))
 	w.Order(orderBy...)
@@ -177,8 +256,12 @@ func (tableKeyValue) FindOneByConfigId(ctx context.Context, configId *dt.ID, ord
 	return data, true, nil
 }
 
-func (tableKeyValue) FindOneByCreatorId(ctx context.Context, creatorId *dt.ID, orderBy ...orm.Order) (data ModelKeyValue, found bool, err error) {
-	w := orm.NewQueryWrapper(data).Limit(1)
+func (t tableKeyValue) FindOneByCreatorId(ctx context.Context, creatorId *dt.ID, orderBy ...orm.Order) (data ModelKeyValue, found bool, err error) {
+	err = t.checkAndCloneTable(ctx)
+	if err != nil {
+		return
+	}
+	w := orm.NewQueryWrapper(data).Limit(1).TableName(t.TableName())
 	w.Eq(TableKeyValue.CreatorId, creatorId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableKeyValue.DeletedAt, 0).IsNull(TableKeyValue.DeletedAt))
 	w.Order(orderBy...)
@@ -193,8 +276,12 @@ func (tableKeyValue) FindOneByCreatorId(ctx context.Context, creatorId *dt.ID, o
 	return data, true, nil
 }
 
-func (tableKeyValue) FindOneByIsHot(ctx context.Context, isHot bool, orderBy ...orm.Order) (data ModelKeyValue, found bool, err error) {
-	w := orm.NewQueryWrapper(data).Limit(1)
+func (t tableKeyValue) FindOneByIsHot(ctx context.Context, isHot bool, orderBy ...orm.Order) (data ModelKeyValue, found bool, err error) {
+	err = t.checkAndCloneTable(ctx)
+	if err != nil {
+		return
+	}
+	w := orm.NewQueryWrapper(data).Limit(1).TableName(t.TableName())
 	w.Eq(TableKeyValue.IsHot, isHot)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableKeyValue.DeletedAt, 0).IsNull(TableKeyValue.DeletedAt))
 	w.Order(orderBy...)
@@ -209,8 +296,12 @@ func (tableKeyValue) FindOneByIsHot(ctx context.Context, isHot bool, orderBy ...
 	return data, true, nil
 }
 
-func (tableKeyValue) FindOneBySeqNo(ctx context.Context, seqNo uint64, orderBy ...orm.Order) (data ModelKeyValue, found bool, err error) {
-	w := orm.NewQueryWrapper(data).Limit(1)
+func (t tableKeyValue) FindOneBySeqNo(ctx context.Context, seqNo uint64, orderBy ...orm.Order) (data ModelKeyValue, found bool, err error) {
+	err = t.checkAndCloneTable(ctx)
+	if err != nil {
+		return
+	}
+	w := orm.NewQueryWrapper(data).Limit(1).TableName(t.TableName())
 	w.Eq(TableKeyValue.SeqNo, seqNo)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableKeyValue.DeletedAt, 0).IsNull(TableKeyValue.DeletedAt))
 	w.Order(orderBy...)

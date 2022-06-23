@@ -111,26 +111,97 @@ func (t ModelAccessKeyList) MapToAccessKeyItemList() []*cos.AccessKeyItem {
 }
 
 type tableAccessKey struct {
-	Id             orm.FieldName
-	CreateTime     orm.FieldName
-	UpdateTime     orm.FieldName
-	IsDisabled     orm.FieldName
-	DeletedAt      orm.FieldName
-	UserId         orm.FieldName
-	AccessKey      orm.FieldName
-	HasValidity    orm.FieldName
-	ValidStartTime orm.FieldName
-	ValidEndTime   orm.FieldName
-	Remark         orm.FieldName
-	Secret         orm.FieldName
+	suffix          []string
+	checkCloneTable bool
+	Id              orm.FieldName
+	CreateTime      orm.FieldName
+	UpdateTime      orm.FieldName
+	IsDisabled      orm.FieldName
+	DeletedAt       orm.FieldName
+	UserId          orm.FieldName
+	AccessKey       orm.FieldName
+	HasValidity     orm.FieldName
+	ValidStartTime  orm.FieldName
+	ValidEndTime    orm.FieldName
+	Remark          orm.FieldName
+	Secret          orm.FieldName
 }
 
-func (tableAccessKey) TableName() string {
+func (t tableAccessKey) EnableHashTableNameAndCheckClone(suffix ...string) tableAccessKey {
+	return tableAccessKey{
+		suffix:          suffix,
+		checkCloneTable: true,
+		Id:              t.Id,
+		CreateTime:      t.CreateTime,
+		UpdateTime:      t.UpdateTime,
+		IsDisabled:      t.IsDisabled,
+		DeletedAt:       t.DeletedAt,
+		UserId:          t.UserId,
+		AccessKey:       t.AccessKey,
+		HasValidity:     t.HasValidity,
+		ValidStartTime:  t.ValidStartTime,
+		ValidEndTime:    t.ValidEndTime,
+		Remark:          t.Remark,
+		Secret:          t.Secret,
+	}
+}
+
+func (t tableAccessKey) EnableHash(suffix ...string) tableAccessKey {
+	return tableAccessKey{
+		suffix:          suffix,
+		checkCloneTable: false,
+		Id:              t.Id,
+		CreateTime:      t.CreateTime,
+		UpdateTime:      t.UpdateTime,
+		IsDisabled:      t.IsDisabled,
+		DeletedAt:       t.DeletedAt,
+		UserId:          t.UserId,
+		AccessKey:       t.AccessKey,
+		HasValidity:     t.HasValidity,
+		ValidStartTime:  t.ValidStartTime,
+		ValidEndTime:    t.ValidEndTime,
+		Remark:          t.Remark,
+		Secret:          t.Secret,
+	}
+}
+
+func (t tableAccessKey) BaseTableName() orm.TableName {
 	return cos.Name + "_" + "access_key"
 }
 
-func (tableAccessKey) FindOneById(ctx context.Context, id *dt.ID, orderBy ...orm.Order) (data ModelAccessKey, found bool, err error) {
-	w := orm.NewQueryWrapper(data).Limit(1)
+func (t tableAccessKey) TableName() orm.TableName {
+	ret := orm.TableName("access_key").Prefix(cos.Name)
+	for _, s := range t.suffix {
+		ret = ret.Suffix(s)
+	}
+	return ret
+}
+
+func (t tableAccessKey) checkAndCloneTable(ctx context.Context) error {
+	if t.checkCloneTable {
+		tableNameList, err := orm.ShowTables(ctx, cos.Name)
+		if err != nil {
+			log.Error(err)
+			return err
+		}
+		if !tableNameList.Contain(t.BaseTableName()) {
+			return errors.SystemError.DatabaseCloneErrorNotFoundTemplate.WithField("tableName", t.BaseTableName().String())
+		}
+		if !tableNameList.Contain(t.TableName()) {
+			w := orm.NewCloneWrapper(t.BaseTableName(), t.TableName())
+			_, err := orm.Clone(ctx, cos.Name, w)
+			return err
+		}
+	}
+	return nil
+}
+
+func (t tableAccessKey) FindOneById(ctx context.Context, id *dt.ID, orderBy ...orm.Order) (data ModelAccessKey, found bool, err error) {
+	err = t.checkAndCloneTable(ctx)
+	if err != nil {
+		return
+	}
+	w := orm.NewQueryWrapper(data).Limit(1).TableName(t.TableName())
 	w.Eq(TableAccessKey.Id, id)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableAccessKey.DeletedAt, 0).IsNull(TableAccessKey.DeletedAt))
 	w.Order(orderBy...)
@@ -145,8 +216,12 @@ func (tableAccessKey) FindOneById(ctx context.Context, id *dt.ID, orderBy ...orm
 	return data, true, nil
 }
 
-func (tableAccessKey) FindOneByUserId(ctx context.Context, userId *dt.ID, orderBy ...orm.Order) (data ModelAccessKey, found bool, err error) {
-	w := orm.NewQueryWrapper(data).Limit(1)
+func (t tableAccessKey) FindOneByUserId(ctx context.Context, userId *dt.ID, orderBy ...orm.Order) (data ModelAccessKey, found bool, err error) {
+	err = t.checkAndCloneTable(ctx)
+	if err != nil {
+		return
+	}
+	w := orm.NewQueryWrapper(data).Limit(1).TableName(t.TableName())
 	w.Eq(TableAccessKey.UserId, userId)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableAccessKey.DeletedAt, 0).IsNull(TableAccessKey.DeletedAt))
 	w.Order(orderBy...)
@@ -161,8 +236,12 @@ func (tableAccessKey) FindOneByUserId(ctx context.Context, userId *dt.ID, orderB
 	return data, true, nil
 }
 
-func (tableAccessKey) FindOneByAccessKey(ctx context.Context, accessKey string, orderBy ...orm.Order) (data ModelAccessKey, found bool, err error) {
-	w := orm.NewQueryWrapper(data).Limit(1)
+func (t tableAccessKey) FindOneByAccessKey(ctx context.Context, accessKey string, orderBy ...orm.Order) (data ModelAccessKey, found bool, err error) {
+	err = t.checkAndCloneTable(ctx)
+	if err != nil {
+		return
+	}
+	w := orm.NewQueryWrapper(data).Limit(1).TableName(t.TableName())
 	w.Eq(TableAccessKey.AccessKey, accessKey)
 	w.Nested(orm.NewOrWhereWrapper().Eq(TableAccessKey.DeletedAt, 0).IsNull(TableAccessKey.DeletedAt))
 	w.Order(orderBy...)
