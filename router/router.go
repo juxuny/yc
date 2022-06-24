@@ -25,12 +25,18 @@ type Router struct {
 	Prefix         string
 	m              map[string]reflect.Value
 	RecoverHandler func(w http.ResponseWriter, r *http.Request)
+	triggerSet     TriggerConfig
 }
 
-func NewRouter(prefix string) *Router {
+func NewRouter(prefix string, trigger ...TriggerConfig) *Router {
+	triggerSet := make(TriggerConfig)
+	for _, item := range trigger {
+		triggerSet.Merge(item)
+	}
 	return &Router{
-		Prefix: prefix,
-		m:      make(map[string]reflect.Value),
+		Prefix:     prefix,
+		m:          make(map[string]reflect.Value),
+		triggerSet: triggerSet,
 		RecoverHandler: func(w http.ResponseWriter, r *http.Request) {
 		},
 	}
@@ -130,6 +136,13 @@ func (t *Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 			_ = r.Body.Close()
 			log.Info("request data size:", len(data))
+			if trigger, b := t.triggerSet[TriggerSignValidator]; b {
+				if err := trigger(ctx, data); err != nil {
+					statusCode = http.StatusBadRequest
+					WriteJson(w, errors.SystemError.InvalidSign.Wrap(err))
+					return
+				}
+			}
 			if message, ok := requestParamInstance.(proto.Message); ok {
 				if err := proto.Unmarshal(data, message); err != nil {
 					statusCode = http.StatusBadRequest

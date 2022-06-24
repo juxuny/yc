@@ -54,6 +54,7 @@ var SystemError = struct {
 	RpcCallErrorNoUserId               Error `code:"-10050" msg:"rpc call error: no userId"`
 	RpcCallErrorInvalidUserId          Error `code:"-10051" msg:"rpc call error: invalid userId"`
 	DatabaseCloneErrorNotFoundTemplate Error `code:"-10052" msg:"database clone error: not found template table"`
+	InvalidSign                        Error `code:"-10053" msg:"invalid sign"`
 }{}
 
 func init() {

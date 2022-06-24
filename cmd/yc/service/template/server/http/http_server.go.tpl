@@ -13,9 +13,9 @@ import (
 	"net/http"
 )
 
-func Start(ctx context.Context) {
+func Start(ctx context.Context, trigger ...router.TriggerConfig) {
 	trace.InitReqId("http")
-	r := router.NewRouter("/api")
+	r := router.NewRouter(config.Env.Prefix, trigger...)
 	if err := r.Register({{.PackageAlias}}.Name, handler.NewWrapper()); err != nil {
 		panic(err)
 	}
