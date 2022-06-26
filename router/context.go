@@ -33,9 +33,10 @@ func newContext(handlerChain []HandleFunc, w http.ResponseWriter, r *http.Reques
 }
 
 func (t *Context) Next() {
+	t.index += 1
 	for t.index < len(t.handlerChain) {
-		t.index += 1
 		t.handlerChain[t.index](t)
+		t.index += 1
 	}
 }
 
@@ -60,11 +61,21 @@ func (t *Context) WriteJsonWithCode(data interface{}, code int) (int, error) {
 }
 
 func (t *Context) WriteJsonFailed(data interface{}) (int, error) {
-	return t.WriteJsonWithCode(data, http.StatusBadRequest)
+	t.ResponseWriter.Header().Set(HeaderContentType, "application/json;utf8")
+	t.WriteHeaderCode(http.StatusBadRequest)
+	jsonData, _ := json.Marshal(data)
+	return t.Write(jsonData)
 }
 
 func (t *Context) WriteJsonSuccess(data interface{}) (int, error) {
-	return t.WriteJsonWithCode(data, http.StatusOK)
+	t.ResponseWriter.Header().Set(HeaderContentType, "application/json;utf8")
+	t.WriteHeaderCode(http.StatusOK)
+	jsonData, _ := json.Marshal(JsonResponseWrapper{
+		Code: 0,
+		Data: data,
+		Msg:  "",
+	})
+	return t.Write(jsonData)
 }
 
 func (t *Context) WriteProtobufWithCode(data proto.Message, code int) (int, error) {

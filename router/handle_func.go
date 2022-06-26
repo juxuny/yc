@@ -50,11 +50,15 @@ type mainHandlerWrapper struct {
 	prefix string
 }
 
-func newMainHandler(prefix string) *mainHandlerWrapper {
+func newMainHandlerWrapper(prefix string) *mainHandlerWrapper {
 	return &mainHandlerWrapper{
 		m:      make(map[string]reflect.Value),
 		prefix: prefix,
 	}
+}
+
+func (t *mainHandlerWrapper) SetPrefix(prefix string) {
+	t.prefix = prefix
 }
 
 func (t *mainHandlerWrapper) initializeRequestInstance(ctx *Context, caller reflect.Value) (inputValue []reflect.Value, requestParamInstance interface{}) {
