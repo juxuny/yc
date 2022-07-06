@@ -2,6 +2,7 @@ package template
 
 import (
 	"fmt"
+	"github.com/fatih/camelcase"
 	"html/template"
 	"reflect"
 	"strings"
@@ -56,4 +57,28 @@ func lower(s string) string {
 
 func upper(s string) string {
 	return strings.ToUpper(s)
+}
+
+func splitVariable(v string) []string {
+	if strings.Contains(v, "_") {
+		return strings.Split(v, "_")
+	} else if strings.Contains(v, "-") {
+		return strings.Split(v, "-")
+	} else {
+		return camelcase.Split(v)
+	}
+}
+
+func underlineString(v string) string {
+	l := splitVariable(v)
+	return strings.Join(l, "_")
+}
+
+func camelcaseString(v string) string {
+	s := splitVariable(v)
+	for i := range s {
+		s[i] = strings.ToLower(s[i])
+		s[i] = toUpperFirst(s[i])
+	}
+	return strings.Join(s, "")
 }

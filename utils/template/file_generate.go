@@ -15,6 +15,8 @@ var funcMap = map[string]interface{}{
 	"num":         castNumber,
 	"lower":       lower,
 	"upper":       upper,
+	"camelcase":   camelcaseString,
+	"underline":   underlineString,
 }
 
 func RunEmbedFile(fs embed.FS, templateFileName string, outputFileName string, data interface{}) error {

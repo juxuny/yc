@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace {{.CSharpModelNamespace}}
 {
-    [Table("{{.TableNameWithoutServicePrefix}}")]
+    [Table("{{.TableNameWithoutServicePrefix|camelcase}}")]
     public class {{.ModelName}}
     {
         public static class TableDefinition {
@@ -18,7 +18,7 @@ namespace {{.CSharpModelNamespace}}
         }
 
         public static string GetTableName() {
-            return "{{.TableNameWithoutServicePrefix}}";
+            return "{{.TableNameWithoutServicePrefix|camelcase}}";
         }
         public {{.ModelName}}() { }
 
