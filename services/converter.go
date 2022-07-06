@@ -34,7 +34,7 @@ var cSharperDataTypeMapper = map[string]string{
 	"uint64": "ulong",
 }
 
-func ConvertProtoTypeToCSharperDataType(dataType string) (finalType string) {
+func ConvertProtoTypeToCSharpDataType(dataType string) (finalType string) {
 	finalType, b := cSharperDataTypeMapper[dataType]
 	if !b {
 		return dataType

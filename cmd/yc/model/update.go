@@ -27,9 +27,10 @@ type UpdateCommand struct {
 	// golang
 	Go bool
 
-	// c-sharper
-	CSharper          bool
-	CSharperNamespace string
+	// c-sharp
+	CSharp               bool
+	CSharpModelNamespace string
+	CSharpBaseNamespace  string
 }
 
 func (t *UpdateCommand) Prepare(cmd *cobra.Command) {
@@ -43,20 +44,24 @@ func (t *UpdateCommand) InitFlag(cmd *cobra.Command) {
 
 	cmd.PersistentFlags().BoolVar(&t.Go, "go", false, "go model template")
 
-	cmd.PersistentFlags().BoolVar(&t.CSharper, "cs", false, "c-sharper model template")
-	cmd.PersistentFlags().StringVar(&t.CSharperNamespace, "cs-namespace", "", "c-sharper namespace")
+	cmd.PersistentFlags().BoolVar(&t.CSharp, "cs", false, "c-sharp model template")
+	cmd.PersistentFlags().StringVar(&t.CSharpModelNamespace, "cs-model-namespace", "", "c-sharp model namespace")
+	cmd.PersistentFlags().StringVar(&t.CSharpBaseNamespace, "cs-base-namespace", "", "c-sharp base namespace")
 }
 
 func (t *UpdateCommand) BeforeRun(cmd *cobra.Command) {
 	log.Println("before")
-	if !t.Go && !t.CSharper {
+	if !t.Go && !t.CSharp {
 		log.Fatal("missing arguments: --go, --cs")
 	}
-	if t.CSharper && t.ModelOutputDir == "" {
+	if t.CSharp && t.ModelOutputDir == "" {
 		log.Fatal("missing argument: --model-output-dir")
 	}
-	if t.CSharper && t.CSharperNamespace == "" {
-		log.Fatal("missing argument: --cs-namespace")
+	if t.CSharp && t.CSharpModelNamespace == "" {
+		log.Fatal("missing argument: --cs-model-namespace")
+	}
+	if t.CSharp && t.CSharpBaseNamespace == "" {
+		log.Fatal("missing argument: --cs-base-namespace")
 	}
 }
 
@@ -103,7 +108,7 @@ func (t *UpdateCommand) Run() {
 		t.genRpc(service)
 		t.genGoModel(service)
 		t.fmt()
-	} else if t.CSharper {
+	} else if t.CSharp {
 		t.genCsEnum(service)
 		t.genCsModel(service)
 	}
@@ -175,22 +180,22 @@ func (t *UpdateCommand) createModelFromMessageOfProto(service services.ServiceEn
 		}
 		fieldSet.Add(f.FieldName)
 		field := services.ModelField{
-			TableName:        strings.Replace(msg.MessageName, "Model", "Table", 1),
-			ModelName:        msg.MessageName,
-			FieldName:        f.FieldName,
-			OrmFieldName:     utils.ToUnderLine(f.FieldName),
-			ModelDataType:    f.Type,
-			HasDeletedAt:     hasDeletedAt,
-			Ignore:           services.CheckIfContainProtoTag("@ignore-proto", f.Comments),
-			HasIndex:         services.CheckIfContainProtoTag("@index", f.Comments),
-			HasUnique:        services.CheckIfContainProtoTag("@unique", f.Comments),
-			CSharperDataType: services.ConvertProtoTypeToCSharperDataType(f.Type),
+			TableName:      strings.Replace(msg.MessageName, "Model", "Table", 1),
+			ModelName:      msg.MessageName,
+			FieldName:      f.FieldName,
+			OrmFieldName:   utils.ToUnderLine(f.FieldName),
+			ModelDataType:  f.Type,
+			HasDeletedAt:   hasDeletedAt,
+			Ignore:         services.CheckIfContainProtoTag("@ignore-proto", f.Comments),
+			HasIndex:       services.CheckIfContainProtoTag("@index", f.Comments),
+			HasUnique:      services.CheckIfContainProtoTag("@unique", f.Comments),
+			CSharpDataType: services.ConvertProtoTypeToCSharpDataType(f.Type),
 		}
 		if internalDataType[f.Type] {
 			field.ModelDataType = strings.Join([]string{service.PackageAlias, f.Type}, ".")
 		}
 		if internalDataType[f.Type] && strings.Index(f.Type, "Enum") == 0 {
-			field.CSharperDataType = "int"
+			field.CSharpDataType = "int"
 		}
 		if strings.Contains(field.ModelDataType, ".") && !strings.Contains(field.ModelDataType, service.PackageAlias+".") {
 			field.ModelDataType = "*" + field.ModelDataType

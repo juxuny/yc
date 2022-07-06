@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace {{.CSharperNamespace}}
+namespace {{.CSharpNamespace}}
 {
     public static class {{.EnumName}}
     {

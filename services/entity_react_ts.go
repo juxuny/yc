@@ -8,11 +8,11 @@ type EnumField struct {
 
 type EnumEntity struct {
 	ServiceEntity
-	EnumName          string
-	Fields            []EnumField
-	Desc              string
-	ValueSet          string
-	CSharperNamespace string
+	EnumName        string
+	Fields          []EnumField
+	Desc            string
+	ValueSet        string
+	CSharpNamespace string
 }
 
 type ReactTsMessageField struct {

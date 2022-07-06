@@ -99,11 +99,11 @@ func (t *UpdateCommand) createCSharperEnum(service services.ServiceEntity, enum 
 	log.Println("create enum:", utils.ToUnderLine(enum.EnumName))
 	outEnumFile := path.Join(t.ModelOutputDir, enum.EnumName+".cs")
 	enumEntity := services.EnumEntity{
-		ServiceEntity:     service,
-		EnumName:          enum.EnumName,
-		Fields:            t.getCsEnumFields(enum.EnumName, enum),
-		Desc:              services.GetDescFromFieldCommentsOfProto(enum.Comments),
-		CSharperNamespace: t.CSharperNamespace,
+		ServiceEntity:   service,
+		EnumName:        enum.EnumName,
+		Fields:          t.getCsEnumFields(enum.EnumName, enum),
+		Desc:            services.GetDescFromFieldCommentsOfProto(enum.Comments),
+		CSharpNamespace: t.CSharpModelNamespace,
 	}
 	if err := template.RunEmbedFile(templateFs, csEnumFileName, outEnumFile, enumEntity); err != nil {
 		log.Fatal(err)
@@ -114,9 +114,10 @@ func (t *UpdateCommand) createCSharperModel(service services.ServiceEntity, msg 
 	log.Println("create model:", utils.ToUnderLine(msg.MessageName))
 	outModelFile := path.Join(t.ModelOutputDir, msg.MessageName+".cs")
 	model := services.ModelEntity{
-		ServiceEntity:     service,
-		CSharperNamespace: t.CSharperNamespace,
-		Model:             t.createModelFromMessageOfProto(service, msg, internalDataType, refMap[msg.MessageName]),
+		ServiceEntity:        service,
+		CSharpModelNamespace: t.CSharpModelNamespace,
+		CSharpBaseNamespace:  t.CSharpBaseNamespace,
+		Model:                t.createModelFromMessageOfProto(service, msg, internalDataType, refMap[msg.MessageName]),
 	}
 	if err := template.RunEmbedFile(templateFs, csModelFileName, outModelFile, model); err != nil {
 		log.Fatal(err)

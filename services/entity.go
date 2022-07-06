@@ -95,17 +95,17 @@ type EntrypointEntity struct {
 }
 
 type ModelField struct {
-	TableName        string
-	ModelName        string
-	FieldName        string
-	OrmFieldName     string
-	JsonFieldName    string
-	ModelDataType    string
-	Ignore           bool
-	HasIndex         bool
-	HasUnique        bool
-	HasDeletedAt     bool
-	CSharperDataType string
+	TableName      string
+	ModelName      string
+	FieldName      string
+	OrmFieldName   string
+	JsonFieldName  string
+	ModelDataType  string
+	Ignore         bool
+	HasIndex       bool
+	HasUnique      bool
+	HasDeletedAt   bool
+	CSharpDataType string
 }
 
 type Model struct {
@@ -131,8 +131,9 @@ type RefModel struct {
 
 type ModelEntity struct {
 	ServiceEntity
-	GoModuleName      string
-	CSharperNamespace string
+	GoModuleName         string
+	CSharpModelNamespace string
+	CSharpBaseNamespace  string
 	Model
 }
 
