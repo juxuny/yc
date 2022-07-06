@@ -7,10 +7,12 @@ type EnumField struct {
 }
 
 type EnumEntity struct {
-	EnumName string
-	Fields   []EnumField
-	Desc     string
-	ValueSet string
+	ServiceEntity
+	EnumName          string
+	Fields            []EnumField
+	Desc              string
+	ValueSet          string
+	CSharperNamespace string
 }
 
 type ReactTsMessageField struct {

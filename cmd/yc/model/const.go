@@ -1,5 +1,7 @@
 package model
 
 const (
-	modelFileName = "template/model.go.tpl"
+	goModelFileName = "template/model.go.tpl"
+	csModelFileName = "template/model.cs.tpl"
+	csEnumFileName  = "template/enum.cs.tpl"
 )

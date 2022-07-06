@@ -20,7 +20,16 @@ import (
 )
 
 type UpdateCommand struct {
-	WorkDir string
+	WorkDir        string
+	ModelOutputDir string
+	ProtoFile      string
+
+	// golang
+	Go bool
+
+	// c-sharper
+	CSharper          bool
+	CSharperNamespace string
 }
 
 func (t *UpdateCommand) Prepare(cmd *cobra.Command) {
@@ -29,10 +38,26 @@ func (t *UpdateCommand) Prepare(cmd *cobra.Command) {
 
 func (t *UpdateCommand) InitFlag(cmd *cobra.Command) {
 	cmd.PersistentFlags().StringVarP(&t.WorkDir, "work-dir", "w", "", "working dir")
+	cmd.PersistentFlags().StringVar(&t.ModelOutputDir, "model-output-dir", "", "model files output directory")
+	cmd.PersistentFlags().StringVar(&t.ProtoFile, "proto", "", "*.proto file")
+
+	cmd.PersistentFlags().BoolVar(&t.Go, "go", false, "go model template")
+
+	cmd.PersistentFlags().BoolVar(&t.CSharper, "cs", false, "c-sharper model template")
+	cmd.PersistentFlags().StringVar(&t.CSharperNamespace, "cs-namespace", "", "c-sharper namespace")
 }
 
 func (t *UpdateCommand) BeforeRun(cmd *cobra.Command) {
 	log.Println("before")
+	if !t.Go && !t.CSharper {
+		log.Fatal("missing arguments: --go, --cs")
+	}
+	if t.CSharper && t.ModelOutputDir == "" {
+		log.Fatal("missing argument: --model-output-dir")
+	}
+	if t.CSharper && t.CSharperNamespace == "" {
+		log.Fatal("missing argument: --cs-namespace")
+	}
 }
 
 func (t *UpdateCommand) getServiceName() string {
@@ -52,6 +77,13 @@ func (t *UpdateCommand) getServiceName() string {
 	return utils.StringHelper.TrimSubSequenceRight(serviceName, ".proto")
 }
 
+func (t *UpdateCommand) getProtoFileName(service services.ServiceEntity) string {
+	if t.ProtoFile != "" {
+		return t.ProtoFile
+	}
+	return path.Join(t.WorkDir, service.ProtoFileName+".proto")
+}
+
 func (t *UpdateCommand) Run() {
 	if t.WorkDir == "" {
 		if w, err := os.Getwd(); err != nil {
@@ -67,13 +99,18 @@ func (t *UpdateCommand) Run() {
 	}
 	log.Println("service name: ", serviceName)
 	service := services.NewServiceEntity(serviceName, yc.Version)
-	t.genRpc(service)
-	t.genModel(service)
-	t.fmt()
+	if t.Go {
+		t.genRpc(service)
+		t.genGoModel(service)
+		t.fmt()
+	} else if t.CSharper {
+		t.genCsEnum(service)
+		t.genCsModel(service)
+	}
 }
 
-func (t *UpdateCommand) genModel(service services.ServiceEntity) {
-	reader, err := os.Open(path.Join(t.WorkDir, service.ProtoFileName+".proto"))
+func (t *UpdateCommand) genGoModel(service services.ServiceEntity) {
+	reader, err := os.Open(t.getProtoFileName(service))
 	if err != nil {
 		log.Fatal("parse proto failed: ", err)
 	}
@@ -85,12 +122,12 @@ func (t *UpdateCommand) genModel(service services.ServiceEntity) {
 	messages := make([]*parser.Message, 0)
 	internalDataType := make(map[string]bool)
 	for _, item := range result.ProtoBody {
-		switch item.(type) {
+		switch it := item.(type) {
 		case *parser.Enum:
-			internalDataType[item.(*parser.Enum).EnumName] = true
+			internalDataType[it.EnumName] = true
 		case *parser.Message:
-			internalDataType[item.(*parser.Message).MessageName] = true
-			messages = append(messages, item.(*parser.Message))
+			internalDataType[it.MessageName] = true
+			messages = append(messages, it)
 		}
 	}
 	refMap := make(map[string][]services.RefModel)
@@ -102,12 +139,12 @@ func (t *UpdateCommand) genModel(service services.ServiceEntity) {
 	}
 	for _, m := range messages {
 		if strings.Index(m.MessageName, "Model") == 0 {
-			t.createModel(service, m, internalDataType, refMap)
+			t.createGoModel(service, m, internalDataType, refMap)
 		}
 	}
 }
 
-func (t *UpdateCommand) createModel(service services.ServiceEntity, msg *parser.Message, internalDataType map[string]bool, refMap map[string][]services.RefModel) {
+func (t *UpdateCommand) createGoModel(service services.ServiceEntity, msg *parser.Message, internalDataType map[string]bool, refMap map[string][]services.RefModel) {
 	log.Println("create model:", utils.ToUnderLine(msg.MessageName))
 	outModelFile := path.Join(t.WorkDir, "db", utils.ToUnderLine(msg.MessageName)+".go")
 	moduleName, err := utils.GetCurrentPackageName(t.WorkDir)
@@ -119,7 +156,7 @@ func (t *UpdateCommand) createModel(service services.ServiceEntity, msg *parser.
 		GoModuleName:  moduleName,
 		Model:         t.createModelFromMessageOfProto(service, msg, internalDataType, refMap[msg.MessageName]),
 	}
-	if err := template.RunEmbedFile(templateFs, modelFileName, outModelFile, model); err != nil {
+	if err := template.RunEmbedFile(templateFs, goModelFileName, outModelFile, model); err != nil {
 		log.Fatal(err)
 	}
 }
@@ -138,17 +175,22 @@ func (t *UpdateCommand) createModelFromMessageOfProto(service services.ServiceEn
 		}
 		fieldSet.Add(f.FieldName)
 		field := services.ModelField{
-			TableName:     strings.Replace(msg.MessageName, "Model", "Table", 1),
-			ModelName:     msg.MessageName,
-			FieldName:     f.FieldName,
-			OrmFieldName:  utils.ToUnderLine(f.FieldName),
-			ModelDataType: f.Type,
-			HasDeletedAt:  hasDeletedAt,
-			Ignore:        getIgnoreFromMessageCommentsOfProto(f.Comments),
-			HasIndex:      getIndexFromMessageCommentsOfProto(f.Comments),
+			TableName:        strings.Replace(msg.MessageName, "Model", "Table", 1),
+			ModelName:        msg.MessageName,
+			FieldName:        f.FieldName,
+			OrmFieldName:     utils.ToUnderLine(f.FieldName),
+			ModelDataType:    f.Type,
+			HasDeletedAt:     hasDeletedAt,
+			Ignore:           services.CheckIfContainProtoTag("@ignore-proto", f.Comments),
+			HasIndex:         services.CheckIfContainProtoTag("@index", f.Comments),
+			HasUnique:        services.CheckIfContainProtoTag("@unique", f.Comments),
+			CSharperDataType: services.ConvertProtoTypeToCSharperDataType(f.Type),
 		}
 		if internalDataType[f.Type] {
 			field.ModelDataType = strings.Join([]string{service.PackageAlias, f.Type}, ".")
+		}
+		if internalDataType[f.Type] && strings.Index(f.Type, "Enum") == 0 {
+			field.CSharperDataType = "int"
 		}
 		if strings.Contains(field.ModelDataType, ".") && !strings.Contains(field.ModelDataType, service.PackageAlias+".") {
 			field.ModelDataType = "*" + field.ModelDataType
