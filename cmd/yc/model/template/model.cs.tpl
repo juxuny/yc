@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace {{.CSharpModelNamespace}}
 {
     [Table("{{.TableNameWithoutServicePrefix|camelcase}}")]
-    public class {{.ModelName}}
+    public class {{.ModelName}}: IModel
     {
         public static class TableDefinition {
             public static Table TableName = new Table("{{.TableNameWithoutServicePrefix|camelcase}}");
@@ -18,12 +18,51 @@ namespace {{.CSharpModelNamespace}}
             {{end}}
         }
 
-        public static string GetTableName() {
-            return "{{.TableNameWithoutServicePrefix|camelcase}}";
+        public static readonly List<Field> FieldList = new List<Field>()
+        {
+            {{range $index, $item := .Fields}}TableDefinition.{{$item.FieldName|upperFirst}},
+            {{end}}
+        };
+
+        public Table GetTableName() {
+            return TableDefinition.TableName;
         }
+
+        public IModel CloneIModel()
+        {
+            return new {{.ModelName}}()
+            {
+                {{range $index, $item := .Fields}}{{$item.FieldName|upperFirst}} = {{$item.FieldName|upperFirst}},
+                {{end}}
+            };
+        }
+
+        public {{.ModelName}} Clone()
+        {
+            return new {{.ModelName}}()
+            {
+                {{range $index, $item := .Fields}}{{$item.FieldName|upperFirst}} = {{$item.FieldName|upperFirst}},
+                {{end}}
+            };
+        }
+
         public {{.ModelName}}() { }
 
-        {{range $index, $item := .Fields}}{{if $item.HasIndex}}[Indexed("{{$item.FieldName|upperFirst}}", {{$index}})]
+        public List{{.Lt}}Field{{.Gt}} GetFieldList()
+        {
+            return FieldList;
+        }
+
+        public Dictionary{{.Lt}}Field, object{{.Gt}} ToDictionary()
+        {
+            return new Dictionary{{.Lt}}Field, object{{.Gt}}()
+            {
+                {{range $index, $item := .Fields}}{ TableDefinition.{{$item.FieldName|upperFirst}}, {{$item.FieldName|upperFirst}} },
+                {{end}}
+            };
+        }
+
+        {{range $index, $item := .Fields}}{{if $item.HasIndex}}[Indexed("{{$item.FieldName|upperFirst}}", {{$index|inc}})]
         {{end}}{{if $item.HasUnique}}[Unique]
         {{end}}public {{.CSharpDataType}} {{$item.FieldName|upperFirst}} { get; set; }
 

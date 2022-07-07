@@ -82,3 +82,11 @@ func camelcaseString(v string) string {
 	}
 	return strings.Join(s, "")
 }
+
+func increase(v int) int {
+	return v + 1
+}
+
+func decrease(v int) int {
+	return v - 1
+}
