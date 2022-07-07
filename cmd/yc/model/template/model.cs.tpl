@@ -145,6 +145,13 @@ namespace {{.CSharpModelNamespace}}
             w.Eq(TableDefinition.{{$item.FieldName|camelcase|upperFirst}}, {{$item.FieldName|camelcase|lowerFirst}}).Order(orders).Page(page, pageSize){{if $item.HasDeletedAt}}.Nested(WhereWrapper.Or().Eq(TableDefinition.DeletedAt, 0).IsNull(TableDefinition.DeletedAt)){{end}};
             return DatabaseHelper.Query{{.Lt}}{{.ModelName}}{{.Gt}}(w);
         }
+
+        public static int CountBy{{$item.FieldName|camelcase|upperFirst}}({{.CSharpDataType}} {{$item.FieldName|camelcase|lowerFirst}})
+        {
+            IQueryWrapper w = CreateQuery();
+            w.Eq(TableDefinition.{{$item.FieldName|camelcase|upperFirst}}, {{$item.FieldName|camelcase|lowerFirst}}).Select(new Field("COUNT(*) AS Total"));
+            return DatabaseHelper.Count(w);
+        }
         {{end}}{{end}}
     }
 }
