@@ -18,7 +18,7 @@ namespace {{.CSharpModelNamespace}}
             {{end}}
         }
 
-        public static readonly List<Field> FieldList = new List<Field>()
+        public static readonly List{{.Lt}}Field{{.Gt}} FieldList = new List{{.Lt}}Field{{.Gt}}()
         {
             {{range $index, $item := .Fields}}TableDefinition.{{$item.FieldName|upperFirst}},
             {{end}}
@@ -64,9 +64,87 @@ namespace {{.CSharpModelNamespace}}
 
         {{range $index, $item := .Fields}}{{if $item.HasIndex}}[Indexed("{{$item.FieldName|upperFirst}}", {{$index|inc}})]
         {{end}}{{if $item.HasUnique}}[Unique]
+        {{end}}{{if $item.HasPrimaryKey}}[PrimaryKey]
+        {{end}}{{if $item.HasAutoIncrement}}[AutoIncrement]
         {{end}}public {{.CSharpDataType}} {{$item.FieldName|upperFirst}} { get; set; }
-
         {{end}}
+        public static IQueryWrapper CreateQuery()
+        {
+            IQueryWrapper w = new QueryWrapper();
+            w.TableName(TableDefinition.TableName);
+            return w;
+        }
+
+        public static IUpdateWrapper CreateUpdate()
+        {
+            IUpdateWrapper w = new UpdateWrapper();
+            w.TableName(TableDefinition.TableName);
+            return w;
+        }
+
+        public static IDeleteWrapper CreateDelete()
+        {
+            IDeleteWrapper w = new DeleteWrapper();
+            w.TableName(TableDefinition.TableName);
+            return w;
+        }
+
+        public static IInsertWrapper CreateInsert()
+        {
+            return new InsertWrapper();
+        }
+
+        public static int Insert(params {{.ModelName}}[] args)
+        {
+            IInsertWrapper w = CreateInsert();
+            foreach ({{.ModelName}} item in args) w.Add(item);
+            return DatabaseHelper.Insert(w);
+        }
+        {{range $item := .Fields}}{{if $item.HasIndex}}public static int UpdateBy{{$item.FieldName|camelcase|upperFirst}}({{.CSharpDataType}} {{$item.FieldName|camelcase|lowerFirst}}, Dictionary{{.Lt}}Field, object{{.Gt}} update)
+        {
+            IUpdateWrapper w = CreateUpdate();
+            foreach (KeyValuePair{{.Lt}}Field, object{{.Gt}} entry in update)
+            {
+                w.SetValue(entry.Key, entry.Value);
+            }
+            w.Eq(TableDefinition.{{$item.FieldName|camelcase|upperFirst}}, {{$item.FieldName|camelcase|lowerFirst}}){{if $item.HasDeletedAt}}.Nested(WhereWrapper.Or().Eq(TableDefinition.DeletedAt, 0).IsNull(TableDefinition.DeletedAt)){{end}};
+            return DatabaseHelper.Update(w);
+        }
+
+        public static int DeleteBy{{$item.FieldName|camelcase|upperFirst}}({{.CSharpDataType}} {{$item.FieldName|camelcase|lowerFirst}})
+        {
+            IDeleteWrapper w = CreateDelete();
+            w.Eq(TableDefinition.{{$item.FieldName|camelcase|upperFirst}}, {{$item.FieldName|camelcase|lowerFirst}}){{if $item.HasDeletedAt}}.Nested(WhereWrapper.Or().Eq(TableDefinition.DeletedAt, 0).IsNull(TableDefinition.DeletedAt)){{end}};
+            return DatabaseHelper.Delete(w);
+        }
+
+        public static List{{.Lt}}{{.ModelName}}{{.Gt}} FindBy{{$item.FieldName|camelcase|upperFirst}}({{.CSharpDataType}} {{$item.FieldName|camelcase|lowerFirst}})
+        {
+            IQueryWrapper w = CreateQuery();
+            w.SelectAll().Eq(TableDefinition.{{$item.FieldName|camelcase|upperFirst}}, {{$item.FieldName|camelcase|lowerFirst}}){{if $item.HasDeletedAt}}.Nested(WhereWrapper.Or().Eq(TableDefinition.DeletedAt, 0).IsNull(TableDefinition.DeletedAt)){{end}};
+            return DatabaseHelper.Query{{.Lt}}{{.ModelName}}{{.Gt}}(w);
+        }
+
+        public static int SoftDeleteBy{{$item.FieldName|camelcase|upperFirst}}({{.CSharpDataType}} {{$item.FieldName|camelcase|lowerFirst}})
+        {
+            return UpdateBy{{$item.FieldName|camelcase|upperFirst}}({{$item.FieldName|camelcase|lowerFirst}}, new Dictionary{{.Lt}}Field, object{{.Gt}}() {
+                {TableDefinition.{{$item.FieldName|camelcase|upperFirst}}, TimeUtils.GetTimestampInMillionSeconds() }
+            });
+        }
+
+        public static int ResetSoftDeletedBy{{$item.FieldName|camelcase|upperFirst}}({{.CSharpDataType}} {{$item.FieldName|camelcase|lowerFirst}})
+        {
+            return UpdateBy{{$item.FieldName|camelcase|upperFirst}}({{$item.FieldName|camelcase|lowerFirst}}, new Dictionary{{.Lt}}Field, object{{.Gt}}() {
+                {TableDefinition.{{$item.FieldName|camelcase|upperFirst}}, 0 }
+            });
+        }
+
+        public static List{{.Lt}}{{.ModelName}}{{.Gt}} PageBy{{$item.FieldName|camelcase|upperFirst}}({{.CSharpDataType}} {{$item.FieldName|camelcase|lowerFirst}}, int page, int pageSize, params QueryWrapper.Order[] orders)
+        {
+            IQueryWrapper w = CreateQuery();
+            w.Eq(TableDefinition.{{$item.FieldName|camelcase|upperFirst}}, {{$item.FieldName|camelcase|lowerFirst}}).Order(orders).Page(page, pageSize){{if $item.HasDeletedAt}}.Nested(WhereWrapper.Or().Eq(TableDefinition.DeletedAt, 0).IsNull(TableDefinition.DeletedAt)){{end}};
+            return DatabaseHelper.Query{{.Lt}}{{.ModelName}}{{.Gt}}(w);
+        }
+        {{end}}{{end}}
     }
 }
-

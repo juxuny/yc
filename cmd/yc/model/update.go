@@ -180,16 +180,18 @@ func (t *UpdateCommand) createModelFromMessageOfProto(service services.ServiceEn
 		}
 		fieldSet.Add(f.FieldName)
 		field := services.ModelField{
-			TableName:      strings.Replace(msg.MessageName, "Model", "Table", 1),
-			ModelName:      msg.MessageName,
-			FieldName:      f.FieldName,
-			OrmFieldName:   utils.ToUnderLine(f.FieldName),
-			ModelDataType:  f.Type,
-			HasDeletedAt:   hasDeletedAt,
-			Ignore:         services.CheckIfContainProtoTag("@ignore-proto", f.Comments),
-			HasIndex:       services.CheckIfContainProtoTag("@index", f.Comments),
-			HasUnique:      services.CheckIfContainProtoTag("@unique", f.Comments),
-			CSharpDataType: services.ConvertProtoTypeToCSharpDataType(f.Type),
+			TableName:        strings.Replace(msg.MessageName, "Model", "Table", 1),
+			ModelName:        msg.MessageName,
+			FieldName:        f.FieldName,
+			OrmFieldName:     utils.ToUnderLine(f.FieldName),
+			ModelDataType:    f.Type,
+			HasDeletedAt:     hasDeletedAt,
+			Ignore:           services.CheckIfContainProtoTag(services.ProtoTagIgnoreProto, f.Comments),
+			HasIndex:         services.CheckIfContainProtoTag(services.ProtoTagIndex, f.Comments) || services.CheckIfContainProtoTag(services.ProtoTagPrimary, f.Comments),
+			HasUnique:        services.CheckIfContainProtoTag(services.ProtoTagUnique, f.Comments),
+			HasPrimaryKey:    services.CheckIfContainProtoTag(services.ProtoTagPrimary, f.Comments),
+			HasAutoIncrement: services.CheckIfContainProtoTag(services.ProtoTagAutoIncrement, f.Comments),
+			CSharpDataType:   services.ConvertProtoTypeToCSharpDataType(f.Type),
 		}
 		if internalDataType[f.Type] {
 			field.ModelDataType = strings.Join([]string{service.PackageAlias, f.Type}, ".")
@@ -238,14 +240,18 @@ func (t *UpdateCommand) createRefModelFromMessageOfProto(service services.Servic
 			continue
 		}
 		field := services.ModelField{
-			TableName:     strings.Replace(msg.MessageName, "Model", "Table", 1),
-			ModelName:     msg.MessageName,
-			FieldName:     f.FieldName,
-			OrmFieldName:  utils.ToUnderLine(f.FieldName),
-			ModelDataType: f.Type,
-			HasDeletedAt:  hasDeletedAt,
-			Ignore:        getIgnoreFromMessageCommentsOfProto(f.Comments),
-			HasIndex:      getIndexFromMessageCommentsOfProto(f.Comments),
+			TableName:        strings.Replace(msg.MessageName, "Model", "Table", 1),
+			ModelName:        msg.MessageName,
+			FieldName:        f.FieldName,
+			OrmFieldName:     utils.ToUnderLine(f.FieldName),
+			ModelDataType:    f.Type,
+			HasDeletedAt:     hasDeletedAt,
+			Ignore:           services.CheckIfContainProtoTag(services.ProtoTagIgnoreProto, f.Comments),
+			HasIndex:         services.CheckIfContainProtoTag(services.ProtoTagIndex, f.Comments) || services.CheckIfContainProtoTag(services.ProtoTagPrimary, f.Comments),
+			HasUnique:        services.CheckIfContainProtoTag(services.ProtoTagUnique, f.Comments),
+			HasPrimaryKey:    services.CheckIfContainProtoTag(services.ProtoTagPrimary, f.Comments),
+			HasAutoIncrement: services.CheckIfContainProtoTag(services.ProtoTagAutoIncrement, f.Comments),
+			CSharpDataType:   services.ConvertProtoTypeToCSharpDataType(f.Type),
 		}
 		if internalDataType[f.Type] {
 			field.ModelDataType = strings.Join([]string{service.PackageAlias, f.Type}, ".")

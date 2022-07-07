@@ -20,48 +20,25 @@ func getLinesContainTag(comments []*parser.Comment, tag string) (lines []string)
 }
 
 func GetGroupNameFromRpcCommentsOfProto(comments []*parser.Comment) (groupName string, ok bool) {
-	for _, c := range comments {
-		lines := c.Lines()
-		for _, line := range lines {
-			line = strings.TrimSpace(line)
-			if strings.Index(line, "@group") == 0 {
-				groupName = strings.Replace(line, "@group:", "", 1)
-				groupName = utils.ToUnderLine(strings.TrimSpace(groupName))
-				return groupName, true
-			}
-		}
+	groupNames := GetContentByProtoTag(ProtoTagGroup, comments)
+	if len(groupNames) > 0 {
+		return groupNames[0], true
 	}
-	return
+	return "", false
 }
 
 func GetAuthFromRpcCommentsOfProto(comments []*parser.Comment) (auth bool) {
-	for _, c := range comments {
-		lines := c.Lines()
-		for _, line := range lines {
-			line = strings.TrimSpace(line)
-			if strings.Index(line, "@auth") == 0 {
-				return true
-			}
-
-			if strings.Index(line, "@ignore-auth") == 0 {
-				return false
-			}
-		}
+	if CheckIfContainProtoTag(ProtoTagAuth, comments) {
+		return true
+	}
+	if CheckIfContainProtoTag(ProtoTagIgnoreAuth, comments) {
+		return false
 	}
 	return true
 }
 
 func GetDescFromFieldCommentsOfProto(comments []*parser.Comment) string {
-	for _, c := range comments {
-		lines := c.Lines()
-		for _, line := range lines {
-			line = strings.TrimSpace(line)
-			if strings.Index(line, "@desc:") == 0 {
-				return strings.TrimSpace(strings.Replace(line, "@desc:", "", 1))
-			}
-		}
-	}
-	return ""
+	return GetContentByProtoTagFistOne(ProtoTagDesc, comments)
 }
 
 func CheckIfRequired(comments []*parser.Comment) bool {

@@ -95,17 +95,20 @@ type EntrypointEntity struct {
 }
 
 type ModelField struct {
-	TableName      string
-	ModelName      string
-	FieldName      string
-	OrmFieldName   string
-	JsonFieldName  string
-	ModelDataType  string
-	Ignore         bool
-	HasIndex       bool
-	HasUnique      bool
-	HasDeletedAt   bool
-	CSharpDataType string
+	baseEntity
+	TableName        string
+	ModelName        string
+	FieldName        string
+	OrmFieldName     string
+	JsonFieldName    string
+	ModelDataType    string
+	Ignore           bool
+	HasIndex         bool
+	HasUnique        bool
+	HasDeletedAt     bool
+	HasPrimaryKey    bool
+	HasAutoIncrement bool
+	CSharpDataType   string
 }
 
 type Model struct {
