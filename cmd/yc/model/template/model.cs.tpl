@@ -100,6 +100,28 @@ namespace {{.CSharpModelNamespace}}
             foreach ({{.ModelName}} item in args) w.Add(item);
             return DatabaseHelper.Insert(w);
         }
+
+        public static List{{.Lt}}{{.ModelName}}{{.Gt}} QueryAdvanced(IWhereWrapper where)
+        {
+            IQueryWrapper w = CreateQuery();
+            w.SetWhere(where){{if .HasDeletedAt}}.Nested(WhereWrapper.Or().Eq(TableDefinition.DeletedAt, 0).IsNull(TableDefinition.DeletedAt)){{end}};
+            return DatabaseHelper.Query{{.Lt}}{{.ModelName}}{{.Gt}}(w);
+        }
+
+        public static int UpdateAdvanced(IWhereWrapper where)
+        {
+            IUpdateWrapper w = CreateUpdate();
+            w.SetWhere(where){{if .HasDeletedAt}}.Nested(WhereWrapper.Or().Eq(TableDefinition.DeletedAt, 0).IsNull(TableDefinition.DeletedAt)){{end}};
+            return DatabaseHelper.Update(w);
+        }
+
+        public static int CountAdvanced(IWhereWrapper where)
+        {
+            IQueryWrapper w = CreateQuery();
+            w.SetWhere(where).Select(new Field("COUNT(*) AS Total")){{if .HasDeletedAt}}.Nested(WhereWrapper.Or().Eq(TableDefinition.DeletedAt, 0).IsNull(TableDefinition.DeletedAt)){{end}};
+            return DatabaseHelper.Count(w);
+        }
+
         {{range $item := .Fields}}{{if $item.HasIndex}}public static int UpdateBy{{$item.FieldName|camelcase|upperFirst}}({{.CSharpDataType}} {{$item.FieldName|camelcase|lowerFirst}}, Dictionary{{.Lt}}Field, object{{.Gt}} update)
         {
             IUpdateWrapper w = CreateUpdate();
@@ -152,6 +174,7 @@ namespace {{.CSharpModelNamespace}}
             w.Eq(TableDefinition.{{$item.FieldName|camelcase|upperFirst}}, {{$item.FieldName|camelcase|lowerFirst}}).Select(new Field("COUNT(*) AS Total"));
             return DatabaseHelper.Count(w);
         }
+
         {{end}}{{end}}
     }
 }
