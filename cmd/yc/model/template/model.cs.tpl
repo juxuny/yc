@@ -101,10 +101,10 @@ namespace {{.CSharpModelNamespace}}
             return DatabaseHelper.Insert(w);
         }
 
-        public static List{{.Lt}}{{.ModelName}}{{.Gt}} QueryAdvanced(IWhereWrapper where)
+        public static List{{.Lt}}{{.ModelName}}{{.Gt}} FindAdvanced(IWhereWrapper where)
         {
             IQueryWrapper w = CreateQuery();
-            w.SetWhere(where){{if .HasDeletedAt}}.Nested(WhereWrapper.Or().Eq(TableDefinition.DeletedAt, 0).IsNull(TableDefinition.DeletedAt)){{end}};
+            w.SelectAll().SetWhere(where){{if .HasDeletedAt}}.Nested(WhereWrapper.Or().Eq(TableDefinition.DeletedAt, 0).IsNull(TableDefinition.DeletedAt)){{end}};
             return DatabaseHelper.Query{{.Lt}}{{.ModelName}}{{.Gt}}(w);
         }
 
@@ -120,6 +120,25 @@ namespace {{.CSharpModelNamespace}}
             IQueryWrapper w = CreateQuery();
             w.SetWhere(where).Select(new Field("COUNT(*) AS Total")){{if .HasDeletedAt}}.Nested(WhereWrapper.Or().Eq(TableDefinition.DeletedAt, 0).IsNull(TableDefinition.DeletedAt)){{end}};
             return DatabaseHelper.Count(w);
+        }
+
+        public static {{.ModelName}} FindOneAdvanced(IWhereWrapper where, params OrderWrapper[] orders)
+        {
+            IQueryWrapper w = CreateQuery();
+            w.SelectAll().SetWhere(where).Order(orders).SetLimit(1){{if .HasDeletedAt}}.Nested(WhereWrapper.Or().Eq(TableDefinition.DeletedAt, 0).IsNull(TableDefinition.DeletedAt)){{end}};
+            List{{.Lt}}{{.ModelName}}{{.Gt}} list = DatabaseHelper.Query{{.Lt}}{{.ModelName}}{{.Gt}}(w);
+            if (list != null && list.Count() {{.Gt}} 0)
+            {
+                return list[0];
+            }
+            return null;
+        }
+
+        public static List{{.Lt}}{{.ModelName}}{{.Gt}} PageAdvanced(IWhereWrapper where, params OrderWrapper[] orders)
+        {
+            IQueryWrapper w = CreateQuery();
+            w.SelectAll().SetWhere(where).Order(orders){{if .HasDeletedAt}}.Nested(WhereWrapper.Or().Eq(TableDefinition.DeletedAt, 0).IsNull(TableDefinition.DeletedAt)){{end}};
+            return DatabaseHelper.Query{{.Lt}}{{.ModelName}}{{.Gt}}(w);
         }
 
         {{range $item := .Fields}}{{if $item.HasIndex}}public static int UpdateBy{{$item.FieldName|camelcase|upperFirst}}({{.CSharpDataType}} {{$item.FieldName|camelcase|lowerFirst}}, Dictionary{{.Lt}}Field, object{{.Gt}} update)
@@ -140,11 +159,23 @@ namespace {{.CSharpModelNamespace}}
             return DatabaseHelper.Delete(w);
         }
 
-        public static List{{.Lt}}{{.ModelName}}{{.Gt}} FindBy{{$item.FieldName|camelcase|upperFirst}}({{.CSharpDataType}} {{$item.FieldName|camelcase|lowerFirst}})
+        public static List{{.Lt}}{{.ModelName}}{{.Gt}} FindBy{{$item.FieldName|camelcase|upperFirst}}({{.CSharpDataType}} {{$item.FieldName|camelcase|lowerFirst}}, params OrderWrapper[] orders)
         {
             IQueryWrapper w = CreateQuery();
-            w.SelectAll().Eq(TableDefinition.{{$item.FieldName|camelcase|upperFirst}}, {{$item.FieldName|camelcase|lowerFirst}}){{if $item.HasDeletedAt}}.Nested(WhereWrapper.Or().Eq(TableDefinition.DeletedAt, 0).IsNull(TableDefinition.DeletedAt)){{end}};
+            w.SelectAll().Order(orders).Eq(TableDefinition.{{$item.FieldName|camelcase|upperFirst}}, {{$item.FieldName|camelcase|lowerFirst}}){{if $item.HasDeletedAt}}.Nested(WhereWrapper.Or().Eq(TableDefinition.DeletedAt, 0).IsNull(TableDefinition.DeletedAt)){{end}};
             return DatabaseHelper.Query{{.Lt}}{{.ModelName}}{{.Gt}}(w);
+        }
+
+        public static {{.ModelName}} FindOneBy{{$item.FieldName|camelcase|upperFirst}}({{.CSharpDataType}} {{$item.FieldName|camelcase|lowerFirst}}, params OrderWrapper[] orders)
+        {
+            IQueryWrapper w = CreateQuery();
+            w.SelectAll().Order(orders).Eq(TableDefinition.{{$item.FieldName|camelcase|upperFirst}}, {{$item.FieldName|camelcase|lowerFirst}}).SetLimit(1){{if $item.HasDeletedAt}}.Nested(WhereWrapper.Or().Eq(TableDefinition.DeletedAt, 0).IsNull(TableDefinition.DeletedAt)){{end}};
+            List{{.Lt}}{{.ModelName}}{{.Gt}} list = DatabaseHelper.Query{{.Lt}}{{.ModelName}}{{.Gt}}(w);
+            if (list != null && list.Count() {{.Gt}} 0)
+            {
+                return list[0];
+            }
+            return null;
         }
 
         public static int SoftDeleteBy{{$item.FieldName|camelcase|upperFirst}}({{.CSharpDataType}} {{$item.FieldName|camelcase|lowerFirst}})
@@ -161,7 +192,7 @@ namespace {{.CSharpModelNamespace}}
             });
         }
 
-        public static List{{.Lt}}{{.ModelName}}{{.Gt}} PageBy{{$item.FieldName|camelcase|upperFirst}}({{.CSharpDataType}} {{$item.FieldName|camelcase|lowerFirst}}, int page, int pageSize, params QueryWrapper.Order[] orders)
+        public static List{{.Lt}}{{.ModelName}}{{.Gt}} PageBy{{$item.FieldName|camelcase|upperFirst}}({{.CSharpDataType}} {{$item.FieldName|camelcase|lowerFirst}}, int page, int pageSize, params OrderWrapper[] orders)
         {
             IQueryWrapper w = CreateQuery();
             w.Eq(TableDefinition.{{$item.FieldName|camelcase|upperFirst}}, {{$item.FieldName|camelcase|lowerFirst}}).Order(orders).Page(page, pageSize){{if $item.HasDeletedAt}}.Nested(WhereWrapper.Or().Eq(TableDefinition.DeletedAt, 0).IsNull(TableDefinition.DeletedAt)){{end}};
