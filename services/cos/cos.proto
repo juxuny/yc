@@ -5,6 +5,8 @@ option go_package = "./;cos";
 
 import "dt/juxuny_yc_dt_base.proto";
 
+// @level: 1
+// @version: 1.0.0
 service Cos {
   // @group: devops
   // @ignore-auth

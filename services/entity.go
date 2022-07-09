@@ -30,20 +30,23 @@ type ServiceEntity struct {
 	PackageName   string
 	ServiceStruct string
 	ServiceDir    string
-	ProtoFileName string
-	PackageAlias  string
-	Version       string
+	// ProtoFileName is base file name, without file extension
+	ProtoFileName      string
+	PackageAlias       string
+	CommandLineVersion string
+	Version            string
+	Level              string
 }
 
-func NewServiceEntity(serviceName string, version string) ServiceEntity {
+func NewServiceEntity(serviceName string, commandLineVersion string) ServiceEntity {
 	ret := ServiceEntity{
-		ServiceDir:    strings.ReplaceAll(utils.ToUnderLine(serviceName), "_", "-"),
-		ServiceName:   serviceName,
-		PackageName:   utils.ToUnderLine(serviceName),
-		ProtoFileName: utils.ToUnderLine(serviceName),
-		ServiceStruct: utils.ToHump(serviceName),
-		PackageAlias:  utils.ToLowerFirst(utils.ToHump(serviceName)),
-		Version:       version,
+		ServiceDir:         strings.ReplaceAll(utils.ToUnderLine(serviceName), "_", "-"),
+		ServiceName:        serviceName,
+		PackageName:        utils.ToUnderLine(serviceName),
+		ProtoFileName:      utils.ToUnderLine(serviceName),
+		ServiceStruct:      utils.ToHump(serviceName),
+		PackageAlias:       utils.ToLowerFirst(utils.ToHump(serviceName)),
+		CommandLineVersion: commandLineVersion,
 	}
 	return ret
 }

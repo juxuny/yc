@@ -16,11 +16,13 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strconv"
 	"strings"
 )
 
 type UpdateCommand struct {
-	WorkDir string
+	WorkDir  string
+	Override bool
 }
 
 func (t *UpdateCommand) BeforeRun(cmd *cobra.Command) {
@@ -36,6 +38,7 @@ func (t *UpdateCommand) Prepare(cmd *cobra.Command) {
 }
 
 func (t *UpdateCommand) InitFlag(cmd *cobra.Command) {
+	cmd.PersistentFlags().BoolVar(&t.Override, "override", false, "override all auto-gen file")
 	cmd.PersistentFlags().StringVarP(&t.WorkDir, "work-dir", "w", "", "working dir")
 }
 
@@ -48,12 +51,8 @@ func (t *UpdateCommand) Run() {
 		}
 	}
 
-	serviceName := t.getServiceName()
-	if serviceName == "" {
-		log.Fatal("not found proto file in working directory")
-	}
-	log.Println("service name: ", serviceName)
-	service := services.NewServiceEntity(serviceName, yc.Version)
+	// create service entity from *.proto file in current directory
+	service := t.getServiceEntity()
 
 	// init env config
 	if err := t.initEnvConfig(service); err != nil {
@@ -64,6 +63,52 @@ func (t *UpdateCommand) Run() {
 	t.genRpc(service)
 	t.genExtend(service)
 	t.fmt()
+}
+
+func (t *UpdateCommand) getServiceEntity() services.ServiceEntity {
+	serviceName := t.getServiceName()
+	if serviceName == "" {
+		log.Fatal("get service name failed")
+	}
+	log.Println("service name: ", serviceName)
+	ret := services.NewServiceEntity(serviceName, yc.Version)
+	reader, err := os.Open(path.Join(t.WorkDir, ret.ProtoFileName+".proto"))
+	if err != nil {
+		log.Fatal("parse proto failed: ", err)
+	}
+	defer reader.Close()
+	result, err := protoparser.Parse(reader)
+	if err != nil {
+		log.Fatal(err)
+	}
+	var service *parser.Service
+	for _, m := range result.ProtoBody {
+		if service != nil {
+			break
+		}
+		switch m.(type) {
+		case *parser.Service:
+			service = m.(*parser.Service)
+			break
+		}
+	}
+	if service == nil {
+		log.Fatal("not found service definition")
+	}
+	serviceVersion := services.GetContentByProtoTagFistOne(services.ProtoTagVersion, service.Comments)
+	if serviceVersion == "" {
+		log.Fatal("service missing @version")
+	}
+	serviceLevel := services.GetContentByProtoTagFistOne(services.ProtoTagLevel, service.Comments)
+	if serviceLevel == "" {
+		log.Fatal("service missing @level")
+	}
+	if _, err := strconv.ParseInt(serviceLevel, 10, 64); err != nil {
+		log.Fatalf("parse level failed, is not a integer: %v", err)
+	}
+	ret.Version = serviceVersion
+	ret.Level = serviceLevel
+	return ret
 }
 
 func (t *UpdateCommand) getServiceName() string {
@@ -152,7 +197,7 @@ func (t *UpdateCommand) genService(service services.ServiceEntity, svc []*parser
 	}
 
 	// gen entrypoint
-	if _, err := os.Stat(path.Join(t.WorkDir, "default.go")); os.IsNotExist(err) {
+	if _, err := os.Stat(path.Join(t.WorkDir, "default.go")); t.Override || os.IsNotExist(err) {
 		if err := template.RunEmbedFile(templateFs, defaultConfigFileName, path.Join(t.WorkDir, "default.go"), service); err != nil {
 			log.Fatal("create default config failed:", err)
 		}

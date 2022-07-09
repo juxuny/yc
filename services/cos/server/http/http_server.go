@@ -10,17 +10,18 @@ import (
 	"github.com/juxuny/yc/services/cos/config"
 	"github.com/juxuny/yc/services/cos/handler"
 	"github.com/juxuny/yc/trace"
+	"net/http"
 )
 
-func Start(ctx context.Context) {
+func Start(ctx context.Context, trigger ...router.TriggerConfig) {
 	trace.InitReqId("http")
-	router.SetPrefix(config.Env.Prefix)
-	if err := router.Register(cos.Name, handler.NewWrapper()); err != nil {
+	r := router.NewRouter(config.Env.Prefix, trigger...)
+	if err := r.Register(cos.Name, handler.NewWrapper()); err != nil {
 		panic(err)
 	}
 	finished := make(chan bool, 1)
 	go func() {
-		if err := router.Start(fmt.Sprintf(":%d", config.Env.HttpPort)); err != nil {
+		if err := http.ListenAndServe(fmt.Sprintf(":%d", config.Env.HttpPort), r); err != nil {
 			panic(err)
 		}
 		finished <- true
