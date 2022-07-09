@@ -95,4 +95,8 @@ func (t *GenCommand) genGoService(serviceEntity services.ServiceEntity, svc *par
 	if err := template.RunEmbedFile(templateFs, goClientSdkFileName, clientSdkInitFile, clientSdkEntity); err != nil {
 		log.Fatal(err)
 	}
+	clientDefaultRpcSdkFile := path.Join(t.WorkDir, "client_default_rpc.sdk.go")
+	if err := template.RunEmbedFile(templateFs, goClientDefaultRpcSdkFileName, clientDefaultRpcSdkFile, clientSdkEntity); err != nil {
+		log.Fatal(err)
+	}
 }
