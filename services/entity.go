@@ -112,6 +112,7 @@ type ModelField struct {
 	HasPrimaryKey    bool
 	HasAutoIncrement bool
 	CSharpDataType   string
+	Desc             string
 }
 
 type Model struct {

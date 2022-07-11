@@ -9,7 +9,8 @@ using System.Threading.Tasks;
 
 namespace {{.CSharpModelNamespace}}
 {
-    [Table("{{.TableNameWithoutServicePrefix|camelcase}}")]
+    {{if ne .Desc ""}}// {{.Desc}}
+    {{end}}[Table("{{.TableNameWithoutServicePrefix|camelcase}}")]
     public class {{.ModelName}}: IModel
     {
         public static class TableDefinition {
@@ -20,7 +21,8 @@ namespace {{.CSharpModelNamespace}}
 
         public static readonly List{{.Lt}}Field{{.Gt}} FieldList = new List{{.Lt}}Field{{.Gt}}()
         {
-            {{range $index, $item := .Fields}}TableDefinition.{{$item.FieldName|upperFirst}},
+            {{range $index, $item := .Fields}}{{if ne .Desc ""}}// {{.Desc}}
+            {{end}}TableDefinition.{{$item.FieldName|upperFirst}},
             {{end}}
         };
 
