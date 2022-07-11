@@ -122,6 +122,7 @@ type Model struct {
 	TableNameWithoutServicePrefix string
 	HasDeletedAt                  bool
 	Refs                          []RefModel
+	Desc                          string
 }
 
 func (t Model) ToRefModel() RefModel {

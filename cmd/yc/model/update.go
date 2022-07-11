@@ -227,6 +227,7 @@ func (t *UpdateCommand) createModelFromMessageOfProto(service services.ServiceEn
 		ModelName:                     msg.MessageName,
 		HasDeletedAt:                  hasDeletedAt,
 		Refs:                          interactFieldsRefs,
+		Desc:                          services.GetDescFromFieldCommentsOfProto(msg.Comments),
 	}
 }
 

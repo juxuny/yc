@@ -15,7 +15,8 @@ namespace {{.CSharpModelNamespace}}
     {
         public static class TableDefinition {
             public static Table TableName = new Table("{{.TableNameWithoutServicePrefix|camelcase}}");
-            {{range $index, $item := .Fields}}public static Field {{$item.FieldName|upperFirst}} = new Field("{{$item.FieldName|upperFirst}}");
+            {{range $index, $item := .Fields}}{{if ne .Desc ""}}// {{.Desc}}
+            {{end}}public static Field {{$item.FieldName|upperFirst}} = new Field("{{$item.FieldName|upperFirst}}");
             {{end}}
         }
 
