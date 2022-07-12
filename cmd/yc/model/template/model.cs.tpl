@@ -137,10 +137,10 @@ namespace {{.CSharpModelNamespace}}
             return null;
         }
 
-        public static List{{.Lt}}{{.ModelName}}{{.Gt}} PageAdvanced(IWhereWrapper where, params OrderWrapper[] orders)
+        public static List{{.Lt}}{{.ModelName}}{{.Gt}} PageAdvanced(IWhereWrapper where, int page, int pageSize, params OrderWrapper[] orders)
         {
             IQueryWrapper w = CreateQuery();
-            w.SelectAll().SetWhere(where).Order(orders){{if .HasDeletedAt}}.Nested(WhereWrapper.Or().Eq(TableDefinition.DeletedAt, 0).IsNull(TableDefinition.DeletedAt)){{end}};
+            w.SelectAll().Page(page, pageSize).SetWhere(where).Order(orders){{if .HasDeletedAt}}.Nested(WhereWrapper.Or().Eq(TableDefinition.DeletedAt, 0).IsNull(TableDefinition.DeletedAt)){{end}};
             return DatabaseHelper.Query{{.Lt}}{{.ModelName}}{{.Gt}}(w);
         }
 
