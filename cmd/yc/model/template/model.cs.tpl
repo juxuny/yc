@@ -209,6 +209,39 @@ namespace {{.CSharpModelNamespace}}
             return DatabaseHelper.Count(w);
         }
 
+        public static List{{.Lt}}{{.CSharpDataType}}{{.Gt}} Pick{{$item.FieldName|camelcase|upperFirst}}(List{{.Lt}}{{.ModelName}}{{.Gt}} list)
+        {
+            List{{.Lt}}{{.CSharpDataType}}{{.Gt}} result = new List{{.Lt}}{{.CSharpDataType}}{{.Gt}}();
+            foreach ({{.ModelName}} item in list)
+            {
+                result.Add(item.{{$item.FieldName|camelcase|upperFirst}});
+            }
+            return result;
+        }
+
+        public static IDictionary{{.Lt}}{{.CSharpDataType}}, List{{.Lt}}{{.ModelName}}{{.Gt}}{{.Gt}} GroupBy{{$item.FieldName|camelcase|upperFirst}}(List{{.Lt}}{{.ModelName}}{{.Gt}} list)
+        {
+            IDictionary{{.Lt}}{{.CSharpDataType}}, List{{.Lt}}{{.ModelName}}{{.Gt}}{{.Gt}} result = new Dictionary{{.Lt}}{{.CSharpDataType}}, List{{.Lt}}{{.ModelName}}{{.Gt}}{{.Gt}}();
+            foreach ({{.ModelName}} item in list)
+            {
+                List{{.Lt}}{{.ModelName}}{{.Gt}} items = null;
+                if (result.ContainsKey(item.{{$item.FieldName|camelcase|upperFirst}}))
+                {
+                    items = result[item.{{$item.FieldName|camelcase|upperFirst}}];
+                    items.Add(item);
+                }
+                else
+                {
+                    items = new List{{.Lt}}{{.ModelName}}{{.Gt}}
+                    {
+                        item
+                    };
+                    result[item.{{$item.FieldName|camelcase|upperFirst}}] = items;
+                }
+            }
+            return result;
+        }
+
         {{end}}{{end}}
     }
 }
