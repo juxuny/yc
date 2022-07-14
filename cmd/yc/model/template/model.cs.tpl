@@ -104,10 +104,10 @@ namespace {{.CSharpModelNamespace}}
             return DatabaseHelper.Insert(w);
         }
 
-        public static List{{.Lt}}{{.ModelName}}{{.Gt}} FindAdvanced(IWhereWrapper where)
+        public static List{{.Lt}}{{.ModelName}}{{.Gt}} FindAdvanced(IWhereWrapper where, params OrderWrapper[] orders)
         {
             IQueryWrapper w = CreateQuery();
-            w.SelectAll().SetWhere(where){{if .HasDeletedAt}}.Nested(WhereWrapper.Or().Eq(TableDefinition.DeletedAt, 0).IsNull(TableDefinition.DeletedAt)){{end}};
+            w.SelectAll().Order(orders).SetWhere(where){{if .HasDeletedAt}}.Nested(WhereWrapper.Or().Eq(TableDefinition.DeletedAt, 0).IsNull(TableDefinition.DeletedAt)){{end}};
             return DatabaseHelper.Query{{.Lt}}{{.ModelName}}{{.Gt}}(w);
         }
 
