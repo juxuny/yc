@@ -184,14 +184,14 @@ namespace {{.CSharpModelNamespace}}
         public static int SoftDeleteBy{{$item.FieldName|camelcase|upperFirst}}({{.CSharpDataType}} {{$item.FieldName|camelcase|lowerFirst}})
         {
             return UpdateBy{{$item.FieldName|camelcase|upperFirst}}({{$item.FieldName|camelcase|lowerFirst}}, new Dictionary{{.Lt}}Field, object{{.Gt}}() {
-                {TableDefinition.{{$item.FieldName|camelcase|upperFirst}}, TimeUtils.GetTimestampInMillionSeconds() }
+                {TableDefinition.DeletedAt, TimeUtils.GetTimestampInMillionSeconds() }
             });
         }
 
         public static int ResetSoftDeletedBy{{$item.FieldName|camelcase|upperFirst}}({{.CSharpDataType}} {{$item.FieldName|camelcase|lowerFirst}})
         {
             return UpdateBy{{$item.FieldName|camelcase|upperFirst}}({{$item.FieldName|camelcase|lowerFirst}}, new Dictionary{{.Lt}}Field, object{{.Gt}}() {
-                {TableDefinition.{{$item.FieldName|camelcase|upperFirst}}, 0 }
+                {TableDefinition.DeletedAt, 0 }
             });
         }
 
