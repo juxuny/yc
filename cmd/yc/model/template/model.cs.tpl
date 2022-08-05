@@ -204,6 +204,18 @@ namespace {{.CSharpModelNamespace}}
             return null;
         }
 
+        public static {{.ModelName}} FindDeletedOneBy{{$item.FieldName|camelcase|upperFirst}}({{.CSharpDataType}} {{$item.FieldName|camelcase|lowerFirst}}, params OrderWrapper[] orders)
+        {
+            IQueryWrapper w = CreateQuery();
+            w.SelectAll().Order(orders).Eq(TableDefinition.{{$item.FieldName|camelcase|upperFirst}}, {{$item.FieldName|camelcase|lowerFirst}}).SetLimit(1){{if $item.HasDeletedAt}}.Gt(TableDefinition.DeletedAt, 0){{end}};
+            List{{.Lt}}{{.ModelName}}{{.Gt}} list = DatabaseHelper.Query{{.Lt}}{{.ModelName}}{{.Gt}}(w);
+            if (list != null && list.Count() {{.Gt}} 0)
+            {
+                return list[0];
+            }
+            return null;
+        }
+
         public static int SoftDeleteBy{{$item.FieldName|camelcase|upperFirst}}({{.CSharpDataType}} {{$item.FieldName|camelcase|lowerFirst}})
         {
             return UpdateBy{{$item.FieldName|camelcase|upperFirst}}({{$item.FieldName|camelcase|lowerFirst}}, new Dictionary{{.Lt}}Field, object{{.Gt}}() {
