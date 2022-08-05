@@ -111,10 +111,21 @@ namespace {{.CSharpModelNamespace}}
             return DatabaseHelper.Query{{.Lt}}{{.ModelName}}{{.Gt}}(w);
         }
 
-        public static int UpdateAdvanced(IWhereWrapper where)
+        public static List{{.Lt}}{{.ModelName}}{{.Gt}} FindAdvanced(IWhereWrapper where, int skip, int length, params OrderWrapper[] orders)
+        {
+            IQueryWrapper w = CreateQuery();
+            w.SelectAll().SetOffset(skip, length).Order(orders).SetWhere(where){{if .HasDeletedAt}}.Nested(WhereWrapper.Or().Eq(TableDefinition.DeletedAt, 0).IsNull(TableDefinition.DeletedAt)){{end}};
+            return DatabaseHelper.Query{{.Lt}}{{.ModelName}}{{.Gt}}(w);
+        }
+
+        public static int UpdateAdvanced(IWhereWrapper where, Dictionary{{.Lt}}Field, object{{.Gt}} update)
         {
             IUpdateWrapper w = CreateUpdate();
             w.SetWhere(where){{if .HasDeletedAt}}.Nested(WhereWrapper.Or().Eq(TableDefinition.DeletedAt, 0).IsNull(TableDefinition.DeletedAt)){{end}};
+            foreach (KeyValuePair{{.Lt}}Field, object{{.Gt}} entry in update)
+            {
+                w.SetValue(entry.Key, entry.Value);
+            }
             return DatabaseHelper.Update(w);
         }
 
@@ -129,6 +140,18 @@ namespace {{.CSharpModelNamespace}}
         {
             IQueryWrapper w = CreateQuery();
             w.SelectAll().SetWhere(where).Order(orders).SetLimit(1){{if .HasDeletedAt}}.Nested(WhereWrapper.Or().Eq(TableDefinition.DeletedAt, 0).IsNull(TableDefinition.DeletedAt)){{end}};
+            List{{.Lt}}{{.ModelName}}{{.Gt}} list = DatabaseHelper.Query{{.Lt}}{{.ModelName}}{{.Gt}}(w);
+            if (list != null && list.Count() {{.Gt}} 0)
+            {
+                return list[0];
+            }
+            return null;
+        }
+
+        public static {{.ModelName}} FindDeletedOneAdvanced(IWhereWrapper where, params OrderWrapper[] orders)
+        {
+            IQueryWrapper w = CreateQuery();
+            w.SelectAll().SetWhere(where).Order(orders).SetLimit(1){{if .HasDeletedAt}}.Gt(TableDefinition.DeletedAt, 0){{end}};
             List{{.Lt}}{{.ModelName}}{{.Gt}} list = DatabaseHelper.Query{{.Lt}}{{.ModelName}}{{.Gt}}(w);
             if (list != null && list.Count() {{.Gt}} 0)
             {
