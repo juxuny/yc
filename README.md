@@ -1,6 +1,8 @@
 # yc
 远界云微服务开发框架
 
+[![OSCS Status](https://www.oscs1024.com/platform/badge/dromara/fast-request.svg?size=small)](https://www.oscs1024.com/cd/1529523511885099008?sign=9b3021fa)
+
 ## Requirements
 
 * protoc v3.12.4
