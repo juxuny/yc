@@ -9,18 +9,21 @@ using System.Threading.Tasks;
 
 namespace {{.CSharpModelNamespace}}
 {
-    [Table("{{.TableNameWithoutServicePrefix|camelcase}}")]
+    {{if ne .Desc ""}}// {{.Desc}}
+    {{end}}[Table("{{.TableNameWithoutServicePrefix|camelcase}}")]
     public class {{.ModelName}}: IModel
     {
         public static class TableDefinition {
             public static Table TableName = new Table("{{.TableNameWithoutServicePrefix|camelcase}}");
-            {{range $index, $item := .Fields}}public static Field {{$item.FieldName|upperFirst}} = new Field("{{$item.FieldName|upperFirst}}");
+            {{range $index, $item := .Fields}}{{if ne .Desc ""}}// {{.Desc}}
+            {{end}}public static Field {{$item.FieldName|upperFirst}} = new Field("{{$item.FieldName|upperFirst}}");
             {{end}}
         }
 
         public static readonly List{{.Lt}}Field{{.Gt}} FieldList = new List{{.Lt}}Field{{.Gt}}()
         {
-            {{range $index, $item := .Fields}}TableDefinition.{{$item.FieldName|upperFirst}},
+            {{range $index, $item := .Fields}}{{if ne .Desc ""}}// {{.Desc}}
+            {{end}}TableDefinition.{{$item.FieldName|upperFirst}},
             {{end}}
         };
 
@@ -101,17 +104,28 @@ namespace {{.CSharpModelNamespace}}
             return DatabaseHelper.Insert(w);
         }
 
-        public static List{{.Lt}}{{.ModelName}}{{.Gt}} FindAdvanced(IWhereWrapper where)
+        public static List{{.Lt}}{{.ModelName}}{{.Gt}} FindAdvanced(IWhereWrapper where, params OrderWrapper[] orders)
         {
             IQueryWrapper w = CreateQuery();
-            w.SelectAll().SetWhere(where){{if .HasDeletedAt}}.Nested(WhereWrapper.Or().Eq(TableDefinition.DeletedAt, 0).IsNull(TableDefinition.DeletedAt)){{end}};
+            w.SelectAll().Order(orders).SetWhere(where){{if .HasDeletedAt}}.Nested(WhereWrapper.Or().Eq(TableDefinition.DeletedAt, 0).IsNull(TableDefinition.DeletedAt)){{end}};
             return DatabaseHelper.Query{{.Lt}}{{.ModelName}}{{.Gt}}(w);
         }
 
-        public static int UpdateAdvanced(IWhereWrapper where)
+        public static List{{.Lt}}{{.ModelName}}{{.Gt}} FindAdvanced(IWhereWrapper where, int skip, int length, params OrderWrapper[] orders)
+        {
+            IQueryWrapper w = CreateQuery();
+            w.SelectAll().SetOffset(skip, length).Order(orders).SetWhere(where){{if .HasDeletedAt}}.Nested(WhereWrapper.Or().Eq(TableDefinition.DeletedAt, 0).IsNull(TableDefinition.DeletedAt)){{end}};
+            return DatabaseHelper.Query{{.Lt}}{{.ModelName}}{{.Gt}}(w);
+        }
+
+        public static int UpdateAdvanced(IWhereWrapper where, Dictionary{{.Lt}}Field, object{{.Gt}} update)
         {
             IUpdateWrapper w = CreateUpdate();
             w.SetWhere(where){{if .HasDeletedAt}}.Nested(WhereWrapper.Or().Eq(TableDefinition.DeletedAt, 0).IsNull(TableDefinition.DeletedAt)){{end}};
+            foreach (KeyValuePair{{.Lt}}Field, object{{.Gt}} entry in update)
+            {
+                w.SetValue(entry.Key, entry.Value);
+            }
             return DatabaseHelper.Update(w);
         }
 
@@ -134,10 +148,22 @@ namespace {{.CSharpModelNamespace}}
             return null;
         }
 
-        public static List{{.Lt}}{{.ModelName}}{{.Gt}} PageAdvanced(IWhereWrapper where, params OrderWrapper[] orders)
+        public static {{.ModelName}} FindDeletedOneAdvanced(IWhereWrapper where, params OrderWrapper[] orders)
         {
             IQueryWrapper w = CreateQuery();
-            w.SelectAll().SetWhere(where).Order(orders){{if .HasDeletedAt}}.Nested(WhereWrapper.Or().Eq(TableDefinition.DeletedAt, 0).IsNull(TableDefinition.DeletedAt)){{end}};
+            w.SelectAll().SetWhere(where).Order(orders).SetLimit(1){{if .HasDeletedAt}}.Gt(TableDefinition.DeletedAt, 0){{end}};
+            List{{.Lt}}{{.ModelName}}{{.Gt}} list = DatabaseHelper.Query{{.Lt}}{{.ModelName}}{{.Gt}}(w);
+            if (list != null && list.Count() {{.Gt}} 0)
+            {
+                return list[0];
+            }
+            return null;
+        }
+
+        public static List{{.Lt}}{{.ModelName}}{{.Gt}} PageAdvanced(IWhereWrapper where, int page, int pageSize, params OrderWrapper[] orders)
+        {
+            IQueryWrapper w = CreateQuery();
+            w.SelectAll().Page(page, pageSize).SetWhere(where).Order(orders){{if .HasDeletedAt}}.Nested(WhereWrapper.Or().Eq(TableDefinition.DeletedAt, 0).IsNull(TableDefinition.DeletedAt)){{end}};
             return DatabaseHelper.Query{{.Lt}}{{.ModelName}}{{.Gt}}(w);
         }
 
@@ -178,17 +204,29 @@ namespace {{.CSharpModelNamespace}}
             return null;
         }
 
+        public static {{.ModelName}} FindDeletedOneBy{{$item.FieldName|camelcase|upperFirst}}({{.CSharpDataType}} {{$item.FieldName|camelcase|lowerFirst}}, params OrderWrapper[] orders)
+        {
+            IQueryWrapper w = CreateQuery();
+            w.SelectAll().Order(orders).Eq(TableDefinition.{{$item.FieldName|camelcase|upperFirst}}, {{$item.FieldName|camelcase|lowerFirst}}).SetLimit(1){{if $item.HasDeletedAt}}.Gt(TableDefinition.DeletedAt, 0){{end}};
+            List{{.Lt}}{{.ModelName}}{{.Gt}} list = DatabaseHelper.Query{{.Lt}}{{.ModelName}}{{.Gt}}(w);
+            if (list != null && list.Count() {{.Gt}} 0)
+            {
+                return list[0];
+            }
+            return null;
+        }
+
         public static int SoftDeleteBy{{$item.FieldName|camelcase|upperFirst}}({{.CSharpDataType}} {{$item.FieldName|camelcase|lowerFirst}})
         {
             return UpdateBy{{$item.FieldName|camelcase|upperFirst}}({{$item.FieldName|camelcase|lowerFirst}}, new Dictionary{{.Lt}}Field, object{{.Gt}}() {
-                {TableDefinition.{{$item.FieldName|camelcase|upperFirst}}, TimeUtils.GetTimestampInMillionSeconds() }
+                {TableDefinition.DeletedAt, TimeUtils.GetTimestampInMillionSeconds() }
             });
         }
 
         public static int ResetSoftDeletedBy{{$item.FieldName|camelcase|upperFirst}}({{.CSharpDataType}} {{$item.FieldName|camelcase|lowerFirst}})
         {
             return UpdateBy{{$item.FieldName|camelcase|upperFirst}}({{$item.FieldName|camelcase|lowerFirst}}, new Dictionary{{.Lt}}Field, object{{.Gt}}() {
-                {TableDefinition.{{$item.FieldName|camelcase|upperFirst}}, 0 }
+                {TableDefinition.DeletedAt, 0 }
             });
         }
 
@@ -204,6 +242,39 @@ namespace {{.CSharpModelNamespace}}
             IQueryWrapper w = CreateQuery();
             w.Eq(TableDefinition.{{$item.FieldName|camelcase|upperFirst}}, {{$item.FieldName|camelcase|lowerFirst}}).Select(new Field("COUNT(*) AS Total"));
             return DatabaseHelper.Count(w);
+        }
+
+        public static List{{.Lt}}{{.CSharpDataType}}{{.Gt}} Pick{{$item.FieldName|camelcase|upperFirst}}(List{{.Lt}}{{.ModelName}}{{.Gt}} list)
+        {
+            List{{.Lt}}{{.CSharpDataType}}{{.Gt}} result = new List{{.Lt}}{{.CSharpDataType}}{{.Gt}}();
+            foreach ({{.ModelName}} item in list)
+            {
+                result.Add(item.{{$item.FieldName|camelcase|upperFirst}});
+            }
+            return result;
+        }
+
+        public static IDictionary{{.Lt}}{{.CSharpDataType}}, List{{.Lt}}{{.ModelName}}{{.Gt}}{{.Gt}} GroupBy{{$item.FieldName|camelcase|upperFirst}}(List{{.Lt}}{{.ModelName}}{{.Gt}} list)
+        {
+            IDictionary{{.Lt}}{{.CSharpDataType}}, List{{.Lt}}{{.ModelName}}{{.Gt}}{{.Gt}} result = new Dictionary{{.Lt}}{{.CSharpDataType}}, List{{.Lt}}{{.ModelName}}{{.Gt}}{{.Gt}}();
+            foreach ({{.ModelName}} item in list)
+            {
+                List{{.Lt}}{{.ModelName}}{{.Gt}} items = null;
+                if (result.ContainsKey(item.{{$item.FieldName|camelcase|upperFirst}}))
+                {
+                    items = result[item.{{$item.FieldName|camelcase|upperFirst}}];
+                    items.Add(item);
+                }
+                else
+                {
+                    items = new List{{.Lt}}{{.ModelName}}{{.Gt}}
+                    {
+                        item
+                    };
+                    result[item.{{$item.FieldName|camelcase|upperFirst}}] = items;
+                }
+            }
+            return result;
         }
 
         {{end}}{{end}}

@@ -112,6 +112,7 @@ type ModelField struct {
 	HasPrimaryKey    bool
 	HasAutoIncrement bool
 	CSharpDataType   string
+	Desc             string
 }
 
 type Model struct {
@@ -121,6 +122,7 @@ type Model struct {
 	TableNameWithoutServicePrefix string
 	HasDeletedAt                  bool
 	Refs                          []RefModel
+	Desc                          string
 }
 
 func (t Model) ToRefModel() RefModel {

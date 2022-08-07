@@ -192,6 +192,7 @@ func (t *UpdateCommand) createModelFromMessageOfProto(service services.ServiceEn
 			HasPrimaryKey:    services.CheckIfContainProtoTag(services.ProtoTagPrimary, f.Comments),
 			HasAutoIncrement: services.CheckIfContainProtoTag(services.ProtoTagAutoIncrement, f.Comments),
 			CSharpDataType:   services.ConvertProtoTypeToCSharpDataType(f.Type),
+			Desc:             services.GetDescFromFieldCommentsOfProto(f.Comments),
 		}
 		if internalDataType[f.Type] {
 			field.ModelDataType = strings.Join([]string{service.PackageAlias, f.Type}, ".")
@@ -226,6 +227,7 @@ func (t *UpdateCommand) createModelFromMessageOfProto(service services.ServiceEn
 		ModelName:                     msg.MessageName,
 		HasDeletedAt:                  hasDeletedAt,
 		Refs:                          interactFieldsRefs,
+		Desc:                          services.GetDescFromFieldCommentsOfProto(msg.Comments),
 	}
 }
 

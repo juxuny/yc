@@ -46,7 +46,7 @@ func (t *UpdateCommand) genCsModel(service services.ServiceEntity) {
 	}
 	for _, m := range messages {
 		if strings.Index(m.MessageName, "Model") == 0 {
-			t.createCSharperModel(service, m, internalDataType, refMap)
+			t.createCSharpModel(service, m, internalDataType, refMap)
 		}
 	}
 }
@@ -72,7 +72,7 @@ func (t *UpdateCommand) genCsEnum(service services.ServiceEntity) {
 	}
 	for _, m := range enums {
 		if strings.Index(m.EnumName, "Enum") == 0 {
-			t.createCSharperEnum(service, m)
+			t.createCSharpEnum(service, m)
 		}
 	}
 }
@@ -95,7 +95,7 @@ func (t *UpdateCommand) getCsEnumFields(enumName string, enum *parser.Enum) []se
 	return ret
 }
 
-func (t *UpdateCommand) createCSharperEnum(service services.ServiceEntity, enum *parser.Enum) {
+func (t *UpdateCommand) createCSharpEnum(service services.ServiceEntity, enum *parser.Enum) {
 	log.Println("create enum:", utils.ToUnderLine(enum.EnumName))
 	outEnumFile := path.Join(t.ModelOutputDir, enum.EnumName+".cs")
 	enumEntity := services.EnumEntity{
@@ -110,7 +110,7 @@ func (t *UpdateCommand) createCSharperEnum(service services.ServiceEntity, enum 
 	}
 }
 
-func (t *UpdateCommand) createCSharperModel(service services.ServiceEntity, msg *parser.Message, internalDataType map[string]bool, refMap map[string][]services.RefModel) {
+func (t *UpdateCommand) createCSharpModel(service services.ServiceEntity, msg *parser.Message, internalDataType map[string]bool, refMap map[string][]services.RefModel) {
 	log.Println("create model:", utils.ToUnderLine(msg.MessageName))
 	outModelFile := path.Join(t.ModelOutputDir, msg.MessageName+".cs")
 	model := services.ModelEntity{

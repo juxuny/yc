@@ -8,9 +8,11 @@ using System.Threading.Tasks;
 
 namespace {{.CSharpNamespace}}
 {
-    public static class {{.EnumName}}
+    {{if ne .Desc ""}}// {{.Desc}}
+    {{end}}public static class {{.EnumName}}
     {
-        {{range $index, $item := .Fields}}public static int {{$item.FieldName|upperFirst}} = {{$item.Value}};
+        {{range $index, $item := .Fields}}{{if ne .Desc ""}}// {{.Desc}}
+        {{end}}public static int {{$item.FieldName|upperFirst}} = {{$item.Value}};
         {{end}}
     }
 }
