@@ -62,7 +62,7 @@ func (t *levelValidator) Run(ctx context.Context) (next context.Context, isEnd b
 	if err != nil {
 		return ctx, true, err
 	}
-	if callerLevel <= cos.Level {
+	if int64(callerLevel) <= cos.Level {
 		log.Error("caller service's level is smaller than current")
 		return ctx, true, errors.SystemError.RpcCallErrorLevelNotAllow
 	}
