@@ -2,7 +2,6 @@ package middle
 
 import (
 	"context"
-	"github.com/juxuny/yc/log"
 	"github.com/juxuny/yc/router"
 )
 
@@ -26,7 +25,6 @@ func (t *group) Run(context context.Context) (next context.Context, isEnd bool, 
 			context = next
 		}
 		if err != nil {
-			log.Error(err)
 			return context, true, err
 		}
 		if isEnd {

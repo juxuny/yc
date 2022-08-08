@@ -100,13 +100,31 @@ func (t *mainHandlerWrapper) process(ctx *Context, writeSuccess, writeFailed fun
 		return
 	}
 
-	if err := json.Unmarshal(data, requestParamInstance); err != nil {
-		err = writeFailed(errors.SystemError.InvalidJsonData.Wrap(err))
+	if ctx.IsJson() {
+		if err := json.Unmarshal(data, requestParamInstance); err != nil {
+			err = writeFailed(errors.SystemError.InvalidJsonData.Wrap(err))
+			if err != nil {
+				log.Error(err)
+			}
+			return
+		}
+	} else if ctx.IsProtoBuf() {
+		if err := proto.Unmarshal(data, requestParamInstance.(proto.Message)); err != nil {
+			log.Error(err)
+			err = writeFailed(errors.SystemError.InvalidProtobufHolder.Wrap(err))
+			if err != nil {
+				log.Error(err)
+			}
+			return
+		}
+	} else {
+		err = writeFailed(errors.SystemError.InvalidContentType)
 		if err != nil {
 			log.Error(err)
 		}
 		return
 	}
+
 	in = append(in, reflect.ValueOf(requestParamInstance))
 	responses := caller.Call(in)
 	if len(responses) == 0 {
