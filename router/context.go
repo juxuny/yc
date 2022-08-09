@@ -80,6 +80,7 @@ func (t *Context) WriteJsonSuccess(data interface{}) (int, error) {
 
 func (t *Context) WriteProtobufWithCode(data proto.Message, code int) (int, error) {
 	t.ResponseWriter.Header().Set(HeaderContentType, "application/protobuf")
+	t.StatusCode = code
 	t.WriteHeaderCode(code)
 	buf, err := proto.Marshal(data)
 	if err != nil {

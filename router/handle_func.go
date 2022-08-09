@@ -43,6 +43,7 @@ func LoggerHandler(ctx *Context) {
 	defer func() {
 		log.Infof("%d %v %v [%v]", ctx.StatusCode, ctx.Request.Method, ctx.Request.URL.Path, time.Now().Sub(start))
 	}()
+	ctx.Next()
 }
 
 type mainHandlerWrapper struct {
