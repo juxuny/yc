@@ -1,6 +1,8 @@
 package yc
 
 import (
+	"crypto/sha256"
+	"fmt"
 	"math/rand"
 	"time"
 )
@@ -25,9 +27,27 @@ func (t *RandomEntrypointDispatcher) SelectOne() string {
 	if len(t.entrypointCandidates) == 0 {
 		return ""
 	}
+	t.randInstance.Seed(time.Now().UnixNano())
 	return t.entrypointCandidates[t.randInstance.Intn(len(t.entrypointCandidates))]
 }
 
 type RpcSignContentHandler interface {
 	Sum(data []byte) (method SignMethod, signResult string, err error)
+}
+
+type Sha256SignHandler struct {
+	accessKey string
+	secret    string
+}
+
+func (t *Sha256SignHandler) Sum(data []byte) (method SignMethod, signResult string, err error) {
+	h := sha256.New()
+	return SignMethodSha256, fmt.Sprintf("%02x", h.Sum(data)), nil
+}
+
+func NewDefaultSignHandler(accessKey string, secret string) RpcSignContentHandler {
+	return &Sha256SignHandler{
+		accessKey: accessKey,
+		secret:    secret,
+	}
 }
