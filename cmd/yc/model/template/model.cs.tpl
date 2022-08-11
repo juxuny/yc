@@ -129,6 +129,13 @@ namespace {{.CSharpModelNamespace}}
             return DatabaseHelper.Update(w);
         }
 
+        public static int DeleteAdvanced(IWhereWrapper where)
+        {
+            IDeleteWrapper w = CreateDelete();
+            w.SetWhere(where);
+            return DatabaseHelper.Delete(w);
+        }
+
         public static int CountAdvanced(IWhereWrapper where)
         {
             IQueryWrapper w = CreateQuery();
@@ -160,12 +167,31 @@ namespace {{.CSharpModelNamespace}}
             return null;
         }
 
+        public static {{.ModelName}} FindWithDeletedOneAdvanced(IWhereWrapper where, params OrderWrapper[] orders)
+        {
+            IQueryWrapper w = CreateQuery();
+            w.SelectAll().SetWhere(where).Order(orders).SetLimit(1);
+            List{{.Lt}}{{.ModelName}}{{.Gt}} list = DatabaseHelper.Query{{.Lt}}{{.ModelName}}{{.Gt}}(w);
+            if (list != null && list.Count() {{.Gt}} 0)
+            {
+                return list[0];
+            }
+            return null;
+        }
+
         public static List{{.Lt}}{{.ModelName}}{{.Gt}} PageAdvanced(IWhereWrapper where, int page, int pageSize, params OrderWrapper[] orders)
         {
             IQueryWrapper w = CreateQuery();
             w.SelectAll().Page(page, pageSize).SetWhere(where).Order(orders){{if .HasDeletedAt}}.Nested(WhereWrapper.Or().Eq(TableDefinition.DeletedAt, 0).IsNull(TableDefinition.DeletedAt)){{end}};
             return DatabaseHelper.Query{{.Lt}}{{.ModelName}}{{.Gt}}(w);
-        }
+        }{{if .HasDeletedAt}}
+
+        public static int SoftDeleteAdvanced(IWhereWrapper where)
+        {
+            IUpdateWrapper w = CreateUpdate();
+            w.SetWhere(where).SetValue(TableDefinition.DeletedAt, TimeUtils.GetTimestampInMillionSeconds());
+            return DatabaseHelper.Update(w);
+        }{{end}}
 
         {{range $item := .Fields}}{{if $item.HasIndex}}public static int UpdateBy{{$item.FieldName|camelcase|upperFirst}}({{.CSharpDataType}} {{$item.FieldName|camelcase|lowerFirst}}, Dictionary{{.Lt}}Field, object{{.Gt}} update)
         {
@@ -175,6 +201,18 @@ namespace {{.CSharpModelNamespace}}
                 w.SetValue(entry.Key, entry.Value);
             }
             w.Eq(TableDefinition.{{$item.FieldName|camelcase|upperFirst}}, {{$item.FieldName|camelcase|lowerFirst}}){{if $item.HasDeletedAt}}.Nested(WhereWrapper.Or().Eq(TableDefinition.DeletedAt, 0).IsNull(TableDefinition.DeletedAt)){{end}};
+            return DatabaseHelper.Update(w);
+        }
+
+        public static int UpdateAndResetSoftDeletedBy{{$item.FieldName|camelcase|upperFirst}}({{.CSharpDataType}} {{$item.FieldName|camelcase|lowerFirst}}, Dictionary{{.Lt}}Field, object{{.Gt}} update)
+        {
+            IUpdateWrapper w = CreateUpdate();
+            foreach (KeyValuePair{{.Lt}}Field, object{{.Gt}} entry in update)
+            {
+                w.SetValue(entry.Key, entry.Value);
+            }{{if $item.HasDeletedAt}}
+            w.SetValue(TableDefinition.DeletedAt, 0);{{end}}
+            w.Eq(TableDefinition.{{$item.FieldName|camelcase|upperFirst}}, {{$item.FieldName|camelcase|lowerFirst}}){{if $item.HasDeletedAt}}.Gt(TableDefinition.DeletedAt, 0){{end}};
             return DatabaseHelper.Update(w);
         }
 
@@ -208,6 +246,18 @@ namespace {{.CSharpModelNamespace}}
         {
             IQueryWrapper w = CreateQuery();
             w.SelectAll().Order(orders).Eq(TableDefinition.{{$item.FieldName|camelcase|upperFirst}}, {{$item.FieldName|camelcase|lowerFirst}}).SetLimit(1){{if $item.HasDeletedAt}}.Gt(TableDefinition.DeletedAt, 0){{end}};
+            List{{.Lt}}{{.ModelName}}{{.Gt}} list = DatabaseHelper.Query{{.Lt}}{{.ModelName}}{{.Gt}}(w);
+            if (list != null && list.Count() {{.Gt}} 0)
+            {
+                return list[0];
+            }
+            return null;
+        }
+
+        public static {{.ModelName}} FindWithDeletedOneBy{{$item.FieldName|camelcase|upperFirst}}({{.CSharpDataType}} {{$item.FieldName|camelcase|lowerFirst}}, params OrderWrapper[] orders)
+        {
+            IQueryWrapper w = CreateQuery();
+            w.SelectAll().Order(orders).Eq(TableDefinition.{{$item.FieldName|camelcase|upperFirst}}, {{$item.FieldName|camelcase|lowerFirst}}).SetLimit(1);
             List{{.Lt}}{{.ModelName}}{{.Gt}} list = DatabaseHelper.Query{{.Lt}}{{.ModelName}}{{.Gt}}(w);
             if (list != null && list.Count() {{.Gt}} 0)
             {
