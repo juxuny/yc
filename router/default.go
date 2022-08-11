@@ -22,3 +22,19 @@ func SetPrefix(prefix string) {
 func Start(addr string) error {
 	return defaultRouter.Start(addr)
 }
+
+func AddIgnoreAuthPath(pathList ...string) {
+	defaultRouter.AddIgnoreAuthPath(pathList...)
+}
+
+func AddOpenApiPath(pathList ...string) {
+	defaultRouter.AddOpenApiPath(pathList...)
+}
+
+func CheckIfIgnoreAuth(path string) bool {
+	return defaultRouter.CheckIfIgnoreAuth(path)
+}
+
+func CheckIfOpenApi(path string) bool {
+	return defaultRouter.CheckIfOpenApi(path)
+}

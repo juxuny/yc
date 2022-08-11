@@ -3,10 +3,15 @@ package router
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"github.com/juxuny/yc"
+	"github.com/juxuny/yc/dt"
+	"github.com/juxuny/yc/errors"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/proto"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -65,6 +70,38 @@ func (t *Context) WriteJsonFailed(data interface{}) (int, error) {
 	t.WriteHeaderCode(http.StatusBadRequest)
 	jsonData, _ := json.Marshal(data)
 	return t.Write(jsonData)
+}
+
+func (t *Context) ERROR(data errors.Error) (int, error) {
+	if t.IsProtoBuf() {
+		return t.WriteProtobufFailed(dt.FromError(data))
+	} else {
+		return t.WriteJsonFailed(data)
+	}
+}
+
+func (t *Context) SUCCESS(data interface{}) (int, error) {
+	if t.IsProtoBuf() {
+		resp, ok := data.(proto.Message)
+		if !ok {
+			panic("is not an instance of proto.Message")
+		}
+		return t.WriteProtobufSuccess(resp)
+	} else {
+		return t.WriteJsonSuccess(data)
+	}
+}
+
+func (t *Context) DATA(data interface{}) (int, error) {
+	if t.IsProtoBuf() {
+		resp, ok := data.(proto.Message)
+		if !ok {
+			panic("is not an instance of proto.Message")
+		}
+		return t.WriteProtobufWithCode(resp, http.StatusOK)
+	} else {
+		return t.WriteJsonWithCode(data, http.StatusOK)
+	}
 }
 
 func (t *Context) WriteJsonSuccess(data interface{}) (int, error) {
@@ -154,4 +191,48 @@ func (t *Context) GetRequestBodyBytes() ([]byte, error) {
 
 func (t *Context) IsPost() bool {
 	return t.Request.Method == http.MethodPost
+}
+
+func (t *Context) GetToken() string {
+	return t.GetHeader(yc.HeaderContextToken)
+}
+
+func (t *Context) GetSign() string {
+	return t.GetHeader(yc.HeaderContextSign)
+}
+
+func (t *Context) GetSignMethod() yc.SignMethod {
+	v := t.GetHeader(yc.HeaderContextSignMethod)
+	v = strings.ToLower(v)
+	if v == string(yc.SignMethodMd5) {
+		return yc.SignMethodMd5
+	} else if v == string(yc.SignMethodSha1) {
+		return yc.SignMethodSha1
+	} else if v == string(yc.SignMethodSha256) {
+		return yc.SignMethodSha256
+	} else if v == string(yc.SignMethodSha512) {
+		return yc.SignMethodSha512
+	}
+	return yc.SignMethodUnknown
+}
+
+func (t *Context) GetAccessKey() string {
+	return t.GetHeader(yc.HeaderContextAccessKey)
+}
+
+func (t *Context) GetTimestamp() int64 {
+	v := t.GetHeader(yc.HeaderContextTimestamp)
+	if v == "" {
+		return 0
+	}
+	timestamp, _ := strconv.ParseInt(v, 10, 64)
+	return timestamp
+}
+
+func (t *Context) SetContextValue(key, value string) {
+	t.Request.Header.Set(key, value)
+}
+
+func (t *Context) SetUserId(userId *dt.ID) {
+	t.SetContextValue(yc.HeaderContextUserId, fmt.Sprintf("%d", userId.Uint64))
 }

@@ -55,6 +55,10 @@ var SystemError = struct {
 	RpcCallErrorInvalidUserId          Error `code:"-10051" msg:"rpc call error: invalid userId"`
 	DatabaseCloneErrorNotFoundTemplate Error `code:"-10052" msg:"database clone error: not found template table"`
 	InvalidSign                        Error `code:"-10053" msg:"invalid sign"`
+	InvalidAccessKey                   Error `code:"-10054" msg:"invalid access key"`
+	SignError                          Error `code:"-10055" msg:"sign error"`
+	InvalidSignMethod                  Error `code:"-10056" msg:"invalid sign method"`
+	SignExpired                        Error `code:"-10057" msg:"sign expired"`
 }{}
 
 func init() {

@@ -2,6 +2,7 @@ package cos
 
 import (
 	"context"
+	"github.com/juxuny/yc"
 	"github.com/juxuny/yc/dt"
 	"github.com/juxuny/yc/env"
 	"github.com/juxuny/yc/services/cos"
@@ -23,6 +24,7 @@ func init() {
 
 func TestFetchValues(t *testing.T) {
 	ctx := context.Background()
+	cos.Config(yc.NewRandomEntrypointDispatcher([]string{testEnv.Entrypoint}), yc.NewDefaultSignHandler(testEnv.AccessKey, testEnv.Secret))
 	resp, err := cos.ListAllValueByConfigId(ctx, &cos.ListAllValueByConfigIdRequest{
 		ConfigId:   testEnv.ConfigId,
 		IsDisabled: &dt.NullBool{Valid: true, Bool: false},

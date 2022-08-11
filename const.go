@@ -5,10 +5,11 @@ const Version = "v0.0.1"
 type SignMethod string
 
 const (
-	SignMethodMd5    = SignMethod("md5")
-	SignMethodSha1   = SignMethod("sha1")
-	SignMethodSha256 = SignMethod("sha256")
-	SignMethodSha512 = SignMethod("sha512")
+	SignMethodUnknown = SignMethod("unknown")
+	SignMethodMd5     = SignMethod("md5")
+	SignMethodSha1    = SignMethod("sha1")
+	SignMethodSha256  = SignMethod("sha256")
+	SignMethodSha512  = SignMethod("sha512")
 )
 
 func IsValidSignMethod(signMethod SignMethod) bool {

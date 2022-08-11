@@ -15,16 +15,29 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 )
 
 const (
-	MdContextCallerService = "x-rpc-caller-service"
-	MdContextCallerLevel   = "x-rpc-caller-level"
-	MdContextAccessKey     = "x-rpc-access-key"
-	MdContextToken         = "x-rpc-token"
-	MdContextSign          = "x-rpc-sign"
-	MdContextSignMethod    = "x-rpc-sign-method"
-	MdContextUserId        = "x-rpc-user-id"
+	HeaderContextCallerService = "X-Rpc-Caller-Service"
+	HeaderContextCallerLevel   = "X-Rpc-Caller-Level"
+	HeaderContextAccessKey     = "X-Rpc-Access-Key"
+	HeaderContextToken         = "X-Rpc-Token"
+	HeaderContextSign          = "X-Rpc-Sign"
+	HeaderContextSignMethod    = "X-Rpc-Sign-Method"
+	HeaderContextUserId        = "X-Rpc-User-Id"
+	HeaderContextTimestamp     = "X-Rpc-Timestamp"
+)
+
+var (
+	MdContextCallerService = strings.ToLower(HeaderContextCallerService)
+	MdContextCallerLevel   = strings.ToLower(HeaderContextCallerLevel)
+	MdContextAccessKey     = strings.ToLower(HeaderContextAccessKey)
+	MdContextToken         = strings.ToLower(HeaderContextToken)
+	MdContextSign          = strings.ToLower(HeaderContextSign)
+	MdContextSignMethod    = strings.ToLower(HeaderContextSignMethod)
+	MdContextUserId        = strings.ToLower(HeaderContextUserId)
+	MdContextTimestamp     = strings.ToLower(HeaderContextTimestamp)
 )
 
 func GetCallerLevelFromMd(md metadata.MD) (level int, err error) {
@@ -164,6 +177,8 @@ func RpcCall(ctx context.Context, host string, queryPath string, data proto.Mess
 		}
 		md.Set(MdContextSign, sign)
 		md.Set(MdContextSignMethod, string(method))
+		md.Set(MdContextTimestamp, fmt.Sprintf("%d", time.Now().UnixNano()/int64(time.Millisecond)))
+		md.Set(MdContextAccessKey, signHandler.GetAccessKey())
 	}
 	MergeRequestHeaderFromMetadata(req, contextHeader, md)
 	req.Header.Set("content-type", "application/protobuf")

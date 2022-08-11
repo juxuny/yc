@@ -33,6 +33,7 @@ func (t *RandomEntrypointDispatcher) SelectOne() string {
 
 type RpcSignContentHandler interface {
 	Sum(data []byte) (method SignMethod, signResult string, err error)
+	GetAccessKey() string
 }
 
 type Sha256SignHandler struct {
@@ -43,6 +44,10 @@ type Sha256SignHandler struct {
 func (t *Sha256SignHandler) Sum(data []byte) (method SignMethod, signResult string, err error) {
 	h := sha256.New()
 	return SignMethodSha256, fmt.Sprintf("%02x", h.Sum(data)), nil
+}
+
+func (t *Sha256SignHandler) GetAccessKey() string {
+	return t.accessKey
 }
 
 func NewDefaultSignHandler(accessKey string, secret string) RpcSignContentHandler {
