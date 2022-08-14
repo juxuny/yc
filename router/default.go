@@ -2,9 +2,9 @@ package router
 
 var defaultRouter = NewRouter(
 	"api",
-	LoggerHandler,
 	RecoverHandler,
 	TraceHandler,
+	LoggerHandler,
 )
 
 func Use(handlerChain ...HandleFunc) {

@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"context"
 	"github.com/juxuny/yc/dt"
 	"github.com/juxuny/yc/errors"
 	"github.com/juxuny/yc/jwt"
@@ -40,8 +39,7 @@ func init() {
 		}
 		userId = claims.UserId.Clone()
 		ctx.SetUserId(userId)
-		backgroundContext := context.Background()
-		modelAccount, found, err := db.TableAccount.FindOneById(backgroundContext, userId)
+		modelAccount, found, err := db.TableAccount.FindOneById(ctx.RpcContext, userId)
 		if err != nil {
 			log.Error(err)
 			_, err = ctx.ERROR(errors.SystemError.DatabaseQueryError.Wrap(err))
