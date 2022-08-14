@@ -13,7 +13,3 @@ func CreateMetadataFromHeader(header http.Header) metadata.MD {
 	}
 	return ret
 }
-
-func IsProtobufContentType(contentType string) bool {
-	return strings.Contains(contentType, "protobuf")
-}

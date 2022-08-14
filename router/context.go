@@ -229,10 +229,8 @@ func (t *Context) GetTimestamp() int64 {
 	return timestamp
 }
 
-func (t *Context) SetContextValue(key, value string) {
-	t.Request.Header.Set(key, value)
-}
-
 func (t *Context) SetUserId(userId *dt.ID) {
-	t.SetContextValue(yc.HeaderContextUserId, fmt.Sprintf("%d", userId.Uint64))
+	t.RpcContext = metadata.NewIncomingContext(t.RpcContext, metadata.New(map[string]string{
+		yc.MdContextUserId: fmt.Sprintf("%d", userId.Uint64),
+	}))
 }
