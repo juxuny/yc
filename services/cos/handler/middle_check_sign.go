@@ -7,6 +7,7 @@ import (
 	"github.com/juxuny/yc/errors"
 	"github.com/juxuny/yc/log"
 	"github.com/juxuny/yc/router"
+	"github.com/juxuny/yc/services/cos"
 	"github.com/juxuny/yc/services/cos/db"
 	"time"
 )
@@ -76,9 +77,31 @@ func init() {
 		}
 		if receivedSign != signResult {
 			log.Error("invalid sign: received: %s, real: %s", receivedSign, signResult)
+			_, _ = ctx.ERROR(errors.SystemError.InvalidSign)
+			ctx.Abort()
 			return
 		}
 		log.Debug("sign verified")
+		modelAccount, found, err := db.TableAccount.FindOneById(ctx.RpcContext, modelAccessKey.UserId)
+		if err != nil {
+			log.Error(err)
+			_, _ = ctx.ERROR(errors.SystemError.InvalidSign)
+			ctx.Abort()
+			return
+		}
+		if !found {
+			log.Error("user not found")
+			_, _ = ctx.ERROR(cos.Error.AccountNotFound)
+			ctx.Abort()
+			return
+		}
+		if modelAccount.IsDisabled {
+			log.Error("user is disabled")
+			_, _ = ctx.ERROR(cos.Error.AccountForbidden)
+			ctx.Abort()
+			return
+		}
+		ctx.SetUserId(modelAccount.Id)
 		ctx.Next()
 	})
 }
