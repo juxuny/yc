@@ -10,12 +10,13 @@ import (
 	"{{.GoModuleName}}/config"
 	"{{.GoModuleName}}/handler"
 	"github.com/juxuny/yc/trace"
+	"strings"
 )
 
 func Start(ctx context.Context) {
 	trace.InitReqId("http")
 	router.SetPrefix(config.Env.Prefix)
-	if err := router.Register({{.PackageAlias}}.Name, handler.NewHandler()); err != nil {
+	if err := router.Register(strings.ReplaceAll({{.PackageAlias}}.Name, "_", "-"), handler.NewHandler()); err != nil {
 		panic(err)
 	}
 	finished := make(chan bool, 1)
