@@ -15,7 +15,7 @@ import (
 func Start(ctx context.Context) {
 	trace.InitReqId("http")
 	router.SetPrefix(config.Env.Prefix)
-	if err := router.Register({{.PackageAlias}}.Name, handler.NewWrapper()); err != nil {
+	if err := router.Register({{.PackageAlias}}.Name, handler.NewHandler()); err != nil {
 		panic(err)
 	}
 	finished := make(chan bool, 1)

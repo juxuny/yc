@@ -5,7 +5,6 @@ import (
 )
 
 type keyValue struct {
-	Db            redis.Key
 	NotifyChannel redis.Key
 }
 

@@ -205,7 +205,6 @@ func (t *UpdateCommand) genService(service services.ServiceEntity, svc []*parser
 	if err := utils.TouchDirs([]string{
 		path.Join(t.WorkDir, "server"),
 		path.Join(t.WorkDir, "server", "http"),
-		path.Join(t.WorkDir, "server", "rpc"),
 	}, 0755); err != nil {
 		log.Fatal(err)
 	}
@@ -219,18 +218,15 @@ func (t *UpdateCommand) genService(service services.ServiceEntity, svc []*parser
 	}); err != nil {
 		log.Fatal(err)
 	}
-	if err := template.RunEmbedFile(templateFs, rpcServerFileName, path.Join(t.WorkDir, "server", "rpc", "rpc_server.go"), services.EntrypointEntity{
-		ServiceEntity: service,
-		GoModuleName:  moduleName,
-	}); err != nil {
-		log.Fatal(err)
-	}
 
 	// init main.go
 	log.Println("create main file")
 	outMainFile := path.Join(t.WorkDir, "server", "main.go")
 	if _, err := os.Stat(outMainFile); os.IsNotExist(err) {
-		if err := template.RunEmbedFile(templateFs, mainFileName, outMainFile, service); err != nil {
+		if err := template.RunEmbedFile(templateFs, mainFileName, outMainFile, services.EntrypointEntity{
+			ServiceEntity: service,
+			GoModuleName:  moduleName,
+		}); err != nil {
 			log.Fatal("create main file error:", err)
 		}
 	}
@@ -256,12 +252,12 @@ func (t *UpdateCommand) genHandler(service services.ServiceEntity, svc []*parser
 			log.Fatal(err)
 		}
 	}
-	handlerWrapperOutputFile := path.Join(t.WorkDir, "handler", "wrapper.go")
-	if _, err := os.Stat(handlerWrapperOutputFile); os.IsNotExist(err) {
-		if err := template.RunEmbedFile(templateFs, handlerWrapperFileName, path.Join(t.WorkDir, "handler", "wrapper.go"), handlerEntity); err != nil {
-			log.Fatal(err)
-		}
-	}
+	//handlerWrapperOutputFile := path.Join(t.WorkDir, "handler", "wrapper.go")
+	//if _, err := os.Stat(handlerWrapperOutputFile); os.IsNotExist(err) {
+	//	if err := template.RunEmbedFile(templateFs, handlerWrapperFileName, path.Join(t.WorkDir, "handler", "wrapper.go"), handlerEntity); err != nil {
+	//		log.Fatal(err)
+	//	}
+	//}
 	// create method groups
 	if len(svc) > 1 {
 		log.Fatal("not allow multiple services in one proto file")
@@ -288,7 +284,6 @@ func (t *UpdateCommand) genHandler(service services.ServiceEntity, svc []*parser
 	}
 	for group, methods := range methodsMap {
 		t.checkOrInitMethodGroupFile(group, handlerEntity)
-		t.checkOrInitWrapperGroupFile(group, handlerEntity)
 		for _, m := range methods {
 			t.checkOrAppendMethod(group, m)
 		}
@@ -308,21 +303,6 @@ func (t *UpdateCommand) checkOrInitMethodGroupFile(group string, handlerInitEnti
 		log.Fatal("init method group file failed:", err)
 	}
 }
-
-func (t *UpdateCommand) checkOrInitWrapperGroupFile(group string, handlerInitEntity services.HandlerInitEntity) {
-	wrapperGroupFileName := t.getWrapperFileNameFromGroup(group)
-	stat, err := os.Stat(path.Join(t.WorkDir, "handler", wrapperGroupFileName))
-	if err == nil {
-		if stat.IsDir() {
-			log.Fatalf("'%s' cannot be a directory", wrapperGroupFileName)
-		}
-		return
-	}
-	if err := template.RunEmbedFile(templateFs, handlerWrapperInitFileName, path.Join(t.WorkDir, "handler", wrapperGroupFileName), handlerInitEntity); err != nil {
-		log.Fatal("init wrapper group file failed:", err)
-	}
-}
-
 func (t *UpdateCommand) checkOrAppendMethod(group string, method services.MethodEntity) {
 	methodGroupFileName := t.getMethodFileNameFromGroup(group)
 	if found, err := t.checkIfContainMethod(path.Join(t.WorkDir, "handler", methodGroupFileName), group, method); err != nil {
@@ -332,18 +312,10 @@ func (t *UpdateCommand) checkOrAppendMethod(group string, method services.Method
 			log.Fatal("create rpc method failed:", err)
 		}
 	}
-	wrapperGroupFileName := t.getWrapperFileNameFromGroup(group)
-	if found, err := t.checkIfContainMethod(path.Join(t.WorkDir, "handler", wrapperGroupFileName), group, method); err != nil {
-		log.Fatalf("create wrapper %s failed: %v", method.MethodName, err)
-	} else if !found {
-		if err := template.AppendFromEmbedFile(templateFs, handlerWrapperFuncFileName, path.Join(t.WorkDir, "handler", wrapperGroupFileName), method); err != nil {
-			log.Fatal("create rpc wrapper failed: ", err)
-		}
-	}
 }
 
 func (t *UpdateCommand) checkIfContainMethod(fileName string, group string, method services.MethodEntity) (found bool, err error) {
-	searchKey := fmt.Sprintf("func %s(ctx context.Context, req *cos.%s) (resp *cos.%s, err error)", method.MethodName, method.Request, method.Response)
+	searchKey := fmt.Sprintf("func %s(ctx context.Context, req *%s.%s) (resp *%s.%s, err error)", method.MethodName, method.PackageAlias, method.Request, method.PackageAlias, method.Response)
 	content, err := ioutil.ReadFile(fileName)
 	if err != nil {
 		return false, err
