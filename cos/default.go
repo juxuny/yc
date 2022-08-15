@@ -6,6 +6,7 @@ import (
 	"github.com/juxuny/yc/dt"
 	"github.com/juxuny/yc/log"
 	"github.com/juxuny/yc/services/cos"
+	"github.com/pkg/errors"
 )
 
 type client struct {
@@ -41,7 +42,7 @@ func (t *client) Parse(out interface{}) error {
 	configMap, err := t.fetch()
 	if err != nil {
 		log.Error(err)
-		return nil
+		return errors.Wrap(err, "fetch config data failed")
 	}
 	return Parse(configMap, out)
 }
