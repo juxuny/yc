@@ -94,7 +94,9 @@ type MethodEntity struct {
 type EntrypointEntity struct {
 	baseEntity
 	ServiceEntity
-	GoModuleName string
+	GoModuleName   string
+	IgnoreAuthList []string
+	OpenApiList    []string
 }
 
 type ModelField struct {

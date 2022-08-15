@@ -20,6 +20,7 @@ const (
 	ProtoTagIgnoreAuth    = ProtoTag("@ignore-auth")
 	ProtoTagAutoIncrement = ProtoTag("@auto-increment")
 	ProtoTagVersion       = ProtoTag("@version")
+	ProtoTagCheckSign     = ProtoTag("@check-sign")
 )
 
 func (t ProtoTag) String() string {

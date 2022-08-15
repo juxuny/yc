@@ -12,6 +12,11 @@ import (
 	"github.com/juxuny/yc/trace"
 	"strings"
 )
+{{$packageAlias := .PackageAlias}}
+func init() {
+	{{range $item := .IgnoreAuthList}}router.AddIgnoreAuthPath(config.Env.Prefix + "/" + path.Join({{$packageAlias}}.Name, "{{$item}}"))
+{{end}}	{{range $item := .OpenApiList}}router.AddOpenApiPath(config.Env.Prefix + "/" + path.Join({{$packageAlias}}.Name, "{{$item}}"))
+{{end}}}
 
 func Start(ctx context.Context) {
 	trace.InitReqId("http")

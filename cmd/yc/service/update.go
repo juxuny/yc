@@ -190,6 +190,38 @@ func (t *UpdateCommand) genExtend(service services.ServiceEntity) {
 	t.genService(service, svc)
 }
 
+func (t *UpdateCommand) getIgnoreAuthMethodList(serviceList []*parser.Service) []string {
+	ret := make([]string, 0)
+	for _, s := range serviceList {
+		for _, item := range s.ServiceBody {
+			rpc, ok := item.(*parser.RPC)
+			if !ok {
+				continue
+			}
+			if services.CheckIfContainProtoTag(services.ProtoTagIgnoreAuth, rpc.Comments) {
+				ret = append(ret, strings.ReplaceAll(utils.StringHelper.ToUnderLine(rpc.RPCName), "_", "-"))
+			}
+		}
+	}
+	return ret
+}
+
+func (t *UpdateCommand) getOpenApiList(serviceList []*parser.Service) []string {
+	ret := make([]string, 0)
+	for _, s := range serviceList {
+		for _, item := range s.ServiceBody {
+			rpc, ok := item.(*parser.RPC)
+			if !ok {
+				continue
+			}
+			if services.CheckIfContainProtoTag(services.ProtoTagCheckSign, rpc.Comments) {
+				ret = append(ret, strings.ReplaceAll(utils.StringHelper.ToUnderLine(rpc.RPCName), "_", "-"))
+			}
+		}
+	}
+	return ret
+}
+
 func (t *UpdateCommand) genService(service services.ServiceEntity, svc []*parser.Service) {
 	t.genHandler(service, svc)
 	for _, s := range svc {
@@ -213,8 +245,10 @@ func (t *UpdateCommand) genService(service services.ServiceEntity, svc []*parser
 		log.Fatal(err)
 	}
 	if err := template.RunEmbedFile(templateFs, httpServerFileName, path.Join(t.WorkDir, "server", "http", "http_server.go"), services.EntrypointEntity{
-		ServiceEntity: service,
-		GoModuleName:  moduleName,
+		ServiceEntity:  service,
+		GoModuleName:   moduleName,
+		OpenApiList:    t.getOpenApiList(svc),
+		IgnoreAuthList: t.getIgnoreAuthMethodList(svc),
 	}); err != nil {
 		log.Fatal(err)
 	}
