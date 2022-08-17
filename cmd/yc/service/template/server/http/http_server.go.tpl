@@ -10,12 +10,13 @@ import (
 	"{{.GoModuleName}}/config"
 	"{{.GoModuleName}}/handler"
 	"github.com/juxuny/yc/trace"
+	"path"
 	"strings"
 )
 {{$packageAlias := .PackageAlias}}
 func init() {
-	{{range $item := .IgnoreAuthList}}router.AddIgnoreAuthPath(config.Env.Prefix + "/" + path.Join({{$packageAlias}}.Name, "{{$item}}"))
-{{end}}	{{range $item := .OpenApiList}}router.AddOpenApiPath(config.Env.Prefix + "/" + path.Join({{$packageAlias}}.Name, "{{$item}}"))
+	{{range $item := .IgnoreAuthList}}router.AddIgnoreAuthPath(config.Env.Prefix + "/" + path.Join({{$packageAlias}}.ApiGroupName, "{{$item}}"))
+{{end}}	{{range $item := .OpenApiList}}router.AddOpenApiPath(config.Env.Prefix + "/" + path.Join({{$packageAlias}}.ApiGroupName, "{{$item}}"))
 {{end}}}
 
 func Start(ctx context.Context) {

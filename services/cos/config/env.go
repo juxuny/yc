@@ -58,5 +58,4 @@ func init() {
 
 	// config jwt secret
 	jwt.SetSecret(Env.JwtSecret)
-
 }
