@@ -9,6 +9,8 @@ import (
 
 type _clientEnv struct {
 	Entrypoint []string
+	AccessKey  string
+	Secret     string
 }
 
 type _cosClientEnv struct {
@@ -24,14 +26,21 @@ var cosClientEnv = _cosClientEnv{}
 func init() {
 	env.Init(&clientEnv, true, "{{.ServiceName|upper}}")
 	env.Init(&cosClientEnv, true, "COS")
+	initClient := &client{
+		Service: Name,
+	}
 	if cosClientEnv.RouteConfigId == "" {
-		DefaultClient = NewClientWithDispatcher(yc.NewRandomEntrypointDispatcher(clientEnv.Entrypoint))
+		initClient.EntrypointDispatcher = yc.NewRandomEntrypointDispatcher(clientEnv.Entrypoint)
 	} else {
-		DefaultClient = NewClientWithDispatcher(cos.NewEntrypointDispatcher(Name, cos.Options{
+		initClient.EntrypointDispatcher = cos.NewEntrypointDispatcher(Name, cos.Options{
 			CosEntrypoint: cosClientEnv.Host,
 			ConfigId:      cosClientEnv.RouteConfigId,
 			AccessKey:     cosClientEnv.AccessKey,
 			Secret:        cosClientEnv.Secret,
-		}))
+		})
 	}
+	if clientEnv.AccessKey != "" && clientEnv.Secret != "" {
+		initClient.signHandler = yc.NewDefaultSignHandler(clientEnv.AccessKey, clientEnv.Secret)
+	}
+	DefaultClient = initClient
 }
