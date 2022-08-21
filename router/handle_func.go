@@ -85,8 +85,8 @@ func (t *mainHandlerWrapper) process(ctx *Context, writeSuccess, writeFailed fun
 		err := writeFailed(errors.SystemError.NotFound)
 		if err != nil {
 			log.Error(err)
-			return
 		}
+		return
 	}
 
 	in, requestParamInstance := t.initializeRequestInstance(ctx, caller)
