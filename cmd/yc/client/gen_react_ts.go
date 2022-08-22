@@ -160,7 +160,7 @@ func (t *GenCommand) genReactTsMethods(service services.ServiceEntity, methods [
 		}
 		apiEntity.Methods = append(apiEntity.Methods, services.ReactTsMethod{
 			ServiceEntity: service,
-			Api:           service.ServiceName + "/" + strings.ReplaceAll(utils.ToUnderLine(item.RPCName), "_", "-"),
+			Api:           strings.ReplaceAll(service.ServiceName, "_", "-") + "/" + strings.ReplaceAll(utils.ToUnderLine(item.RPCName), "_", "-"),
 			MethodName:    item.RPCName,
 			Request:       item.RPCRequest.MessageType,
 			Response:      item.RPCResponse.MessageType,

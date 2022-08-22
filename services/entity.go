@@ -36,6 +36,7 @@ type ServiceEntity struct {
 	CommandLineVersion string
 	Version            string
 	Level              string
+	ClassName          string
 }
 
 func NewServiceEntity(serviceName string, commandLineVersion string) ServiceEntity {
@@ -46,6 +47,7 @@ func NewServiceEntity(serviceName string, commandLineVersion string) ServiceEnti
 		ProtoFileName:      utils.ToUnderLine(serviceName),
 		ServiceStruct:      utils.ToHump(serviceName),
 		PackageAlias:       utils.ToLowerFirst(utils.ToHump(serviceName)),
+		ClassName:          utils.ToUpperFirst(utils.ToHump(serviceName)),
 		CommandLineVersion: commandLineVersion,
 	}
 	return ret
