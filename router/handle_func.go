@@ -126,7 +126,24 @@ func (t *mainHandlerWrapper) process(ctx *Context, writeSuccess, writeFailed fun
 		return
 	}
 
-	in = append(in, reflect.ValueOf(requestParamInstance))
+	requestParamInstanceValue := reflect.ValueOf(requestParamInstance)
+	if validateMethod := requestParamInstanceValue.MethodByName("Validate"); validateMethod.IsValid() {
+		validateOutput := validateMethod.Call([]reflect.Value{})
+		if len(validateOutput) > 0 {
+			validateOutputValue := validateOutput[0].Interface()
+			if validateOutputValue != nil {
+				if validateError, ok := validateOutputValue.(error); ok {
+					log.Error("validate failed: ", validateError)
+					err = writeFailed(validateError)
+					if err != nil {
+						log.Error(err)
+					}
+				}
+				return
+			}
+		}
+	}
+	in = append(in, reflect.ValueOf(requestParamInstanceValue))
 	responses := caller.Call(in)
 	if len(responses) == 0 {
 		log.Error("no response")
