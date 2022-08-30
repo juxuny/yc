@@ -37,6 +37,7 @@ type ServiceEntity struct {
 	Version            string
 	Level              string
 	ClassName          string
+	ServiceCode        string
 }
 
 func NewServiceEntity(serviceName string, commandLineVersion string) ServiceEntity {

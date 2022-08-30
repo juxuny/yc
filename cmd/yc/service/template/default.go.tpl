@@ -8,4 +8,5 @@ import (
 const Name = "{{.ServiceName}}"
 const Level = int64({{.Level}})
 const Version = "{{.Version}}"
+const ServiceCode = "{{.ServiceCode}}"
 var ApiGroupName = strings.ReplaceAll(Name, "_", "-")

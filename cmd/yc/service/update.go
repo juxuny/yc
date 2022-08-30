@@ -106,8 +106,16 @@ func (t *UpdateCommand) getServiceEntity() services.ServiceEntity {
 	if _, err := strconv.ParseInt(serviceLevel, 10, 64); err != nil {
 		log.Fatalf("parse level failed, is not a integer: %v", err)
 	}
+	serviceCode := services.GetContentByProtoTagFistOne(services.ProtoTagCode, service.Comments)
+	if serviceCode == "" {
+		log.Fatalf("@service missing @code")
+	}
+	if _, err := strconv.ParseInt(serviceCode, 10, 64); err != nil {
+		log.Fatalf("parse service code failed, is not a integer: %v", serviceCode)
+	}
 	ret.Version = serviceVersion
 	ret.Level = serviceLevel
+	ret.ServiceCode = serviceCode
 	return ret
 }
 
@@ -151,8 +159,6 @@ func (t *UpdateCommand) genRpc(service services.ServiceEntity) {
 		"-I=.",
 		"--go_out=.",
 		"--go_opt=paths=source_relative",
-		"--go-grpc_out=.",
-		"--go-grpc_opt=paths=source_relative",
 		fmt.Sprintf("%s.proto", service.ProtoFileName),
 	}
 	if err := cmd.Exec(

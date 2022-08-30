@@ -184,7 +184,7 @@ func (t *UpdateCommand) createModelFromMessageOfProto(service services.ServiceEn
 			ModelName:        msg.MessageName,
 			FieldName:        f.FieldName,
 			OrmFieldName:     utils.ToUnderLine(f.FieldName),
-			ModelDataType:    f.Type,
+			ModelDataType:    services.ConvertProtoTypeToGoDataType(f.Type),
 			HasDeletedAt:     hasDeletedAt,
 			Ignore:           services.CheckIfContainProtoTag(services.ProtoTagIgnoreProto, f.Comments),
 			HasIndex:         services.CheckIfContainProtoTag(services.ProtoTagIndex, f.Comments) || services.CheckIfContainProtoTag(services.ProtoTagPrimary, f.Comments),

@@ -27,7 +27,7 @@ func ConvertProtoTypeToReactTsDataType(dataType string) (finalType string, nulla
 	return
 }
 
-var cSharperDataTypeMapper = map[string]string{
+var cSharpDataTypeMapper = map[string]string{
 	"int64":  "long",
 	"int32":  "int",
 	"uint32": "uint",
@@ -35,9 +35,22 @@ var cSharperDataTypeMapper = map[string]string{
 }
 
 func ConvertProtoTypeToCSharpDataType(dataType string) (finalType string) {
-	finalType, b := cSharperDataTypeMapper[dataType]
+	finalType, b := cSharpDataTypeMapper[dataType]
 	if !b {
 		return dataType
 	}
 	return
+}
+
+var goDataTypeMapper = map[string]string{
+	"double": "float64",
+	"float":  "float32",
+}
+
+func ConvertProtoTypeToGoDataType(dataType string) string {
+	finalType, b := goDataTypeMapper[dataType]
+	if !b {
+		return dataType
+	}
+	return finalType
 }

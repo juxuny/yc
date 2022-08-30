@@ -240,6 +240,18 @@ func ({{.TableName|lowerFirst}}) Find(ctx context.Context, where orm.WhereWrappe
 	return
 }
 
+func ({{.TableName|lowerFirst}}) FindIncludeDeleted(ctx context.Context, where orm.WhereWrapper, orderBy ...orm.Order) (list {{.ModelName}}List, err error) {
+	w := orm.NewQueryWrapper({{.ModelName}}{})
+	w.Nested(where)
+	w.Order(orderBy...)
+	err = orm.Select(ctx, {{$packageAlias}}.Name, w, &list)
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+	return
+}
+
 func ({{.TableName|lowerFirst}}) FindOne(ctx context.Context, where orm.WhereWrapper, orderBy ...orm.Order) (ret {{.ModelName}}, found bool, err error) {
 	w := orm.NewQueryWrapper({{.ModelName}}{})
 	w.SetWhere(where).Order(orderBy...){{if .HasDeletedAt}}
@@ -249,6 +261,20 @@ func ({{.TableName|lowerFirst}}) FindOne(ctx context.Context, where orm.WhereWra
 		if e, ok := err.(errors.Error); ok && e.Code == errors.SystemError.DatabaseNoData.Code {
 			return ret, false, nil
 		}
+		log.Error(err)
+		return ret, false, err
+	}
+	return ret, true, nil
+}
+
+func ({{.TableName|lowerFirst}}) FindOneIncludeDeleted(ctx context.Context, where orm.WhereWrapper, orderBy ...orm.Order) (ret {{.ModelName}}, found bool, err error) {
+	w := orm.NewQueryWrapper({{.ModelName}}{})
+	w.SetWhere(where).Order(orderBy...)
+	err = orm.Select(ctx, {{$packageAlias}}.Name, w, &ret)
+	if err != nil {
+	if e, ok := err.(errors.Error); ok && e.Code == errors.SystemError.DatabaseNoData.Code {
+		return ret, false, nil
+	}
 		log.Error(err)
 		return ret, false, err
 	}

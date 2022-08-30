@@ -21,6 +21,7 @@ const (
 	ProtoTagAutoIncrement = ProtoTag("@auto-increment")
 	ProtoTagVersion       = ProtoTag("@version")
 	ProtoTagCheckSign     = ProtoTag("@check-sign")
+	ProtoTagCode          = ProtoTag("@code")
 )
 
 func (t ProtoTag) String() string {
