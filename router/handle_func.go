@@ -143,7 +143,7 @@ func (t *mainHandlerWrapper) process(ctx *Context, writeSuccess, writeFailed fun
 			}
 		}
 	}
-	in = append(in, reflect.ValueOf(requestParamInstanceValue))
+	in = append(in, requestParamInstanceValue)
 	responses := caller.Call(in)
 	if len(responses) == 0 {
 		log.Error("no response")
