@@ -25,7 +25,7 @@ func init() {
 			return
 		}
 		signTimestamp := ctx.GetTimestamp()
-		if time.Now().UnixMilli()-signTimestamp > int64(yc.SignExpiresInSeconds*1000) {
+		if time.Now().UnixNano()/int64(time.Millisecond)-signTimestamp > int64(yc.SignExpiresInSeconds*1000) {
 			log.Error("sign expired")
 			_, _ = ctx.ERROR(errors.SystemError.SignExpired)
 			ctx.Abort()
