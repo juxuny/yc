@@ -82,7 +82,15 @@ func GetBool(key string, defaultValue ...bool) bool {
 }
 
 func IsDebug() bool {
-	return GetString("MODE", "dev") != "prod"
+	return GetString("MODE", "prod") != "prod"
+}
+
+func IsLocal() bool {
+	return GetString("MODE", "prod") == "local"
+}
+
+func IsProd() bool {
+	return GetString("MODE", "prod") == "prod"
 }
 
 func GinRelease() bool {
