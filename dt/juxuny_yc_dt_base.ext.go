@@ -9,6 +9,9 @@ import (
 )
 
 func (m *ID) Clone() *ID {
+	if m == nil {
+		return nil
+	}
 	return proto.Clone(m).(*ID)
 }
 
@@ -74,7 +77,7 @@ func (m *ID) UnmarshalJSON(data []byte) error {
 	return err
 }
 
-func (m ID) MarshalJSON() (data []byte, err error) {
+func (m *ID) MarshalJSON() (data []byte, err error) {
 	if !m.Valid {
 		return []byte("null"), nil
 	}
