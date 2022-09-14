@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"crypto/md5"
 	"crypto/sha1"
 	"crypto/sha256"
 	"crypto/sha512"
@@ -74,4 +75,8 @@ func (t hashHelper) Sha512FromBytesToString(in ...[]byte) string {
 
 func (t hashHelper) Sha1FromBytesToString(in ...[]byte) string {
 	return t.sumFromBytesAsString(sha1.New(), in...)
+}
+
+func (t hashHelper) Md5(in ...string) string {
+	return t.sumFromStringAsString(md5.New(), in...)
 }

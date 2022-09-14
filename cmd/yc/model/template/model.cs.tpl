@@ -273,12 +273,13 @@ namespace {{.CSharpModelNamespace}}
             });
         }
 
-        public static int ResetSoftDeletedBy{{$item.FieldName|camelcase|upperFirst}}({{.CSharpDataType}} {{$item.FieldName|camelcase|lowerFirst}})
+        {{if $item.HasDeletedAt}}public static int ResetSoftDeletedBy{{$item.FieldName|camelcase|upperFirst}}({{.CSharpDataType}} {{$item.FieldName|camelcase|lowerFirst}})
         {
-            return UpdateBy{{$item.FieldName|camelcase|upperFirst}}({{$item.FieldName|camelcase|lowerFirst}}, new Dictionary{{.Lt}}Field, object{{.Gt}}() {
-                {TableDefinition.DeletedAt, 0 }
-            });
-        }
+            IUpdateWrapper w = CreateUpdate();
+            w.SetValue(TableDefinition.DeletedAt, 0);
+            w.Eq(TableDefinition.{{$item.FieldName|camelcase|upperFirst}}, {{$item.FieldName|camelcase|lowerFirst}}){{if $item.HasDeletedAt}}.Gt(TableDefinition.DeletedAt, 0){{end}};
+            return DatabaseHelper.Update(w);
+        }{{end}}
 
         public static List{{.Lt}}{{.ModelName}}{{.Gt}} PageBy{{$item.FieldName|camelcase|upperFirst}}({{.CSharpDataType}} {{$item.FieldName|camelcase|lowerFirst}}, int page, int pageSize, params OrderWrapper[] orders)
         {
