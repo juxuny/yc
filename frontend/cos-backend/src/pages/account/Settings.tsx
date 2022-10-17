@@ -5,14 +5,15 @@ import { Button, message } from 'antd';
 import { FormattedMessage } from '@@/plugin-locale/localeExports';
 import { ProForm, ProCard, ProFormText } from '@ant-design/pro-components';
 import type { ProFormInstance } from '@ant-design/pro-components';
+import type { ModifyPasswordRequest } from '@/services/api/typing';
 import {cos} from "@/services/api";
 
 export default (): React.ReactNode => {
   const intl = useIntl();
   const [loading, setLoading] = useState<number>(0);
-  const formRef = useRef<ProFormInstance<API.User.ModifyPasswordReq> | undefined>(undefined);
+  const formRef = useRef<ProFormInstance<ModifyPasswordRequest> | undefined>(undefined);
 
-  const savePassword = async (update: API.User.ModifyPasswordReq) => {
+  const savePassword = async (update: ModifyPasswordRequest) => {
     try {
       setLoading((v) => v + 1);
       await formRef.current?.validateFields();
@@ -31,7 +32,7 @@ export default (): React.ReactNode => {
   return (
     <PageContainer>
       <ProCard>
-        <ProForm<API.User.ModifyPasswordReq>
+        <ProForm<ModifyPasswordRequest>
           formRef={formRef}
           submitter={{
             render: () => {
@@ -42,7 +43,7 @@ export default (): React.ReactNode => {
                   loading={loading > 0}
                   onClick={async () =>
                     await savePassword(
-                      formRef.current?.getFieldsValue() || ({} as API.User.ModifyPasswordReq),
+                      formRef.current?.getFieldsValue() || ({} as ModifyPasswordRequest),
                     )
                   }
                 >

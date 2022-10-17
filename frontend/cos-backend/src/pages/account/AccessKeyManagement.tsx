@@ -13,13 +13,14 @@ import {ColumnBuilder} from "@/utils/column_builder";
 import {Formatter} from "@/utils/formatter";
 import RemarkPopoverEditor from "@/pages/account/component/RemarkPopoverEditor";
 import { cos } from '@/services/api';
-import type { AccessKeyListRequest, AccessKeyItem, DeleteAccessKeyRequest, UpdateStatusAccessKeyRequest} from '@/services/api/typing';
+import type { AccessKeyListRequest, AccessKeyItem, DeleteAccessKeyRequest, UpdateStatusAccessKeyRequest, CreateAccessKeyRequest} from '@/services/api/typing';
+import type {QueryParams} from "@juxuny/yc-ts-data-type/typing";
 
 export default (): React.ReactNode => {
   const intl = useIntl();
   const actionRef = useRef<ActionType>();
   const loadData = async (
-    params: API.QueryParams<AccessKeyListRequest>,
+    params: QueryParams<AccessKeyListRequest>,
   ): Promise<{ data: AccessKeyItem[]; success: boolean; total: number }> => {
     const {current, pageSize, ...args} = params;
     const resp = await cos.accessKeyList({
@@ -35,10 +36,10 @@ export default (): React.ReactNode => {
 
   const [editVisible, setEditVisible] = useState(false);
   const [visibleAccessKeyId, setVisibleAccessKeyId] = useState<string | number | undefined>();
-  const [selectedUserData, setSelectedUserData] = useState<API.User.CreateAccessKeyReq | undefined>(undefined);
+  const [selectedUserData, setSelectedUserData] = useState<CreateAccessKeyRequest | undefined>(undefined);
   const [createResult, setCreateResult] = useState<CreateResult | undefined>(undefined);
 
-  const showEditor = (userData: API.User.CreateAccessKeyReq) => {
+  const showEditor = (userData: CreateAccessKeyRequest) => {
     setEditVisible(true);
     setSelectedUserData(userData);
   };
@@ -174,7 +175,7 @@ export default (): React.ReactNode => {
             type="primary"
             onClick={() => {
               showEditor(
-                {} as API.User.AccessKeyListItem
+                {} as AccessKeyItem
               );
             }}
           >
