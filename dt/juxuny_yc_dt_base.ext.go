@@ -198,6 +198,11 @@ func (m *NullBool) UnmarshalJSON(data []byte) error {
 		m.Valid = false
 		return nil
 	}
+	if input == "true" {
+		m.Valid = true
+		m.Bool = true
+		return nil
+	}
 	value, err := strconv.ParseBool(input)
 	if err != nil {
 		return err
