@@ -11,4 +11,4 @@ FROM alpine:3.8
 RUN apk add --no-cache ca-certificates tzdata && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 WORKDIR /app
 COPY --from=builder /src/services/cos/server/app /app/entrypoint
-ENTRYPOINT /app/entrypoint
+ENTRYPOINT /app/entrypoint serve
