@@ -111,6 +111,13 @@ namespace {{.CSharpModelNamespace}}
             return DatabaseHelper.Query{{.Lt}}{{.ModelName}}{{.Gt}}(w);
         }
 
+        public static List{{.Lt}}{{.ModelName}}{{.Gt}} FindWithDeletedAdvanced(IWhereWrapper where, params OrderWrapper[] orders)
+        {
+            IQueryWrapper w = CreateQuery();
+            w.SelectAll().Order(orders).SetWhere(where);
+            return DatabaseHelper.Query{{.Lt}}{{.ModelName}}{{.Gt}}(w);
+        }
+
         public static List{{.Lt}}{{.ModelName}}{{.Gt}} FindAdvanced(IWhereWrapper where, int skip, int length, params OrderWrapper[] orders)
         {
             IQueryWrapper w = CreateQuery();
