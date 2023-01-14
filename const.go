@@ -1,6 +1,6 @@
 package yc
 
-const Version = "v0.0.1"
+const Version = "v0.0.2"
 
 type SignMethod string
 

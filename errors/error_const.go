@@ -59,6 +59,9 @@ var SystemError = struct {
 	SignError                          Error `code:"-10055" msg:"sign error"`
 	InvalidSignMethod                  Error `code:"-10056" msg:"invalid sign method"`
 	SignExpired                        Error `code:"-10057" msg:"sign expired"`
+	FsError                            Error `code:"-10058" msg:"file system error"`
+	FsWriteError                       Error `code:"-10059" msg:"write file error"`
+	FsExtractError                     Error `code:"-10060" msg:"extract file error"`
 }{}
 
 func init() {

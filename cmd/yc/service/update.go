@@ -32,6 +32,7 @@ func (t *UpdateCommand) BeforeRun(cmd *cobra.Command) {
 	if Env.YcHome == "" {
 		log.Fatal("missing environment YC_HOME")
 	}
+	prepareGrpc()
 }
 
 func (t *UpdateCommand) Prepare(cmd *cobra.Command) {
@@ -63,6 +64,10 @@ func (t *UpdateCommand) Run() {
 	t.genRpc(service)
 	t.genExtend(service)
 	t.fmt()
+}
+
+func (t *UpdateCommand) getServiceAbsoluteDir(serviceDirName string) string {
+	return path.Join(t.WorkDir, "..", "..", serviceDirName)
 }
 
 func (t *UpdateCommand) getServiceEntity() services.ServiceEntity {
@@ -140,11 +145,12 @@ func (t *UpdateCommand) getServiceName() string {
 }
 
 func (t *UpdateCommand) initEnvConfig(service services.ServiceEntity) error {
-	configDir := path.Join(t.WorkDir, "config")
+	serviceAbsoluteDir := t.getServiceAbsoluteDir(service.ServiceDir)
+	configDir := path.Join(serviceAbsoluteDir, "config")
 	if err := utils.TouchDir(configDir, 0755); err != nil {
 		log.Fatal(err)
 	}
-	outEnvFile := path.Join(t.WorkDir, "config", "env.go")
+	outEnvFile := path.Join(serviceAbsoluteDir, "config", "env.go")
 	if _, err := os.Stat(outEnvFile); os.IsNotExist(err) {
 		if err := template.RunEmbedFile(templateFs, envConfigFileName, outEnvFile, service); err != nil {
 			log.Fatal("create env.go failed:", err)
@@ -279,16 +285,17 @@ func (t *UpdateCommand) genHandler(service services.ServiceEntity, svc []*parser
 	}
 	log.Println("module name:", moduleName)
 	// create default
-	if err := utils.TouchDir(path.Join(t.WorkDir, "handler"), 0755); err != nil {
+	serviceDir := path.Join(t.WorkDir, "..", "..", service.ServiceDir)
+	if err := utils.TouchDir(path.Join(serviceDir, "handler"), 0755); err != nil {
 		log.Fatal(err)
 	}
 	handlerEntity := services.HandlerInitEntity{
 		ServiceEntity: service,
 		GoModuleName:  moduleName,
 	}
-	handlerDefaultOutputFile := path.Join(t.WorkDir, "handler", "default.go")
+	handlerDefaultOutputFile := path.Join(serviceDir, "handler", "default.go")
 	if _, err := os.Stat(handlerDefaultOutputFile); os.IsNotExist(err) {
-		if err := template.RunEmbedFile(templateFs, handlerDefaultFileName, path.Join(t.WorkDir, "handler", "default.go"), handlerEntity); err != nil {
+		if err := template.RunEmbedFile(templateFs, handlerDefaultFileName, path.Join(serviceDir, "handler", "default.go"), handlerEntity); err != nil {
 			log.Fatal(err)
 		}
 	}
@@ -331,24 +338,26 @@ func (t *UpdateCommand) genHandler(service services.ServiceEntity, svc []*parser
 }
 
 func (t *UpdateCommand) checkOrInitMethodGroupFile(group string, handlerInitEntity services.HandlerInitEntity) {
+	serviceAbsoluteDir := t.getServiceAbsoluteDir(handlerInitEntity.ServiceDir)
 	methodGroupFileName := t.getMethodFileNameFromGroup(group)
-	stat, err := os.Stat(path.Join(t.WorkDir, "handler", methodGroupFileName))
+	stat, err := os.Stat(path.Join(serviceAbsoluteDir, "handler", methodGroupFileName))
 	if err == nil {
 		if stat.IsDir() {
 			log.Fatalf("'%s' cannot be a directory", methodGroupFileName)
 		}
 		return
 	}
-	if err := template.RunEmbedFile(templateFs, handlerMethodInitFileName, path.Join(t.WorkDir, "handler", methodGroupFileName), handlerInitEntity); err != nil {
+	if err := template.RunEmbedFile(templateFs, handlerMethodInitFileName, path.Join(serviceAbsoluteDir, "handler", methodGroupFileName), handlerInitEntity); err != nil {
 		log.Fatal("init method group file failed:", err)
 	}
 }
 func (t *UpdateCommand) checkOrAppendMethod(group string, method services.MethodEntity) {
+	serviceAbsoluteDir := t.getServiceAbsoluteDir(method.ServiceDir)
 	methodGroupFileName := t.getMethodFileNameFromGroup(group)
-	if found, err := t.checkIfContainMethod(path.Join(t.WorkDir, "handler", methodGroupFileName), group, method); err != nil {
+	if found, err := t.checkIfContainMethod(path.Join(serviceAbsoluteDir, "handler", methodGroupFileName), group, method); err != nil {
 		log.Fatalf("create method %s failed: %v", method.MethodName, err)
 	} else if !found {
-		if err := template.AppendFromEmbedFile(templateFs, handlerMethodFuncFileName, path.Join(t.WorkDir, "handler", methodGroupFileName), method); err != nil {
+		if err := template.AppendFromEmbedFile(templateFs, handlerMethodFuncFileName, path.Join(serviceAbsoluteDir, "handler", methodGroupFileName), method); err != nil {
 			log.Fatal("create rpc method failed:", err)
 		}
 	}

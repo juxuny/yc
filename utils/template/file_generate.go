@@ -4,6 +4,7 @@ import (
 	"embed"
 	"github.com/juxuny/yc/errors"
 	"html/template"
+	"io/ioutil"
 	"os"
 )
 
@@ -58,4 +59,17 @@ func AppendFromEmbedFile(fs embed.FS, templateFileName string, outputFileName st
 	}()
 	return tpl.Execute(out, data)
 
+}
+
+// SaveEmbedFileAs save embed file to a specified path
+func SaveEmbedFileAs(fs embed.FS, fileName string, outputFileName string) error {
+	buf, err := fs.ReadFile(fileName)
+	if err != nil {
+		return errors.SystemError.FsReadTemplateDataFailed.Wrap(err)
+	}
+	err = ioutil.WriteFile(outputFileName, buf, 0666)
+	if err != nil {
+		return errors.SystemError.FsWriteError.Wrap(err)
+	}
+	return nil
 }
