@@ -246,9 +246,10 @@ func (t *UpdateCommand) genService(service services.ServiceEntity, svc []*parser
 			log.Fatal("create default config failed:", err)
 		}
 	}
+	serviceAbsoluteDir := t.getServiceAbsoluteDir(service.ServiceDir)
 	if err := utils.TouchDirs([]string{
-		path.Join(t.WorkDir, "server"),
-		path.Join(t.WorkDir, "server", "http"),
+		path.Join(serviceAbsoluteDir, "server"),
+		path.Join(serviceAbsoluteDir, "server", "http"),
 	}, 0755); err != nil {
 		log.Fatal(err)
 	}
@@ -256,18 +257,23 @@ func (t *UpdateCommand) genService(service services.ServiceEntity, svc []*parser
 	if err != nil {
 		log.Fatal(err)
 	}
-	if err := template.RunEmbedFile(templateFs, httpServerFileName, path.Join(t.WorkDir, "server", "http", "http_server.go"), services.EntrypointEntity{
-		ServiceEntity:  service,
-		GoModuleName:   moduleName,
-		OpenApiList:    t.getOpenApiList(svc),
-		IgnoreAuthList: t.getIgnoreAuthMethodList(svc),
+	serviceModuleName, err := utils.GetCurrentPackageName(serviceAbsoluteDir)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	if err := template.RunEmbedFile(templateFs, httpServerFileName, path.Join(serviceAbsoluteDir, "server", "http", "http_server.go"), services.EntrypointEntity{
+		ServiceEntity:     service,
+		GoModuleName:      moduleName,
+		ServiceModuleName: serviceModuleName,
+		OpenApiList:       t.getOpenApiList(svc),
+		IgnoreAuthList:    t.getIgnoreAuthMethodList(svc),
 	}); err != nil {
 		log.Fatal(err)
 	}
 
 	// init main.go
 	log.Println("create main file")
-	outMainFile := path.Join(t.WorkDir, "server", "main.go")
+	outMainFile := path.Join(serviceAbsoluteDir, "server", "main.go")
 	if _, err := os.Stat(outMainFile); os.IsNotExist(err) {
 		if err := template.RunEmbedFile(templateFs, mainFileName, outMainFile, services.EntrypointEntity{
 			ServiceEntity: service,

@@ -26,8 +26,9 @@ func (baseEntity) Ge() template.HTML {
 
 type ServiceEntity struct {
 	baseEntity
-	ServiceName   string
-	PackageName   string
+	ServiceName string
+	PackageName string
+
 	ServiceStruct string
 	ServiceDir    string
 	// ProtoFileName is base file name, without file extension
@@ -97,9 +98,10 @@ type MethodEntity struct {
 type EntrypointEntity struct {
 	baseEntity
 	ServiceEntity
-	GoModuleName   string
-	IgnoreAuthList []string
-	OpenApiList    []string
+	GoModuleName      string
+	ServiceModuleName string
+	IgnoreAuthList    []string
+	OpenApiList       []string
 }
 
 type ModelField struct {
